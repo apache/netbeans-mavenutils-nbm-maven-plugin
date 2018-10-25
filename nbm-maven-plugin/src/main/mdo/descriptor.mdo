@@ -22,7 +22,7 @@ under the License.
     <defaults>
         <default>
             <key>package</key>
-            <value>org.codehaus.mojo.nbm.model</value>
+            <value>org.apache.netbeans.nbm.model</value>
         </default>
     </defaults>
     <classes>
