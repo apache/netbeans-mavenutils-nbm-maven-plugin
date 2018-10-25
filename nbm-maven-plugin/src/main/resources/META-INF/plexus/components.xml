@@ -73,13 +73,13 @@ under the License.
         <phases>
           <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
           <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-          <process-classes>org.codehaus.mojo:nbm-maven-plugin:manifest</process-classes>
+          <process-classes>org.netbeans.maven:nbm-maven-plugin:manifest</process-classes>
           <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
           <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
           <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
           <package>org.apache.maven.plugins:maven-jar-plugin:jar, 
-                   org.codehaus.mojo:nbm-maven-plugin:branding,
-                   org.codehaus.mojo:nbm-maven-plugin:nbm
+                   org.netbeans.maven:nbm-maven-plugin:branding,
+                   org.netbeans.maven:nbm-maven-plugin:nbm
           </package>
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
           <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
@@ -95,7 +95,7 @@ under the License.
         <phases>
           <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
           <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-          <package>org.codehaus.mojo:nbm-maven-plugin:cluster-app,org.codehaus.mojo:nbm-maven-plugin:standalone-zip</package>
+          <package>org.netbeans.maven:nbm-maven-plugin:cluster-app,org.netbeans.maven:nbm-maven-plugin:standalone-zip</package>
           <integration-test>org.apache.maven.plugins:maven-surefire-plugin:test</integration-test>
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
           <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
