@@ -29,5 +29,5 @@
 
 ### Reporting Bugs
 
-Bugs should be reported to https://issues.apache.org/jira/projects/NETBEANS/issues/ using the component **maveutilities**
+Bugs should be reported to https://issues.apache.org/jira/projects/NETBEANS/issues/ using the component **mavenutilities**
 
