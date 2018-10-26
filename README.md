@@ -21,4 +21,13 @@
 
 # Apache NetBeans Maven Utilities
 
+### Get In Touch
+
+[Subscribe](mailto:users-subscribe@netbeans.incubator.apache.org) or [mail](mailto:users@netbeans.incubator.apache.org) the [users@netbeans.incubator.apache.org](mailto:users@netbeans.incubator.apache.org) list - Ask questions, find answers, and also help other users.
+
+[Subscribe](mailto:dev-subscribe@netbeans.incubator.apache.org) or [mail](mailto:dev@netbeans.incubator.apache.org) the [dev@netbeans.incubator.apache.org](mailto:dev@netbeans.incubator.apache.org) list - Join developement discussions, propose new ideas and connect with contributors.
+
+### Reporting Bugs
+
+Bugs should be reported to https://issues.apache.org/jira/projects/NETBEANS/issues/ using the component **maveutilities**
 
