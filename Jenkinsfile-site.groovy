@@ -60,7 +60,7 @@ pipeline {
                     echo 'Adding content...'
                     sshagent (credentials: ['9b041bd0-aea9-4498-a576-9eeb771411dd']) {
                         sh 'git add -v .'
-                        sh 'git commit -v -m "Automated site publishing by Jenkins build ${BUILD_NUMBER}'
+                        sh 'git commit -v -m "Automated site publishing by Jenkins build ${BUILD_NUMBER}"'
                         sh 'git push -v origin asf-site'
                     }                 
                 }
