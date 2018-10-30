@@ -1,0 +1,128 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>21</version>
+    </parent>
+    <groupId>org.netbeans.maven</groupId>
+    <artifactId>utilities-parent</artifactId>
+    <version>1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Apache Netbeans Maven Utilties</name>
+    <description>Apache Netbeans Maven Utilities is a set of artefacts to build and populate Apache NetBeans artefacts using Apache Maven</description>
+    <url>http://netbeans.apache.org/mavenutilities/parent</url> 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <issueManagement>
+        <system>jira</system>
+        <url>https://issues.apache.org/jira/projects/NETBEANS</url>
+    </issueManagement>
+    <mailingLists>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Users List</name>
+            <subscribe>users-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>users-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:users@netbeans.incubator.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/netbeans-users/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Dev List</name>
+            <subscribe>dev-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:dev@netbeans.incubator.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/netbeans-dev/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) NetCAT List</name>
+            <subscribe>netcat-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>netcat-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:netcat@netbeans.incubator.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/netbeans-netcat/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Announcements List</name>
+            <subscribe>announce-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>announce-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:announce@netbeans.incubator.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/netbeans-announce/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Commits List</name>
+            <subscribe>commits-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:commits@netbeans.incubator.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/netbeans-commits/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Notifications List</name>
+            <subscribe>notifications-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>notifications-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:notifications@netbeans.incubator.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/netbeans-notifications/</archive>
+        </mailingList>
+    </mailingLists>
+    <scm>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/incubator-netbeans-mavenutils.git</connection>
+        <developerConnection>scm:git:gitbox.apache.org/repos/asf/incubator-netbeans-mavenutils.git</developerConnection>
+        <url>https://github.com/apache/incubator-netbeans-mavenutils</url>
+    </scm>
+    <dependencyManagement>
+        <dependencies>
+            <dependency> 
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>animal-sniffer-maven-plugin</artifactId>
+                    <version>1.17</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-changes-plugin</artifactId>
+                    <version>2.12.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <configuration>
+                        <configLocation>config/maven_checks.xml</configLocation>
+                        <headerLocation>config/maven-header.txt</headerLocation>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.shared</groupId>
+                            <artifactId>maven-shared-resources</artifactId>
+                            <version>2</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jxr-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>3.10.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-linkcheck-plugin</artifactId>
+                    <version>1.2</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
