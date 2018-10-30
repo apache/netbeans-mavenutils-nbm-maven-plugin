@@ -35,6 +35,19 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/asf-site']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'MessageExclusion', excludedMessage: 'Automated site publishing.*'], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'asf-site-branch']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '9b041bd0-aea9-4498-a576-9eeb771411dd', url: 'https://gitbox.apache.org/repos/asf//incubator-netbeans-mavenutils/']]])
             }
         }
+        stage('Prepare Publish Site'){ 
+            agent {label 'git-websites'}
+            steps {
+                dir('asf-site-branch') {
+                    echo 'Adding content...'
+                    sshagent (credentials: ['9b041bd0-aea9-4498-a576-9eeb771411dd']) {
+                        sh 'git checkout asf-site'
+                        sh 'git fetch origin asf-site'
+                        sh 'git pull origin asf-site'
+                    }                 
+                }
+            }
+        }
         stage('Build Site'){ 
             agent {label 'git-websites'}
             steps {
