@@ -48,7 +48,7 @@
             <li> <a href="../shared/index.html">Shared</a> </li>
 #* *##end
 #* *##if ($project.artifactId == 'utilities-parent')
-            <li> <strong $stylecompensate>Shared</strong> </li>
+            <li> <strong $stylecompensate>Parent</strong> </li>
 #* *##else
             <li> <a href="../parent/index.html">Parent</a> </li>
 #* *##end
