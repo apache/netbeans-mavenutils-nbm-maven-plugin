@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="no-js" lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Apache NetBeans Maven Utilities - NBM Maven Plugin &#x2013; nbm:branding</title>
+  <link rel="stylesheet" href="./css/netbeans.css" />
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">   
+</head>
+<body>
+<div class="top-bar" id="responsive-menu">
+    <div class='top-bar-left'>
+        <a class='title' href="http://netbeans.apache.org"><img src='/images/apache-netbeans.svg' style='padding: 8px; height: 48px;'>Apache NetBeans (incubating)</a>
+    </div>
+    <div class="top-bar-right">
+        <ul class="vertical medium-horizontal menu" style="right: 90px;" data-responsive-menu="drilldown medium-dropdown">
+            <li> <a href="../nb-repository/index.html">NB Repository Plugin</a> </li>
+            <li> <strong style='line-height: 1;margin-bottom: 0;padding: 0.7rem 1rem;display: block;' >NBM Plugin</strong> </li>
+            <li> <a href="../shared/index.html">Shared</a> </li>
+            <li> <a href="../parent/index.html">Parent</a> </li>
+        </ul>
+    </div>
+</div>
+<div class='grid-container main-content'>
+            <div id="toc" class="toc">
+<div id="toctitle">Overview</div>
+<ul class="sectlevel1">
+<li><a href="index.html">Usage</a></li>
+<li><a href="plugin-info.html">Plugin Goals</a></li>
+</ul>
+<div id="toctitle">HOWTOs</div>
+<ul class="sectlevel1">
+<li><a href="buildinstexample.html">Customize installers</a></li>
+<li><a href="upgrade.html">Upgrade from older versions</a></li>
+</ul>
+<div id="toctitle">Deprecated</div>
+<ul class="sectlevel1">
+<li><a href="nbm.html">Descriptor Format</a></li>
+<li><a href="descriptor.html">Example Descriptor</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+
+  
+    <div class="section">
+<h2><a name="nbm:branding"></a>nbm:branding</h2>
+      
+<p><b>Full name</b>:</p>
+      
+<p>org.netbeans.maven:nbm-maven-plugin:4.2-SNAPSHOT:branding</p>
+      
+<p><b>Description</b>:</p>
+      
+<div>Package branding resources for NetBeans platform/IDE based
+application. The format of branding resources is the same as in
+NetBeans Ant-based projects. The <tt>src/main/nbm-branding</tt>
+folder of the project is assumed to contain the branding content.
+Within the directory, the following folder structure is assumed: 
+
+<ul>
+
+<li>1. pick the IDE/platform module which contents you want to
+brand. eg. org-openide-windows.jar</li>
+
+<li>2. locate the jar within the IDE/platform installation and it's
+cluster, eg. modules/org-openide-windows.jar</li>
+
+<li>3. create the same folder structure in src/main/nbm-branding,
+make folder with the module's jar name as well. eg. create folder
+by name modules/org-openide-windows.jar</li>
+
+<li>4. within that folder place your branding modifications at the
+same location, as if they were withn the jar, eg.
+org/openide/windows/ui/Bundle.properties and place the changed
+bundle keys there.</li>
+</ul></div>
+      
+<p><b>Attributes</b>:</p>
+      
+<ul>
+        
+<li>Requires a Maven project to be executed.</li>
+        
+<li>Binds by default to the <a class="externalLink" href="http://maven.apache.org/ref/current/maven-core/lifecycles.html">lifecycle phase</a>: <tt>package</tt>.</li>
+      </ul>
+      
+<div class="section">
+<h3><a name="Required_Parameters"></a>Required Parameters</h3>
+        
+<table class="bodyTable" border="0">
+          
+<tr class="a">
+            
+<th>Name</th>
+            
+<th>Type</th>
+            
+<th>Since</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#brandingSources">brandingSources</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>Location of the branded resources.<br /><b>Default value is</b>: <tt>${basedir}/src/main/nbm-branding</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#cluster">cluster</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>cluster of the branding.<br /><b>Default value is</b>: <tt>extra</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#nbmBuildDir">nbmBuildDir</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>directory where the the binary content is created.<br /><b>Default value is</b>: <tt>${project.build.directory}/nbm</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#outputDirectory">outputDirectory</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>output directory.<br /><b>Default value is</b>: <tt>${project.build.directory}</tt>.<br /></td>
+          </tr>
+        </table>
+      </div>
+      
+<div class="section">
+<h3><a name="Optional_Parameters"></a>Optional Parameters</h3>
+        
+<table class="bodyTable" border="0">
+          
+<tr class="a">
+            
+<th>Name</th>
+            
+<th>Type</th>
+            
+<th>Since</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#brandingToken">brandingToken</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>The branding token used by the application. Required unless
+<tt>nbmBuildDir</tt> does not exist and the mojo is thus
+skipped.<br /><b>User property is</b>: <tt>netbeans.branding.token</tt>.<br /></td>
+          </tr>
+        </table>
+      </div>
+      
+<div class="section">
+<h3><a name="Parameter_Details"></a>Parameter Details</h3>
+        
+<p><b><a name="brandingSources">brandingSources</a>:</b></p>
+        
+<div>Location of the branded resources.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.io.File</tt></li>
+          
+<li><b>Required</b>: <tt>Yes</tt></li>
+          
+<li><b>Default</b>: <tt>${basedir}/src/main/nbm-branding</tt></li>
+        </ul><hr />
+<p><b><a name="brandingToken">brandingToken</a>:</b></p>
+        
+<div>The branding token used by the application. Required unless
+<tt>nbmBuildDir</tt> does not exist and the mojo is thus
+skipped.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>netbeans.branding.token</tt></li>
+        </ul><hr />
+<p><b><a name="cluster">cluster</a>:</b></p>
+        
+<div>cluster of the branding.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>Yes</tt></li>
+          
+<li><b>Default</b>: <tt>extra</tt></li>
+        </ul><hr />
+<p><b><a name="nbmBuildDir">nbmBuildDir</a>:</b></p>
+        
+<div>directory where the the binary content is created.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.io.File</tt></li>
+          
+<li><b>Required</b>: <tt>Yes</tt></li>
+          
+<li><b>Default</b>: <tt>${project.build.directory}/nbm</tt></li>
+        </ul><hr />
+<p><b><a name="outputDirectory">outputDirectory</a>:</b></p>
+        
+<div>output directory.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.io.File</tt></li>
+          
+<li><b>Required</b>: <tt>Yes</tt></li>
+          
+<li><b>Default</b>: <tt>${project.build.directory}</tt></li>
+        </ul>
+      </div>
+    </div>
+  
+
+</div>
+</div>
+</div>
+<div class='grid-container incubator-area' style='margin-top: 64px'>
+    <div class='grid-x grid-padding-x'>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/">
+                <img style="width: 320px" title="Apache Software Foundation" src="/images/asf_logo_wide.svg" />
+            </a>
+        </div>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/events/current-event.html">
+               <img style="width:234px; height: 60px;" title="Apache Software Foundation current event" src="https://www.apache.org/events/current-event-234x60.png"/>
+            </a>
+        </div>
+    </div>
+</div>
+<div class='footer-disclaimer'>
+    <div class="footer-disclaimer-content">
+        <p>Copyright &copy; 2017-2018 <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+        <p>Licensed under the Apache <a href="https://www.apache.org/licenses/">license</a>, version 2.0</p>
+        <p><a href="https://incubator.apache.org/" alt="Apache Incubator"><img src='/images/incubator_feather_egg_logo_bw_crop.png' title='Apache Incubator'></img></a></p>
+        <div style='max-width: 40em; margin: 0 auto'>
+            <p>Apache NetBeans is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.</p>
+            <p>Apache Incubator, Apache, the Apache feather logo, the Apache NetBeans logo, and the Apache Incubator project logo are trademarks of <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+            <p>Oracle and Java are registered trademarks of Oracle and/or its affiliates.</p>
+        </div>
+        
+    </div>
+</div>
+<a href="https://github.com/apache/incubator-netbeans-mavenutils"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+
+
+
+        <script src="/js/vendor/jquery-3.2.1.min.js"></script>
+        <script src="/js/vendor/what-input.js"></script>
+        <script src="/js/vendor/jquery.colorbox-min.js"></script>
+        <script src="/js/vendor/foundation.min.js"></script>
+        <script src="/js/netbeans.js"></script>
+        <script>
+            
+            $(function(){ $(document).foundation(); });
+        </script>
+</body>

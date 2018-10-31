@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html class="no-js" lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Apache NetBeans Maven Utilities - NB Repository Plugin &#x2013; Tag List report</title>
+  <link rel="stylesheet" href="./css/netbeans.css" />
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">   
+</head>
+<body>
+<div class="top-bar" id="responsive-menu">
+    <div class='top-bar-left'>
+        <a class='title' href="http://netbeans.apache.org"><img src='/images/apache-netbeans.svg' style='padding: 8px; height: 48px;'>Apache NetBeans (incubating)</a>
+    </div>
+    <div class="top-bar-right">
+        <ul class="vertical medium-horizontal menu" style="right: 90px;" data-responsive-menu="drilldown medium-dropdown">
+            <li> <strong style='line-height: 1;margin-bottom: 0;padding: 0.7rem 1rem;display: block;' >NB Repository Plugin</strong> </li>
+            <li> <a href="../nbm-maven-plugin/index.html">NBM Plugin</a> </li>
+            <li> <a href="../shared/index.html">Shared</a> </li>
+            <li> <a href="../parent/index.html">Parent</a> </li>
+        </ul>
+    </div>
+</div>
+<div class='grid-container main-content'>
+            <div id="toc" class="toc">
+<div id="toctitle">Overview</div>
+<ul class="sectlevel1">
+<li><a href="index.html">Usage</a></li>
+<li><a href="plugin-info.html">Plugin Goals</a></li>
+</ul>
+<div id="toctitle">HOWTOs</div>
+<ul class="sectlevel1">
+<li><a href="repository.html">Populate repository</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="section">
+<h2><a name="Tag_List_Report"></a>Tag List Report</h2>
+<p>The following document contains the listing of user tags found in the code. Below is the summary of the occurrences per tag.</p>
+<table border="0" class="bodyTable">
+<tr class="a">
+<th>Tag Class</th>
+<th>Total number of occurrences</th>
+<th>Tag strings used by tag class</th></tr>
+<tr class="b">
+<td>@todo</td>
+<td>0</td>
+<td>@todo</td></tr>
+<tr class="a">
+<td><a href="#tag_class_2">TODO</a></td>
+<td>4</td>
+<td>TODO</td></tr></table>
+<p>Each tag is detailed below:</p>
+<div class="section">
+<h3><a name="TODO"></a><a name="tag_class_2">TODO</a></h3>
+<p><b>Number of occurrences found in the code: 4</b></p>
+<table border="0" class="bodyTable">
+<tr class="b">
+<th>org.netbeans.nbm.repository.PopulateRepositoryMojo</th>
+<th>Line</th></tr>
+<tr class="a">
+<td>get artifact id from the module's manifest?</td>
+<td><a href="./xref/org/netbeans/nbm/repository/PopulateRepositoryMojo.html#365">365</a></td></tr>
+<tr class="b">
+<td>install exception that does not give a trace</td>
+<td><a href="./xref/org/netbeans/nbm/repository/PopulateRepositoryMojo.html#719">719</a></td></tr>
+<tr class="a">
+<th>org.netbeans.nbm.repository.PopulateRepositoryMojoTest</th>
+<th>Line</th></tr>
+<tr class="b">
+<td>how is this done on maven3? PopulateRepositoryMojo mojo = ( PopulateRepositoryMojo ) lookupMojo( &quot;populate&quot;, new File( getBasedir(), &quot;src/test/resources/PopulateMojoTest.xml&quot; ) ); File repo = new File( System.getProperty( &quot;java.io.tmpdir&quot; ), &quot;PopulateRepositoryMojoTest&quot; ); FileUtils.deleteDirectory( repo ); mojo.localRepository = new DefaultArtifactRepository( &quot;test&quot;, repo.toURI().toString(), new DefaultRepositoryLayout() ); Artifact art1 = mojo.createArtifact( &quot;testarg&quot;, &quot;1.0&quot;, &quot;testgrp&quot; ); File f = File.createTempFile( &quot;PopulateRepositoryMojoTest&quot;, &quot;.nbm&quot; ); f.deleteOnExit(); Artifact art2 = mojo.createAttachedArtifact( art1, f, &quot;nbm-file&quot;, null ); assertEquals( &quot;nbm&quot;, art2.getArtifactHandler().getExtension() );</td>
+<td><a href="./xref-test/org/netbeans/nbm/repository/PopulateRepositoryMojoTest.html#41">41</a></td></tr>
+<tr class="a">
+<td>does not work because of missing session //        mojo.install( f, art2 ); //        assertTrue( new File( repo, &quot;testgrp/testarg/1.0/testarg-1.0.nbm&quot; ).isFile() ); //        assertFalse( new File( repo, &quot;testgrp/testarg/1.0/testarg-1.0.jar&quot; ).isFile() );</td>
+<td><a href="./xref-test/org/netbeans/nbm/repository/PopulateRepositoryMojoTest.html#51">51</a></td></tr></table></div></div>
+</div>
+</div>
+</div>
+<div class='grid-container incubator-area' style='margin-top: 64px'>
+    <div class='grid-x grid-padding-x'>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/">
+                <img style="width: 320px" title="Apache Software Foundation" src="/images/asf_logo_wide.svg" />
+            </a>
+        </div>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/events/current-event.html">
+               <img style="width:234px; height: 60px;" title="Apache Software Foundation current event" src="https://www.apache.org/events/current-event-234x60.png"/>
+            </a>
+        </div>
+    </div>
+</div>
+<div class='footer-disclaimer'>
+    <div class="footer-disclaimer-content">
+        <p>Copyright &copy; 2017-2018 <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+        <p>Licensed under the Apache <a href="https://www.apache.org/licenses/">license</a>, version 2.0</p>
+        <p><a href="https://incubator.apache.org/" alt="Apache Incubator"><img src='/images/incubator_feather_egg_logo_bw_crop.png' title='Apache Incubator'></img></a></p>
+        <div style='max-width: 40em; margin: 0 auto'>
+            <p>Apache NetBeans is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.</p>
+            <p>Apache Incubator, Apache, the Apache feather logo, the Apache NetBeans logo, and the Apache Incubator project logo are trademarks of <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+            <p>Oracle and Java are registered trademarks of Oracle and/or its affiliates.</p>
+        </div>
+        
+    </div>
+</div>
+<a href="https://github.com/apache/incubator-netbeans-mavenutils"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+
+
+
+        <script src="/js/vendor/jquery-3.2.1.min.js"></script>
+        <script src="/js/vendor/what-input.js"></script>
+        <script src="/js/vendor/jquery.colorbox-min.js"></script>
+        <script src="/js/vendor/foundation.min.js"></script>
+        <script src="/js/netbeans.js"></script>
+        <script>
+            
+            $(function(){ $(document).foundation(); });
+        </script>
+</body>
