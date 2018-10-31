@@ -51,7 +51,17 @@ pipeline {
         stage('Build Site'){ 
             agent {label 'git-websites'}
             steps {
-                
+                // build site skin
+                script {
+                    def mvnfoldersforsite  = ['parent','webskin']
+                    def BASEDIR = pwd()
+                    for (String mvnproject in mvnfoldersforsite) {
+                        dir('master-branch/'+mvnproject) {
+                            sh "mvn clean install -Dmaven.repo.local=${BASEDIR}/.repository"
+                        }
+                    }
+                }
+                // build site
                 script {
                     def mvnfoldersforsite  = ['parent','nbm-shared','nb-repository-plugin',/*'nbm-maven-harness',*/ 'nbm-maven-plugin']
                     def BASEDIR = pwd()
