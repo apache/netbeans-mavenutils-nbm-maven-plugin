@@ -68,6 +68,7 @@ pipeline {
                     for (String mvnproject in mvnfoldersforsite) {
                         dir('master-branch/'+mvnproject) {
                             sh "mvn clean install site -Dmaven.repo.local=${BASEDIR}/.repository"
+                            sh "rm -rf ${BASEDIR}/asf-site-branch/${mvnproject}"
                             sh "mv target/site ${BASEDIR}/asf-site-branch/${mvnproject}/"
                         }
                     }
