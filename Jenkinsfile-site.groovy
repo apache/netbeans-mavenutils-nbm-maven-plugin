@@ -44,7 +44,9 @@ pipeline {
                         sh 'git checkout asf-site'
                         sh 'git fetch origin asf-site'
                         sh 'git pull origin asf-site'
-                        sh "rm -rf content/mavenutils/"
+                        // remove mavenutils git will see what change later
+                        sh 'rm -rf content/mavenutils/'
+                        sh 'mkdir -p content/mavenutils'
                     }                 
                 }
             }
