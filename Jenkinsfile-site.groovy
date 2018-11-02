@@ -44,6 +44,7 @@ pipeline {
                         sh 'git checkout asf-site'
                         sh 'git fetch origin asf-site'
                         sh 'git pull origin asf-site'
+                        sh "rm -rf content/mavenutils/"
                     }                 
                 }
             }
@@ -68,8 +69,7 @@ pipeline {
                     for (String mvnproject in mvnfoldersforsite) {
                         dir('master-branch/'+mvnproject) {
                             sh "mvn clean install site -Dmaven.repo.local=${BASEDIR}/.repository"
-                            sh "rm -rf ${BASEDIR}/asf-site-branch/${mvnproject}"
-                            sh "mv target/site ${BASEDIR}/asf-site-branch/${mvnproject}/"
+                            sh "mv target/site ${BASEDIR}/asf-site-branch/content/mavenutils/${mvnproject}/"
                         }
                     }
                 }
@@ -84,7 +84,7 @@ pipeline {
                     echo 'Adding content...'
                     sshagent (credentials: ['9b041bd0-aea9-4498-a576-9eeb771411dd']) {
                         sh 'git add -v .'
-                        sh 'git commit -v -m "Automated site publishing by Jenkins build ${BUILD_NUMBER}"'
+                        sh 'git commit -v -m "Automated site publishing by Jenkins build by mavenutils-${BUILD_NUMBER}"'
                         sh 'git push -v origin asf-site'
                     }                 
                 }
