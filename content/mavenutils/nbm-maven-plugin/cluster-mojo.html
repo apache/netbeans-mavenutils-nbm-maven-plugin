@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html class="no-js" lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Apache NetBeans Maven Utilities - NBM Maven Plugin &#x2013; nbm:cluster</title>
+  <link rel="stylesheet" href="./css/netbeans.css" />
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">   
+</head>
+<body>
+<div class="top-bar" id="responsive-menu">
+    <div class='top-bar-left'>
+        <a class='title' href="http://netbeans.apache.org"><img src='/images/apache-netbeans.svg' style='padding: 8px; height: 48px;'>Apache NetBeans (incubating)</a>
+    </div>
+    <div class="top-bar-right">
+        <ul class="vertical medium-horizontal menu" style="right: 90px;" data-responsive-menu="drilldown medium-dropdown">
+            <li> <a href="../nb-repository/index.html">NB Repository Plugin</a> </li>
+            <li> <strong style='line-height: 1;margin-bottom: 0;padding: 0.7rem 1rem;display: block;' >NBM Plugin</strong> </li>
+            <li> <a href="../shared/index.html">Shared</a> </li>
+            <li> <a href="../parent/index.html">Parent</a> </li>
+        </ul>
+    </div>
+</div>
+<div class='grid-container main-content'>
+            <div id="toc" class="toc">
+<div id="toctitle">Overview</div>
+<ul class="sectlevel1">
+<li><a href="index.html">Usage</a></li>
+<li><a href="plugin-info.html">Plugin Goals</a></li>
+</ul>
+<div id="toctitle">HOWTOs</div>
+<ul class="sectlevel1">
+<li><a href="buildinstexample.html">Customize installers</a></li>
+<li><a href="upgrade.html">Upgrade from older versions</a></li>
+</ul>
+<div id="toctitle">Deprecated</div>
+<ul class="sectlevel1">
+<li><a href="nbm.html">Descriptor Format</a></li>
+<li><a href="descriptor.html">Example Descriptor</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+
+  
+    <div class="section">
+<h2><a name="nbm:cluster"></a>nbm:cluster</h2>
+      
+<p><b>Full name</b>:</p>
+      
+<p>org.netbeans.maven:nbm-maven-plugin:4.2-SNAPSHOT:cluster</p>
+      
+<p><b>Description</b>:</p>
+      
+<div>Create the NetBeans module clusters from reactor. Semi-deprecated;
+used only for standalone modules and &quot;suites&quot;.</div>
+      
+<p><b>Attributes</b>:</p>
+      
+<ul>
+        
+<li>Requires a Maven project to be executed.</li>
+        
+<li>Executes as an aggregator plugin.</li>
+        
+<li>Requires dependency resolution of artifacts in scope: <tt>runtime</tt>.</li>
+      </ul>
+      
+<div class="section">
+<h3><a name="Required_Parameters"></a>Required Parameters</h3>
+        
+<table class="bodyTable" border="0">
+          
+<tr class="a">
+            
+<th>Name</th>
+            
+<th>Type</th>
+            
+<th>Since</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#nbmBuildDir">nbmBuildDir</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>directory where the the NetBeans cluster will be created.<br /><b>Default value is</b>: <tt>${project.build.directory}/netbeans_clusters</tt>.<br /></td>
+          </tr>
+        </table>
+      </div>
+      
+<div class="section">
+<h3><a name="Optional_Parameters"></a>Optional Parameters</h3>
+        
+<table class="bodyTable" border="0">
+          
+<tr class="a">
+            
+<th>Name</th>
+            
+<th>Type</th>
+            
+<th>Since</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#defaultCluster">defaultCluster</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>-</tt></td>
+            
+<td>default cluster value for reactor projects without cluster
+information, typically OSGi bundles<br /><b>Default value is</b>: <tt>extra</tt>.<br /></td>
+          </tr>
+        </table>
+      </div>
+      
+<div class="section">
+<h3><a name="Parameter_Details"></a>Parameter Details</h3>
+        
+<p><b><a name="defaultCluster">defaultCluster</a>:</b></p>
+        
+<div>default cluster value for reactor projects without cluster
+information, typically OSGi bundles</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>Default</b>: <tt>extra</tt></li>
+        </ul><hr />
+<p><b><a name="nbmBuildDir">nbmBuildDir</a>:</b></p>
+        
+<div>directory where the the NetBeans cluster will be created.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.io.File</tt></li>
+          
+<li><b>Required</b>: <tt>Yes</tt></li>
+          
+<li><b>Default</b>: <tt>${project.build.directory}/netbeans_clusters</tt></li>
+        </ul>
+      </div>
+    </div>
+  
+
+</div>
+</div>
+</div>
+<div class='grid-container incubator-area' style='margin-top: 64px'>
+    <div class='grid-x grid-padding-x'>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/">
+                <img style="width: 320px" title="Apache Software Foundation" src="/images/asf_logo_wide.svg" />
+            </a>
+        </div>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/events/current-event.html">
+               <img style="width:234px; height: 60px;" title="Apache Software Foundation current event" src="https://www.apache.org/events/current-event-234x60.png"/>
+            </a>
+        </div>
+    </div>
+</div>
+<div class='footer-disclaimer'>
+    <div class="footer-disclaimer-content">
+        <p>Copyright &copy; 2017-2018 <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+        <p>Licensed under the Apache <a href="https://www.apache.org/licenses/">license</a>, version 2.0</p>
+        <p><a href="https://incubator.apache.org/" alt="Apache Incubator"><img src='/images/incubator_feather_egg_logo_bw_crop.png' title='Apache Incubator'></img></a></p>
+        <div style='max-width: 40em; margin: 0 auto'>
+            <p>Apache NetBeans is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.</p>
+            <p>Apache Incubator, Apache, the Apache feather logo, the Apache NetBeans logo, and the Apache Incubator project logo are trademarks of <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+            <p>Oracle and Java are registered trademarks of Oracle and/or its affiliates.</p>
+        </div>
+        
+    </div>
+</div>
+<a href="https://github.com/apache/incubator-netbeans-mavenutils"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+
+
+
+        <script src="/js/vendor/jquery-3.2.1.min.js"></script>
+        <script src="/js/vendor/what-input.js"></script>
+        <script src="/js/vendor/jquery.colorbox-min.js"></script>
+        <script src="/js/vendor/foundation.min.js"></script>
+        <script src="/js/netbeans.js"></script>
+        <script>
+            
+            $(function(){ $(document).foundation(); });
+        </script>
+</body>

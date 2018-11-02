@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html class="no-js" lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Apache NetBeans Maven Utilities - NBM Maven Plugin &#x2013; NetBeansModule</title>
+  <link rel="stylesheet" href="./css/netbeans.css" />
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">   
+</head>
+<body>
+<div class="top-bar" id="responsive-menu">
+    <div class='top-bar-left'>
+        <a class='title' href="http://netbeans.apache.org"><img src='/images/apache-netbeans.svg' style='padding: 8px; height: 48px;'>Apache NetBeans (incubating)</a>
+    </div>
+    <div class="top-bar-right">
+        <ul class="vertical medium-horizontal menu" style="right: 90px;" data-responsive-menu="drilldown medium-dropdown">
+            <li> <a href="../nb-repository/index.html">NB Repository Plugin</a> </li>
+            <li> <strong style='line-height: 1;margin-bottom: 0;padding: 0.7rem 1rem;display: block;' >NBM Plugin</strong> </li>
+            <li> <a href="../shared/index.html">Shared</a> </li>
+            <li> <a href="../parent/index.html">Parent</a> </li>
+        </ul>
+    </div>
+</div>
+<div class='grid-container main-content'>
+            <div id="toc" class="toc">
+<div id="toctitle">Overview</div>
+<ul class="sectlevel1">
+<li><a href="index.html">Usage</a></li>
+<li><a href="plugin-info.html">Plugin Goals</a></li>
+</ul>
+<div id="toctitle">HOWTOs</div>
+<ul class="sectlevel1">
+<li><a href="buildinstexample.html">Customize installers</a></li>
+<li><a href="upgrade.html">Upgrade from older versions</a></li>
+</ul>
+<div id="toctitle">Deprecated</div>
+<ul class="sectlevel1">
+<li><a href="nbm.html">Descriptor Format</a></li>
+<li><a href="descriptor.html">Example Descriptor</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+
+  
+    <div class="section">
+<h2><a name="NetBeansModule"></a>NetBeansModule</h2>
+      
+<p>Maven's model for the NetBeans module descriptor.</p>
+      
+<div class="source">
+<pre>
+&lt;<a href="#class_nbm">nbm</a>&gt;
+  &lt;moduleType/&gt;
+  &lt;codeNameBase/&gt;
+  &lt;cluster/&gt;
+  &lt;requiresRestart/&gt;
+  &lt;manifest/&gt;
+  &lt;homepageUrl/&gt;
+  &lt;distributionUrl/&gt;
+  &lt;author/&gt;
+  &lt;licenseName/&gt;
+  &lt;licenseFile/&gt;
+  &lt;libraries/&gt;
+  &lt;dependencies&gt;
+    &lt;<a href="#class_dependency">dependency</a>&gt;
+      &lt;id/&gt;
+      &lt;type/&gt;
+      &lt;explicitValue/&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+  &lt;nbmResources&gt;
+    &lt;<a href="#class_nbmResource">nbmResource</a>&gt;
+      &lt;baseDirectory/&gt;
+      &lt;relativeClusterPath/&gt;
+      &lt;includes/&gt;
+      &lt;excludes/&gt;
+    &lt;/nbmResource&gt;
+  &lt;/nbmResources&gt;
+&lt;/nbm&gt;
+</pre></div>
+      <a name="class_nbm"></a>
+      
+<div class="section">
+<h3><a name="nbm"></a>nbm</h3>
+        
+<p>Describes the layout, dependencies and packaging of a NetBeans module.</p>
+        
+<table border="0" class="bodyTable">
+          
+<tr class="a">
+            
+<th>Element</th>
+            
+<th>Type</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>moduleType</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>
+                    
+<p>DEPRECATED, use the plugin configuration instead. Type of the module. Possible values are </p>
+                    
+<p><b>autoload</b> - Such a module is automatically enabled when some other module requires it and automatically disabled otherwise.</p>
+                    
+<p><b>eager</b> - This module type gets automatically enabled when all it's dependencies are satisfied. Disabled otherwise.</p>
+                    
+<p><b>normal</b> - This is the default value. This kind of module is enabled/disabled manually by the user. It installs enabled.</p>
+                            </td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>codeNameBase</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Codenamebase of the module. Primary identification of the module. Usually the package name. Eg. &quot;org.codehaus.mevenide.project&quot;. 
+                    If not defined here, the default value is constructed from groupId and artifactId.</td>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>cluster</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Each modules should belong to a cluster. A cluster is a group of related modules. For individual modules it's not that important. Refer to netbeans.org documentation for more details.</td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>requiresRestart</tt>
+            </td>
+            
+<td>
+              <tt>boolean</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Determines if the module requires restart of the IDE/platform upon installation.<br /><b>Default value is</b>: <tt>false</tt>.</td>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>manifest</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Location of the manifest file with NetBeans specific manifest entries.
+                        </td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>homepageUrl</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Homepage URL of the module. Is accessible from NetBeans UI upon installation, should point to place with additional information about the functionality. If not defined, it defaults to POM's url element.</td>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>distributionUrl</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Http URL of the location where the module can be downloaded from the internet. This value put into the NBM and used when generating the Autoupdate Site. Should point directly to the NBM download.</td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>author</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Author of the module. Is used when generating the NBM file.</td>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>licenseName</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Name of the license. If the user already agreed to the same license before, he/she won't be asked again to agree.</td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>licenseFile</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>DEPRECATED, use the plugin configuration instead. Path to the license agreement file.</td>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>libraries/library*</tt>
+            </td>
+            
+<td>
+              <tt>List&lt;String&gt;</tt>
+            </td>
+            
+<td><b>(Many)</b> groupId:artifactId of artifacts that shall become part of the module and be added on the classpath 
+                    (ClassPath: manifest entry gets created and the jar is included in the nbm file)</td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>dependencies/<a href="#class_dependency">dependency</a>*</tt>
+            </td>
+            
+<td>
+              <tt>List&lt;Dependency&gt;</tt>
+            </td>
+            
+<td><b>(Many)</b> DEPRECATED, use the plugin configuration instead. List of module dependencies. The plugin will use it to Generate the OpenIDE-Module-Module-Dependencies manifest entry.</td>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>nbmResources/<a href="#class_nbmResource">nbmResource</a>*</tt>
+            </td>
+            
+<td>
+              <tt>List&lt;NbmResource&gt;</tt>
+            </td>
+            
+<td><b>(Many)</b> DEPRECATED, use the plugin configuration instead. List of resources that shall be also included into the Nbm file along with the module jar and library jars.</td>
+          </tr>
+        </table>
+      </div>
+      <a name="class_dependency"></a>
+      
+<div class="section">
+<h3><a name="dependency"></a>dependency</h3>
+        
+<p></p>
+        
+<table border="0" class="bodyTable">
+          
+<tr class="a">
+            
+<th>Element</th>
+            
+<th>Type</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>id</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>groupId:artifactId of the dependency defined in the POM (or a transitive dependency)</td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>type</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>
+                        Type of module dependency. 3 possible values allowed.
+                        
+<p><b>spec</b> - specification dependency, module can only use public APIs in public packages. Works with the version defined and any later version.</p>
+                        
+<p><b>impl</b> - implementation dependency, module can use any class in the dependency module, but works with just the one version of the module.</p>
+                        
+<p><b>loose</b> - similar to spec, but isa very loose connection, no version is required, just the module presence.</p>
+                        
+                    <br /><b>Default value is</b>: <tt>spec</tt>.</td>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>explicitValue</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>
+                        The plugin tries to resolve the correct module name and module specification/implementation version by examining the
+                        dependency jar's manifest.
+                        You can override this behaviour by explicitly defining the value here. For example org.openide.io/1 &gt; 10.1 for a &quot;spec&quot; type of dependency.
+          
+                                      
+                    </td>
+          </tr>
+        </table>
+      </div>
+      <a name="class_nbmResource"></a>
+      
+<div class="section">
+<h3><a name="nbmResource"></a>nbmResource</h3>
+        
+<p>No description.</p>
+        
+<table border="0" class="bodyTable">
+          
+<tr class="a">
+            
+<th>Element</th>
+            
+<th>Type</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>baseDirectory</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>The base directory, all paths within the nbm file will be the same as paths within the base directory.</td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>relativeClusterPath</tt>
+            </td>
+            
+<td>
+              <tt>String</tt>
+            </td>
+            
+<td>A relative path to be added to cluster root where the files will be copied to.</td>
+          </tr>
+          
+<tr class="b">
+            
+<td>
+              <tt>includes/include*</tt>
+            </td>
+            
+<td>
+              <tt>List&lt;String&gt;</tt>
+            </td>
+            
+<td><b>(Many)</b> Include pattern, what shall be included in the nbm. </td>
+          </tr>
+          
+<tr class="a">
+            
+<td>
+              <tt>excludes/exclude*</tt>
+            </td>
+            
+<td>
+              <tt>List&lt;String&gt;</tt>
+            </td>
+            
+<td><b>(Many)</b> Exclude pattern, what files within the basedir shall not be included. </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  
+
+</div>
+</div>
+</div>
+<div class='grid-container incubator-area' style='margin-top: 64px'>
+    <div class='grid-x grid-padding-x'>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/">
+                <img style="width: 320px" title="Apache Software Foundation" src="/images/asf_logo_wide.svg" />
+            </a>
+        </div>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/events/current-event.html">
+               <img style="width:234px; height: 60px;" title="Apache Software Foundation current event" src="https://www.apache.org/events/current-event-234x60.png"/>
+            </a>
+        </div>
+    </div>
+</div>
+<div class='footer-disclaimer'>
+    <div class="footer-disclaimer-content">
+        <p>Copyright &copy; 2017-2018 <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+        <p>Licensed under the Apache <a href="https://www.apache.org/licenses/">license</a>, version 2.0</p>
+        <p><a href="https://incubator.apache.org/" alt="Apache Incubator"><img src='/images/incubator_feather_egg_logo_bw_crop.png' title='Apache Incubator'></img></a></p>
+        <div style='max-width: 40em; margin: 0 auto'>
+            <p>Apache NetBeans is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.</p>
+            <p>Apache Incubator, Apache, the Apache feather logo, the Apache NetBeans logo, and the Apache Incubator project logo are trademarks of <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+            <p>Oracle and Java are registered trademarks of Oracle and/or its affiliates.</p>
+        </div>
+        
+    </div>
+</div>
+<a href="https://github.com/apache/incubator-netbeans-mavenutils"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+
+
+
+        <script src="/js/vendor/jquery-3.2.1.min.js"></script>
+        <script src="/js/vendor/what-input.js"></script>
+        <script src="/js/vendor/jquery.colorbox-min.js"></script>
+        <script src="/js/vendor/foundation.min.js"></script>
+        <script src="/js/netbeans.js"></script>
+        <script>
+            
+            $(function(){ $(document).foundation(); });
+        </script>
+</body>

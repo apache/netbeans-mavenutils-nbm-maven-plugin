@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+
+<html class="no-js" lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Apache NetBeans Maven Utilities - NBM Maven Plugin &#x2013; nbm:webstart-app</title>
+  <link rel="stylesheet" href="./css/netbeans.css" />
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">   
+</head>
+<body>
+<div class="top-bar" id="responsive-menu">
+    <div class='top-bar-left'>
+        <a class='title' href="http://netbeans.apache.org"><img src='/images/apache-netbeans.svg' style='padding: 8px; height: 48px;'>Apache NetBeans (incubating)</a>
+    </div>
+    <div class="top-bar-right">
+        <ul class="vertical medium-horizontal menu" style="right: 90px;" data-responsive-menu="drilldown medium-dropdown">
+            <li> <a href="../nb-repository/index.html">NB Repository Plugin</a> </li>
+            <li> <strong style='line-height: 1;margin-bottom: 0;padding: 0.7rem 1rem;display: block;' >NBM Plugin</strong> </li>
+            <li> <a href="../shared/index.html">Shared</a> </li>
+            <li> <a href="../parent/index.html">Parent</a> </li>
+        </ul>
+    </div>
+</div>
+<div class='grid-container main-content'>
+            <div id="toc" class="toc">
+<div id="toctitle">Overview</div>
+<ul class="sectlevel1">
+<li><a href="index.html">Usage</a></li>
+<li><a href="plugin-info.html">Plugin Goals</a></li>
+</ul>
+<div id="toctitle">HOWTOs</div>
+<ul class="sectlevel1">
+<li><a href="buildinstexample.html">Customize installers</a></li>
+<li><a href="upgrade.html">Upgrade from older versions</a></li>
+</ul>
+<div id="toctitle">Deprecated</div>
+<ul class="sectlevel1">
+<li><a href="nbm.html">Descriptor Format</a></li>
+<li><a href="descriptor.html">Example Descriptor</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+
+  
+    <div class="section">
+<h2><a name="nbm:webstart-app"></a>nbm:webstart-app</h2>
+      
+<p><b>Full name</b>:</p>
+      
+<p>org.netbeans.maven:nbm-maven-plugin:4.2-SNAPSHOT:webstart-app</p>
+      
+<p><b>Description</b>:</p>
+      
+<div>Create webstartable binaries for a 'nbm-application'.</div>
+      
+<p><b>Attributes</b>:</p>
+      
+<ul>
+        
+<li>Requires a Maven project to be executed.</li>
+        
+<li>Since version: <tt>3.0</tt>.</li>
+        
+<li>Binds by default to the <a class="externalLink" href="http://maven.apache.org/ref/current/maven-core/lifecycles.html">lifecycle phase</a>: <tt>package</tt>.</li>
+      </ul>
+      
+<div class="section">
+<h3><a name="Required_Parameters"></a>Required Parameters</h3>
+        
+<table class="bodyTable" border="0">
+          
+<tr class="a">
+            
+<th>Name</th>
+            
+<th>Type</th>
+            
+<th>Since</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#brandingToken">brandingToken</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>The branding token for the application based on NetBeans platform.<br /><b>User property is</b>: <tt>netbeans.branding.token</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#destinationFile">destinationFile</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>Ready-to-deploy WAR containing application in JNLP packaging.<br /><b>Default value is</b>: <tt>${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#outputDirectory">outputDirectory</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>output directory where the the NetBeans application will be
+created.<br /><b>Default value is</b>: <tt>${project.build.directory}</tt>.<br /></td>
+          </tr>
+        </table>
+      </div>
+      
+<div class="section">
+<h3><a name="Optional_Parameters"></a>Optional Parameters</h3>
+        
+<table class="bodyTable" border="0">
+          
+<tr class="a">
+            
+<th>Name</th>
+            
+<th>Type</th>
+            
+<th>Since</th>
+            
+<th>Description</th>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#additionalArguments">additionalArguments</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>additional command line arguments. Eg. -J-Xdebug -J-Xnoagent
+-J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888 can
+be used to debug the IDE.<br /><b>User property is</b>: <tt>netbeans.run.params</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#codebase">codebase</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>Codebase value within *.jnlp files. <b>Defining this parameter
+is generally a bad idea.</b><br /><b>User property is</b>: <tt>nbm.webstart.codebase</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#keystore">keystore</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>keystore location for signing the nbm file<br /><b>User property is</b>: <tt>keystore</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#keystorealias">keystorealias</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>keystore alias<br /><b>User property is</b>: <tt>keystorealias</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#keystorepassword">keystorepassword</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>keystore password<br /><b>User property is</b>: <tt>keystorepass</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#keystoretype">keystoretype</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>keystore type<br /><b>User property is</b>: <tt>keystoretype</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#masterJnlpFile">masterJnlpFile</a></b></td>
+            
+<td><tt>File</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>A custom master JNLP file. If not defined, the <a class="externalLink" href="http://mojo.codehaus.org/nbm-maven-plugin/masterjnlp.txt">default
+one</a> is used. The following expressions can be used within the
+file and will be replaced when generating content. 
+
+<ul>
+
+<li>${jnlp.resources}</li>
+
+<li>${jnlp.codebase} - the 'codebase' parameter value is passed
+in.</li>
+
+<li>${app.name}</li>
+
+<li>${app.title}</li>
+
+<li>${app.vendor}</li>
+
+<li>${app.description}</li>
+
+<li>${branding.token} - the 'brandingToken' parameter value is
+passed in.</li>
+
+<li>${netbeans.jnlp.fixPolicy}</li>
+</ul><br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#masterJnlpFileName">masterJnlpFileName</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>The basename (minus .jnlp extension) of the master JNLP file in the
+output. This file will be the entry point for javaws. Defaults to
+the branding token.<br /><b>User property is</b>: <tt>master.jnlp.file.name</tt>.<br /></td>
+          </tr>
+          
+<tr class="b">
+            
+<td><b><a href="#processJarVersions">processJarVersions</a></b></td>
+            
+<td><tt>boolean</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>If set true, build-jnlp target creates versioning info in jnlp
+descriptors and version.xml files. This allows for incremental
+updates of Webstart applications, but requires download via
+JnlpDownloadServlet Defaults to false, which means versioning info
+is not generated (see
+http://java.sun.com/j2se/1.5.0/docs/guide/javaws/developersguide/downloadservletguide.html#resources).<br /><b>Default value is</b>: <tt>false</tt>.<br /><b>User property is</b>: <tt>nbm.webstart.versions</tt>.<br /></td>
+          </tr>
+          
+<tr class="a">
+            
+<td><b><a href="#webstartClassifier">webstartClassifier</a></b></td>
+            
+<td><tt>String</tt></td>
+            
+<td><tt>3.0</tt></td>
+            
+<td>Artifact Classifier to use for the webstart distributable zip file.<br /><b>Default value is</b>: <tt>webstart</tt>.<br /><b>User property is</b>: <tt>nbm.webstart.classifier</tt>.<br /></td>
+          </tr>
+        </table>
+      </div>
+      
+<div class="section">
+<h3><a name="Parameter_Details"></a>Parameter Details</h3>
+        
+<p><b><a name="additionalArguments">additionalArguments</a>:</b></p>
+        
+<div>additional command line arguments. Eg. -J-Xdebug -J-Xnoagent
+-J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888 can
+be used to debug the IDE.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>netbeans.run.params</tt></li>
+        </ul><hr />
+<p><b><a name="brandingToken">brandingToken</a>:</b></p>
+        
+<div>The branding token for the application based on NetBeans platform.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>Yes</tt></li>
+          
+<li><b>User Property</b>: <tt>netbeans.branding.token</tt></li>
+        </ul><hr />
+<p><b><a name="codebase">codebase</a>:</b></p>
+        
+<div>Codebase value within *.jnlp files. <b>Defining this parameter
+is generally a bad idea.</b></div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>nbm.webstart.codebase</tt></li>
+        </ul><hr />
+<p><b><a name="destinationFile">destinationFile</a>:</b></p>
+        
+<div>Ready-to-deploy WAR containing application in JNLP packaging.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.io.File</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>Yes</tt></li>
+          
+<li><b>Default</b>: <tt>${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war</tt></li>
+        </ul><hr />
+<p><b><a name="keystore">keystore</a>:</b></p>
+        
+<div>keystore location for signing the nbm file</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>keystore</tt></li>
+        </ul><hr />
+<p><b><a name="keystorealias">keystorealias</a>:</b></p>
+        
+<div>keystore alias</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>keystorealias</tt></li>
+        </ul><hr />
+<p><b><a name="keystorepassword">keystorepassword</a>:</b></p>
+        
+<div>keystore password</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>keystorepass</tt></li>
+        </ul><hr />
+<p><b><a name="keystoretype">keystoretype</a>:</b></p>
+        
+<div>keystore type</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>keystoretype</tt></li>
+        </ul><hr />
+<p><b><a name="masterJnlpFile">masterJnlpFile</a>:</b></p>
+        
+<div>A custom master JNLP file. If not defined, the <a class="externalLink" href="http://mojo.codehaus.org/nbm-maven-plugin/masterjnlp.txt">default
+one</a> is used. The following expressions can be used within the
+file and will be replaced when generating content. 
+
+<ul>
+
+<li>${jnlp.resources}</li>
+
+<li>${jnlp.codebase} - the 'codebase' parameter value is passed
+in.</li>
+
+<li>${app.name}</li>
+
+<li>${app.title}</li>
+
+<li>${app.vendor}</li>
+
+<li>${app.description}</li>
+
+<li>${branding.token} - the 'brandingToken' parameter value is
+passed in.</li>
+
+<li>${netbeans.jnlp.fixPolicy}</li>
+</ul></div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.io.File</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+        </ul><hr />
+<p><b><a name="masterJnlpFileName">masterJnlpFileName</a>:</b></p>
+        
+<div>The basename (minus .jnlp extension) of the master JNLP file in the
+output. This file will be the entry point for javaws. Defaults to
+the branding token.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>master.jnlp.file.name</tt></li>
+        </ul><hr />
+<p><b><a name="outputDirectory">outputDirectory</a>:</b></p>
+        
+<div>output directory where the the NetBeans application will be
+created.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.io.File</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>Yes</tt></li>
+          
+<li><b>Default</b>: <tt>${project.build.directory}</tt></li>
+        </ul><hr />
+<p><b><a name="processJarVersions">processJarVersions</a>:</b></p>
+        
+<div>If set true, build-jnlp target creates versioning info in jnlp
+descriptors and version.xml files. This allows for incremental
+updates of Webstart applications, but requires download via
+JnlpDownloadServlet Defaults to false, which means versioning info
+is not generated (see
+http://java.sun.com/j2se/1.5.0/docs/guide/javaws/developersguide/downloadservletguide.html#resources).</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>boolean</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>nbm.webstart.versions</tt></li>
+          
+<li><b>Default</b>: <tt>false</tt></li>
+        </ul><hr />
+<p><b><a name="webstartClassifier">webstartClassifier</a>:</b></p>
+        
+<div>Artifact Classifier to use for the webstart distributable zip file.</div>
+        
+<ul>
+          
+<li><b>Type</b>: <tt>java.lang.String</tt></li>
+          
+<li><b>Since</b>: <tt>3.0</tt></li>
+          
+<li><b>Required</b>: <tt>No</tt></li>
+          
+<li><b>User Property</b>: <tt>nbm.webstart.classifier</tt></li>
+          
+<li><b>Default</b>: <tt>webstart</tt></li>
+        </ul>
+      </div>
+    </div>
+  
+
+</div>
+</div>
+</div>
+<div class='grid-container incubator-area' style='margin-top: 64px'>
+    <div class='grid-x grid-padding-x'>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/">
+                <img style="width: 320px" title="Apache Software Foundation" src="/images/asf_logo_wide.svg" />
+            </a>
+        </div>
+        <div class='large-auto cell text-center'>
+            <a href="https://www.apache.org/events/current-event.html">
+               <img style="width:234px; height: 60px;" title="Apache Software Foundation current event" src="https://www.apache.org/events/current-event-234x60.png"/>
+            </a>
+        </div>
+    </div>
+</div>
+<div class='footer-disclaimer'>
+    <div class="footer-disclaimer-content">
+        <p>Copyright &copy; 2017-2018 <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+        <p>Licensed under the Apache <a href="https://www.apache.org/licenses/">license</a>, version 2.0</p>
+        <p><a href="https://incubator.apache.org/" alt="Apache Incubator"><img src='/images/incubator_feather_egg_logo_bw_crop.png' title='Apache Incubator'></img></a></p>
+        <div style='max-width: 40em; margin: 0 auto'>
+            <p>Apache NetBeans is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.</p>
+            <p>Apache Incubator, Apache, the Apache feather logo, the Apache NetBeans logo, and the Apache Incubator project logo are trademarks of <a href="https://www.apache.org">The Apache Software Foundation</a>.</p>
+            <p>Oracle and Java are registered trademarks of Oracle and/or its affiliates.</p>
+        </div>
+        
+    </div>
+</div>
+<a href="https://github.com/apache/incubator-netbeans-mavenutils"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+
+
+
+        <script src="/js/vendor/jquery-3.2.1.min.js"></script>
+        <script src="/js/vendor/what-input.js"></script>
+        <script src="/js/vendor/jquery.colorbox-min.js"></script>
+        <script src="/js/vendor/foundation.min.js"></script>
+        <script src="/js/netbeans.js"></script>
+        <script>
+            
+            $(function(){ $(document).foundation(); });
+        </script>
+</body>
