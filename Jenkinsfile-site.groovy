@@ -30,22 +30,7 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: true, reference: '', shallow: true], [$class: 'MessageExclusion', excludedMessage: 'Automated site publishing.*'], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'master-branch']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/apache/incubator-netbeans-mavenutils/']]])
 
                 sh 'rm -rf stagedsite'
-            }
-        }
-        stage('Prepare Publish Site'){ 
-            agent {label 'git-websites'}
-            steps {
-                dir('asf-site-branch') {
-                    echo 'Adding content...'
-                    sshagent (credentials: ['9b041bd0-aea9-4498-a576-9eeb771411dd']) {
-                        sh 'git checkout asf-site'
-                        sh 'git fetch origin asf-site'
-                        sh 'git pull origin asf-site'
-                        // remove mavenutils git will see what change later
-                        sh 'rm -rf content/mavenutils/'
-                        sh 'mkdir -p content/mavenutils'
-                    }                 
-                }
+		sh 'mkdir stagedsite'
             }
         }
         stage('Build Site'){ 
