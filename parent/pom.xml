@@ -10,7 +10,7 @@
     <artifactId>utilities-parent</artifactId>
     <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Apache Netbeans Maven Utilties</name>
+    <name>Apache Netbeans Maven Utilities</name>
     <description>Apache Netbeans Maven Utilities is a set of artefacts to build and populate Apache NetBeans artefacts using Apache Maven</description>
     <url>http://netbeans.apache.org/mavenutilities/parent</url> 
     <licenses>
