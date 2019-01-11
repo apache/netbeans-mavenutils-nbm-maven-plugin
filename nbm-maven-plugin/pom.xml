@@ -448,7 +448,7 @@
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-analyzer</artifactId>
-            <version>1.10</version>
+            <version>1.11.1</version>
         </dependency>
         <!-- maven dependecy analyser version 1.8 will have the correct dependency -->
         <dependency>
@@ -479,9 +479,9 @@
         </dependency>
         <dependency>
             <!-- use harness from NetBeans 8.2  --> 
-            <groupId>org.codehaus.mojo</groupId>
+            <groupId>org.netbeans.maven</groupId>
             <artifactId>nbm-maven-harness</artifactId>
-            <version>8.2</version>
+            <version>9.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
