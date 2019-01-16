@@ -57,16 +57,11 @@ pipeline {
                         }
                     }
                 }
-                
-                
-            }
-        }
-        stage('Publish Site'){ 
-            agent {label 'ubuntu'}
-            steps {
                 zip zipFile:'mavenusite.zip',archive:false,dir:'stagedsite'
                 archiveArtifacts artifacts:'mavenusite.zip'
-                  }
-        }       
+  
+                
+            }
+        }               
     }
 }
