@@ -35,7 +35,7 @@
 #* *##if ($project.artifactId == 'nb-repository-plugin')
             <li> <strong $stylecompensate >NB Repository Plugin</strong> </li>
 #* *##else
-            <li> <a href="../nb-repository/index.html">NB Repository Plugin</a> </li>
+            <li> <a href="../nb-repository-plugin/index.html">NB Repository Plugin</a> </li>
 #* *##end
 #* *##if ($project.artifactId == 'nbm-maven-plugin')
             <li> <strong $stylecompensate >NBM Plugin</strong> </li>
@@ -45,7 +45,7 @@
 #* *##if ($project.artifactId == 'nbm-shared')
             <li> <strong $stylecompensate>Shared</strong> </li>
 #* *##else
-            <li> <a href="../shared/index.html">Shared</a> </li>
+            <li> <a href="../nbm-shared/index.html">Shared</a> </li>
 #* *##end
 #* *##if ($project.artifactId == 'utilities-parent')
             <li> <strong $stylecompensate>Parent</strong> </li>

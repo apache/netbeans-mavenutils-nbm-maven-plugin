@@ -15,7 +15,7 @@
     <description>Maven plugin for creating NetBeans modules. It defines a custom lifecycle called "nbm". During packaging, the module JAR is enhanced with NetBeans-specific manifest entries and, along with other required files, packed into a *.nbm file, ready for distribution. Additionally the plugin provides aggregator goals to create an update site or cluster for your module projects.
     </description>
     <inceptionYear>2005</inceptionYear>
-    <url>http://netbeans.apache.org/mavenutilities/nbm-maven-plugin</url>
+    <url>http://bits.netbeans.org/mavenutilities/nbm-maven-plugin</url>
     <issueManagement>
         <system>jira</system>
         <url>https://issues.apache.org/jira/browse/NETBEANS</url>

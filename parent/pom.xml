@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
     <name>Apache Netbeans Maven Utilities</name>
     <description>Apache Netbeans Maven Utilities is a set of artefacts to build and populate Apache NetBeans artefacts using Apache Maven</description>
-    <url>http://netbeans.apache.org/mavenutilities/parent</url> 
+    <url>http://bits.netbeans.org/mavenutilities/parent</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>

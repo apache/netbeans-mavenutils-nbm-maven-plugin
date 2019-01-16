@@ -15,7 +15,7 @@
     <description>Maven site skin for Apache Netbeans Utilities.
     </description>
     <inceptionYear>2018</inceptionYear>
-    <url>http://netbeans.apache.org/mavenutilities/maven-netbeans-skin</url>
+    <url>http://bits.netbeans.org/mavenutilities/maven-netbeans-skin</url>
     <issueManagement>
         <system>jira</system>
         <url>https://issues.apache.org/jira/browse/NETBEANS</url>
