@@ -42,7 +42,7 @@
 #* *##else
             <li> <a href="../nbm-maven-plugin/index.html">NBM Plugin</a> </li>
 #* *##end
-#* *##if ($project.artifactId == 'nbm-shared')
+#* *##if ($project.artifactId == 'nb-shared')
             <li> <strong $stylecompensate>Shared</strong> </li>
 #* *##else
             <li> <a href="../nbm-shared/index.html">Shared</a> </li>
