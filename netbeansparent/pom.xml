@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>21</version>
+    </parent>
+
+    <groupId>org.netbeans.maven</groupId>
+    <artifactId>parent</artifactId>
+    <version>1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Apache Netbeans</name>
+    <description>This is the parent pom of Apache Netbeans Maven Artefacts</description>
+    <url>https://netbeans.apache.org/</url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>apachenetbeans</id>
+            <name>Apache NetBeans Dev Mailing List</name>
+            <email>dev@netbeans.incubator.apache.org</email>
+        </developer>
+    </developers>
+
+    <mailingLists>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Users List</name>
+            <subscribe>users-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>users-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:users@netbeans.incubator.apache.org</post>
+            <archive>https://mail-archives.apache.org/mod_mbox/netbeans-users/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Dev List</name>
+            <subscribe>dev-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:dev@netbeans.incubator.apache.org</post>
+            <archive>https://mail-archives.apache.org/mod_mbox/netbeans-dev/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) NetCAT List</name>
+            <subscribe>netcat-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>netcat-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:netcat@netbeans.incubator.apache.org</post>
+            <archive>https://mail-archives.apache.org/mod_mbox/netbeans-netcat/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Announcements List</name>
+            <subscribe>announce-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>announce-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:announce@netbeans.incubator.apache.org</post>
+            <archive>https://mail-archives.apache.org/mod_mbox/netbeans-announce/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Commits List</name>
+            <subscribe>commits-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:commits@netbeans.incubator.apache.org</post>
+            <archive>https://mail-archives.apache.org/mod_mbox/netbeans-commits/</archive>
+        </mailingList>
+        <mailingList> 
+            <name>Apache Netbeans (incubating) Notifications List</name>
+            <subscribe>notifications-subscribe@netbeans.incubator.apache.org</subscribe>
+            <unsubscribe>notifications-unsubscribe@netbeans.incubator.apache.org</unsubscribe>
+            <post>mailto:notifications@netbeans.incubator.apache.org</post>
+            <archive>https://mail-archives.apache.org/mod_mbox/netbeans-notifications/</archive>
+        </mailingList>
+    </mailingLists>
+
+    <scm>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/incubator-netbeans.git</connection>
+        <developerConnection>scm:git:gitbox.apache.org/repos/asf/incubator-netbeans.git</developerConnection>
+        <url>https://github.com/apache/incubator-netbeans-mavenutils</url>
+    </scm>
+    <issueManagement>
+        <system>jira</system>
+        <url>https://issues.apache.org/jira/projects/NETBEANS</url>
+    </issueManagement>
+</project>
