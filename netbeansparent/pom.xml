@@ -80,7 +80,7 @@
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/incubator-netbeans.git</connection>
         <developerConnection>scm:git:gitbox.apache.org/repos/asf/incubator-netbeans.git</developerConnection>
-        <url>https://github.com/apache/incubator-netbeans-mavenutils</url>
+        <url>https://github.com/apache/incubator-netbeans</url>
     </scm>
     <issueManagement>
         <system>jira</system>
