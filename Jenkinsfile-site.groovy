@@ -31,6 +31,7 @@ pipeline {
 
                 sh 'rm -rf stagedsite'
 		sh 'mkdir stagedsite'
+		sh 'rm -f mavenusite.zip'
             }
         }
         stage('Build Site'){ 
