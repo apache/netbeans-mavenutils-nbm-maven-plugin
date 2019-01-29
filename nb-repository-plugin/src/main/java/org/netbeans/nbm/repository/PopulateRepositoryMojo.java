@@ -69,6 +69,7 @@ import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -218,6 +219,15 @@ public class PopulateRepositoryMojo
     @Parameter(defaultValue="temp", property="dependencyRepositoryId")
     private String dependencyRepositoryId;
 
+    /**
+     * Colon separated artefact coordinate groupId:artefactId:version that
+     * represent parent to be used
+     *
+     * @since 1.4
+     */
+    @Parameter(property = "parentGAV", required = false)
+    private String parentGAV;
+    
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
      * Local maven repository.
@@ -265,6 +275,9 @@ public class PopulateRepositoryMojo
     private ArtifactRepositoryLayout artifactRepositoryLayout;
 // </editor-fold>
 
+    // parent handler in case we have one
+    private Parent artefactParent = null;
+    
     @Override
     public void execute()
         throws MojoExecutionException
@@ -272,6 +285,21 @@ public class PopulateRepositoryMojo
         getLog().info( "Populate repository with NetBeans modules" );
         Project antProject = antProject();
         ArtifactRepository deploymentRepository = null;
+        
+        if (parentGAV != null) 
+        {
+            // populate artefactParent
+            artefactParent = new Parent();
+            String[] split = parentGAV.split(":");
+            if (split.length != 3) {
+                throw new MojoExecutionException(
+                    "parentGAV should respect the following format groupId:artefactId:version" );
+            }
+            artefactParent.setArtifactId( split[0] );
+            artefactParent.setArtifactId( split[1] );
+            artefactParent.setVersion( split[2] );
+        }
+        
         if ( deployUrl != null )
         {
             ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
@@ -754,6 +782,9 @@ public class PopulateRepositoryMojo
         mavenModel.setVersion( wrapper.getVersion() );
         mavenModel.setPackaging( "jar" );
         mavenModel.setModelVersion( "4.0.0" );
+        if ( artefactParent != null ) {
+            mavenModel.setParent( artefactParent );
+        }
         ExamineManifest man = wrapper.getModuleManifest();
         List<Dependency> deps = new ArrayList<Dependency>();
         if ( !man.getDependencyTokens().isEmpty() )
@@ -985,6 +1016,9 @@ public class PopulateRepositoryMojo
         mavenModel.setVersion( wrapper.getVersion() );
         mavenModel.setPackaging( "jar" );
         mavenModel.setModelVersion( "4.0.0" );
+        if ( artefactParent != null ) {
+            mavenModel.setParent( artefactParent );
+        }
         mavenModel.setName( 
             "Maven definition for " + wrapper.getFile().getName() + " - external part of NetBeans module." );
         mavenModel.setDescription( 
@@ -1031,6 +1065,9 @@ public class PopulateRepositoryMojo
 //        mavenModel.setPackaging("nbm-application");
         mavenModel.setPackaging( "pom" );
         mavenModel.setModelVersion( "4.0.0" );
+        if ( artefactParent != null ) {
+            mavenModel.setParent( artefactParent );
+        }
         List<Dependency> deps = new ArrayList<Dependency>();
         for ( ModuleWrapper wr : mods )
         {
