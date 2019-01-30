@@ -28,7 +28,7 @@ under the License.
 
     <groupId>org.netbeans.maven</groupId>
     <artifactId>netbeans-parent</artifactId>
-    <version>1-SNAPSHOT</version>
+    <version>1</version>
     <packaging>pom</packaging>
 
     <name>Apache Netbeans</name>
@@ -99,7 +99,8 @@ under the License.
         <connection>scm:git:https://gitbox.apache.org/repos/asf/incubator-netbeans-mavenutils.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/incubator-netbeans-mavenutils.git</developerConnection>
         <url>https://github.com/apache/incubator-netbeans-mavenutils</url>
-    </scm>
+      <tag>netbeans-parent-1</tag>
+  </scm>
     <issueManagement>
         <system>jira</system>
         <url>https://issues.apache.org/jira/projects/NETBEANS</url>
