@@ -277,7 +277,7 @@ public class PopulateRepositoryMojo
 
     // parent handler in case we have one
     private Parent artefactParent = null;
-    
+
     @Override
     public void execute()
         throws MojoExecutionException
@@ -285,7 +285,7 @@ public class PopulateRepositoryMojo
         getLog().info( "Populate repository with NetBeans modules" );
         Project antProject = antProject();
         ArtifactRepository deploymentRepository = null;
-        
+
         if (parentGAV != null) 
         {
             // populate artefactParent
@@ -295,11 +295,11 @@ public class PopulateRepositoryMojo
                 throw new MojoExecutionException(
                     "parentGAV should respect the following format groupId:artefactId:version" );
             }
-            artefactParent.setArtifactId( split[0] );
+            artefactParent.setGroupId( split[0] );
             artefactParent.setArtifactId( split[1] );
             artefactParent.setVersion( split[2] );
         }
-        
+
         if ( deployUrl != null )
         {
             ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
