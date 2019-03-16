@@ -398,8 +398,8 @@ public class CreateClusterAppMojo
                                             //ex.setPopulateDependencies( true );
                                             ex.checkFile();
                                             if (ex.isOsgiBundle()) {
-                                                if ( (art.getId().contains("org.netbeans.modules:org-netbeans-modules-maven-embedder") || 
-                                                     (art.getId().contains("org.apache.netbeans.modules:org-netbeans-modules-maven-embedder")) 
+                                                if ( art.getId().contains("org.netbeans.modules:org-netbeans-modules-maven-embedder") || 
+                                                     art.getId().contains("org.apache.netbeans.modules:org-netbeans-modules-maven-embedder") )
                                                 {
                                                     // in this case we dont want module-maven-embedder to be considered as wrapper for his libs                                                     
                                                     // guava is provided but ide have it also 
