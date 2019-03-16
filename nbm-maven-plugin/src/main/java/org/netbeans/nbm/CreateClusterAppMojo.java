@@ -963,7 +963,7 @@ public class CreateClusterAppMojo
             throw new MojoExecutionException( "We could not find org-netbeans-bootstrap among the modules in the application. Launchers could not be found.");
         }
         Artifact nbmArt = artifactFactory.createArtifact(
-            "org.netbeans.modules",
+            "org.apache.netbeans.modules",
             "org-netbeans-modules-apisupport-harness",
             version,
             "compile",
