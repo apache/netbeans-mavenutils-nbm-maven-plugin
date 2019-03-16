@@ -945,7 +945,7 @@ public class CreateClusterAppMojo
         Set<Artifact> artifacts = project.getArtifacts();
         String version = null;
         for (Artifact a : artifacts) {
-            if ("org.netbeans.modules".equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
+            if (( "org.apache.netbeans.modules".equals(a.getGroupId()) || "org.netbeans.modules".equals(a.getGroupId())) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
                 version = a.getBaseVersion(); //base version in non-snapshot should equals version, in snapshots to X-SNAPSHOT, not timestamp
                 break;
             }
