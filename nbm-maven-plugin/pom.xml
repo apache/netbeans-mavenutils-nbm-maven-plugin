@@ -448,7 +448,7 @@
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-analyzer</artifactId>
-            <version>1.10</version>
+            <version>1.11.1</version>
         </dependency>
         <!-- maven dependecy analyser version 1.8 will have the correct dependency -->
         <dependency>
