@@ -141,6 +141,12 @@ public class CreateClusterAppMojo
     @Parameter(defaultValue = "true", property = "netbeans.verify.integrity")
     private boolean verifyIntegrity;
     
+    /**
+     * @since 4.12
+     */
+    @Parameter(defaultValue ="org.netbeans", property = "groupIdPrefix")
+    private String groupIdPrefix;
+    
     private final Collection<String> defaultPlatformTokens = Arrays.asList( new String[] {
                     "org.openide.modules.os.Windows",
                     "org.openide.modules.os.Unix",
@@ -398,8 +404,7 @@ public class CreateClusterAppMojo
                                             //ex.setPopulateDependencies( true );
                                             ex.checkFile();
                                             if (ex.isOsgiBundle()) {
-                                                if ( art.getId().contains("org.netbeans.modules:org-netbeans-modules-maven-embedder") || 
-                                                     art.getId().contains("org.apache.netbeans.modules:org-netbeans-modules-maven-embedder") )
+                                                if ( art.getId().contains( groupIdPrefix + ".modules:org-netbeans-modules-maven-embedder") )
                                                 {
                                                     // in this case we dont want module-maven-embedder to be considered as wrapper for his libs                                                     
                                                     // guava is provided but ide have it also 
@@ -954,7 +959,7 @@ public class CreateClusterAppMojo
         Set<Artifact> artifacts = project.getArtifacts();
         String version = null;
         for (Artifact a : artifacts) {
-            if (( "org.apache.netbeans.modules".equals(a.getGroupId()) || "org.netbeans.modules".equals(a.getGroupId())) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
+            if ( (groupIdPrefix + ".modules").equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
                 version = a.getBaseVersion(); //base version in non-snapshot should equals version, in snapshots to X-SNAPSHOT, not timestamp
                 break;
             }
@@ -963,7 +968,7 @@ public class CreateClusterAppMojo
             throw new MojoExecutionException( "We could not find org-netbeans-bootstrap among the modules in the application. Launchers could not be found.");
         }
         Artifact nbmArt = artifactFactory.createArtifact(
-            "org.apache.netbeans.modules",
+            groupIdPrefix + ".modules",
             "org-netbeans-modules-apisupport-harness",
             version,
             "compile",
