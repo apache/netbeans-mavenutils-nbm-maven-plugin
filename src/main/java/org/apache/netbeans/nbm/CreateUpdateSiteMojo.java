@@ -236,15 +236,13 @@ public class CreateUpdateSiteMojo
             while ( it.hasNext() )
             {
                 MavenProject proj = (MavenProject) it.next();
-                //TODO how to figure where the the buildDir/nbm directory is
-                File moduleDir = proj.getFile().getParentFile();
-                if ( moduleDir != null && moduleDir.exists() )
+                File projOutputDirectory = new File( proj.getBuild().getDirectory() );
+                if ( projOutputDirectory != null && projOutputDirectory.exists() )
                 {
                     Copy copyTask = (Copy) antProject.createTask( "copy" );
                     if ( !isRepository )
                     {
                         FileSet fs = new FileSet();
-                        File projOutputDirectory = new File( proj.getBuild().getDirectory() );
                         fs.setDir( projOutputDirectory );
                         fs.createInclude().setName( "*.nbm" );
                         copyTask.addFileset( fs );
@@ -254,9 +252,8 @@ public class CreateUpdateSiteMojo
                     }
                     else
                     {
-                        File target = new File( proj.getBuild().getDirectory() );
                         boolean has = false;
-                        File[] fls = target.listFiles();
+                        File[] fls = projOutputDirectory.listFiles();
                         if ( fls != null )
                         {
                             for ( File fl : fls )
