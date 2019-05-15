@@ -373,7 +373,7 @@
                                 <goal>install</goal>
                             </goals>
                             <filterProperties>
-                                <netbeans.version>RELEASE82</netbeans.version>
+                                <netbeans.version>11.0-SNAPSHOT</netbeans.version>
                             </filterProperties>
                         </configuration>
                         <executions>
@@ -417,7 +417,7 @@
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.9.6</version>
+            <version>1.10.5</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -478,10 +478,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <!-- use harness from NetBeans 8.2  --> 
-            <groupId>org.codehaus.mojo</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
-            <version>8.2</version>
+            <version>11-0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
