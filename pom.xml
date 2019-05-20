@@ -27,7 +27,7 @@ under the License.
     </parent>
     <groupId>org.apache.netbeans.utilities</groupId>
     <artifactId>utilities-parent</artifactId>
-    <version>2-SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Netbeans Maven Utilities</name>
     <description>Apache Netbeans Maven Utilities is a set of artefacts to build and populate Apache NetBeans artefacts using Apache Maven</description>
@@ -55,56 +55,6 @@ under the License.
             </dependency>
         </dependencies>
     </dependencyManagement>
-    <developers>
-        <!-- Please contact development team by using Apache NetBeans dev list-->
-        <developer>
-            <id>mkleint</id>
-            <name>Milos Kleint</name>
-            <email>protected</email>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>jglick</id>
-            <name>Jesse Glick</name>
-            <email>protected</email>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>ebarboni</id>
-            <name>Eric Barboni</name>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </developer>
-    </developers>
-    <contributors>
-        <contributor>
-            <name>Johan Andr�n</name>
-            <email>protected</email>
-            <roles>
-                <role>Patch Contributor</role>
-                <role>Goal Contributor</role>
-            </roles>
-        </contributor>
-        <contributor>
-            <name>Mykola Nikishov</name>
-            <email>mn@mn.com.ua</email>
-            <roles>
-                <role>Patch Contributor</role>
-            </roles>
-        </contributor>
-        <contributor>
-            <name>Frantisek Mantlik</name>
-            <email>frantisek@mantlik.cz</email>
-            <roles>
-                <role>Goal Contributor</role>
-            </roles>
-        </contributor>
-    </contributors>
     <build>
         <pluginManagement>
             <plugins>
