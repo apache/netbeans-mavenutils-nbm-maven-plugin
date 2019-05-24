@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm.utils;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,7 +19,6 @@
  * under the License.
  */
 
-package org.apache.netbeans.nbm.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -221,7 +222,7 @@ public class ExamineManifest
                         String tok = tokens.nextToken();
                         //we are just interested in specification and loose dependencies.
                         int spec = tok.indexOf( '>' );
-                        int impl = tok.indexOf( '=');
+                        int impl = tok.indexOf( '=' );
                         if ( spec > 0 )
                         {
                             tok = tok.substring( 0, spec );
@@ -242,16 +243,20 @@ public class ExamineManifest
                 String req = attrs.getValue( "OpenIDE-Module-Requires" );
                 String prov = attrs.getValue( "OpenIDE-Module-Provides" );
                 String needs = attrs.getValue( "OpenIDE-Module-Needs" );
-                if (prov != null) {
-                    provides = Arrays.asList( StringUtils.stripAll( StringUtils.split( prov, "," ) ));
+                if ( prov != null ) 
+                {
+                    provides = Arrays.asList( StringUtils.stripAll( StringUtils.split( prov, "," ) ) );
                 }
-                if (req != null || needs != null) {
+                if ( req != null || needs != null ) 
+                {
                     requires = new ArrayList<String>();
-                    if (req != null) {
-                        requires.addAll(Arrays.asList( StringUtils.stripAll( StringUtils.split( req, "," ) )));
+                    if ( req != null ) 
+                    {
+                        requires.addAll( Arrays.asList( StringUtils.stripAll( StringUtils.split( req, "," ) ) ) );
                     }
-                    if (needs != null) {
-                        requires.addAll(Arrays.asList( StringUtils.stripAll( StringUtils.split( needs, "," ) )));
+                    if ( needs != null ) 
+                    {
+                        requires.addAll( Arrays.asList( StringUtils.stripAll( StringUtils.split( needs, "," ) ) ) );
                     }
                 }
             }
@@ -269,19 +274,22 @@ public class ExamineManifest
                     bndName./* MNBMODULE-125 */replaceFirst( " *;.+", "" )./* MNBMODULE-96 */replace( '-', '_' );
                 this.specVersion = attrs.getValue( "Bundle-Version" );
                 String exp = attrs.getValue( "Export-Package" );
-                String autoload = attrs.getValue( "Nbm-Maven-Plugin-Autoload");
-                if (autoload != null) {
+                String autoload = attrs.getValue( "Nbm-Maven-Plugin-Autoload" );
+                if ( autoload != null ) 
+                {
                     bundleAutoload = Boolean.parseBoolean( autoload );
                 }
                 this.publicPackages = exp != null;
                 if ( populateDependencies )
                 {
-                    //well, this doesn't appear to cover the major way of declation dependencies in osgi - Import-Package
+                    //well, this doesn't appear to cover
+                    //the major way of declation dependencies in osgi - Import-Package
                     String deps = attrs.getValue( "Require-Bundle" );
                     if ( deps != null )
                     {
                         List<String> depList = new ArrayList<String>();
-                        // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
+                        // https://stackoverflow.com/questions/1757065
+                        // java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for ( String piece : deps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
                         {
                             depList.add( piece.replaceFirst( ";.+", "" ).trim().intern() );
@@ -292,7 +300,8 @@ public class ExamineManifest
                     if ( imps != null )
                     {
                         Set<String> depList = new HashSet<String>();
-                        // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
+                        // https://stackoverflow.com/questions/1757065
+                        // java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for ( String piece : imps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
                         {
                             depList.add( piece.replaceFirst( ";.+", "" ).trim().intern() );
@@ -303,7 +312,8 @@ public class ExamineManifest
                     if ( exps != null )
                     {
                         Set<String> depList = new HashSet<String>();
-                        // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
+                        // https://stackoverflow.com/questions/1757065
+                        // java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for ( String piece : exps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
                         {
                             depList.add( piece.replaceFirst( ";.+", "" ).trim().intern() );

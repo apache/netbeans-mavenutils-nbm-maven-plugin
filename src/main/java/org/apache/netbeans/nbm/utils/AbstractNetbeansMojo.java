@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm.utils;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,7 +19,6 @@
  * under the License.
  */
 
-package org.apache.netbeans.nbm.utils;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.tools.ant.BuildEvent;
@@ -25,6 +26,9 @@ import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Taskdef;
 
+/**
+ * Abstract goal intended for nbm-maven-plugin and nb-repository. 
+ */
 public abstract class AbstractNetbeansMojo
     extends AbstractMojo
 {
