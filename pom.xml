@@ -52,7 +52,7 @@ under the License.
     </licenses>
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nb-repository-plugin.git</connection>
-        <developerConnection>scm:git:gitbox.apache.org/repos/asf/netbeans-mavenutils-nb-repository-plugin.git</developerConnection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nb-repository-plugin.git</developerConnection>
         <url>https://github.com/apache/netbeans-mavenutils-nb-repository-plugin</url>
     </scm>
     <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->    
