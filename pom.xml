@@ -49,7 +49,7 @@ under the License.
     </licenses>
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-shared.git</connection>
-        <developerConnection>scm:git:gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-shared.git</developerConnection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-shared.git</developerConnection>
         <url>https://github.com/apache/netbeans-mavenutils-nbm-shared</url>
     </scm>
     <build>
