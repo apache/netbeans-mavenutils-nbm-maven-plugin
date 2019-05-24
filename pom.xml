@@ -43,7 +43,7 @@ under the License.
     </licenses>
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-maven-harness.git</connection>
-        <developerConnection>scm:git:gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-maven-harness.git</developerConnection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-maven-harness.git</developerConnection>
         <url>https://github.com/apache/netbeans-mavenutils-nbm-maven-harness</url>
     </scm>
     <build>
