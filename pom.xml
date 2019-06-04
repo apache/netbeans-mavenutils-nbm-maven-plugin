@@ -28,7 +28,7 @@ under the License.
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nb-repository-plugin</artifactId>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>Apache NetBeans Maven Utilities - NB Repository Plugin</name>
@@ -54,7 +54,7 @@ under the License.
         <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nb-repository-plugin.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nb-repository-plugin.git</developerConnection>
         <url>https://github.com/apache/netbeans-mavenutils-nb-repository-plugin</url>
-      <tag>nb-repository-plugin-1.4</tag>
+      <tag>HEAD</tag>
   </scm>
     <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->    
 
