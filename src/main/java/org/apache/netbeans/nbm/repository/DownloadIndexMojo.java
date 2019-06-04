@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm.repository;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm.repository;
 
 import java.io.File;
 import java.net.URI;
@@ -50,70 +50,73 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
- * Goal for retrieving and expanding the lucene index of the given repository. That in turn is used by the <code>populate</code>
- * goal.
+ * Goal for retrieving and expanding the lucene index of the given repository. 
+ * That in turn is used by the <code>populate</code> goal.
  * @author Milos Kleint
  */
-@Mojo(name="download", aggregator=true, requiresProject=false)
-public class DownloadIndexMojo extends AbstractMojo implements Contextualizable {
-    
+@Mojo( name = "download", aggregator = true, requiresProject = false )
+public class DownloadIndexMojo extends AbstractMojo implements Contextualizable 
+{
+
     /**
      * url of the repository to download index from. Please note that if you already have
      * an existing index at <code>nexusIndexDirectory</code>, you should always use the same url for that directory.
      */
-    @Parameter(required=true, property="repositoryUrl")
+    @Parameter( required = true, property = "repositoryUrl" )
     private String repositoryUrl;
-    
+
     /**
-     * location on disk where the index should be created. either empty or with existing index from same repository. then only update check will
-     * be performed.
+     * location on disk where the index should be created. either empty or with existing index from same repository. 
+     * Then only update check will be performed.
      */
-    @Parameter(required=true, property="nexusIndexDirectory")
+    @Parameter( required = true, property = "nexusIndexDirectory" )
     private File nexusIndexDirectory;
  
     @Component
     IndexUpdater remoteIndexUpdater;
-    
+
     @Component
     NexusIndexer indexer;
-    
+
     PlexusContainer container;
-    
-    
+
+
     @Component
     WagonManager wagonManager;
-    
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        try        
+        try
         {
             List<IndexCreator> creators = new ArrayList<IndexCreator>();
-            creators.addAll(container.lookupList(IndexCreator.class));
-            String indexurl = repositoryUrl + (!repositoryUrl.endsWith( "/") ? "/" : "") + ".index";
+            creators.addAll( container.lookupList( IndexCreator.class ) );
+            String indexurl = repositoryUrl + ( !repositoryUrl.endsWith( "/" ) ? "/" : "" ) + ".index";
             IndexingContext indexingContext = indexer.addIndexingContextForced(
                                     "central", // context id
                                     "central", // repository id
                                     null, // repository folder
                                     nexusIndexDirectory,
-                                    repositoryUrl,// repositoryUrl
+                                    repositoryUrl, // repositoryUrl
                                     indexurl,
-                                    creators);
+                                    creators );
 
-            String protocol = URI.create(repositoryUrl).getScheme();
+            String protocol = URI.create( repositoryUrl ).getScheme();
             ProxyInfo wagonProxy = wagonManager.getProxy( protocol );
-            TransferListener tr = new TransferListener() {
+            TransferListener tr = new TransferListener() 
+            {
 
                 @Override
                 public void transferInitiated( TransferEvent transferEvent )
                 {
-                    getLog().info( "Initiated connection to " + repositoryUrl);
+                    getLog().info( "Initiated connection to " + repositoryUrl );
                 }
 
                 @Override
                 public void transferStarted( TransferEvent transferEvent )
                 {
-                    getLog().info( "Started transfer of " + repositoryUrl + "/.index/" + transferEvent.getResource().toString());
+                    getLog().info( "Started transfer of " + repositoryUrl + "/.index/" 
+                            + transferEvent.getResource().toString() );
                 }
 
                 @Override
@@ -124,13 +127,15 @@ public class DownloadIndexMojo extends AbstractMojo implements Contextualizable 
                 @Override
                 public void transferCompleted( TransferEvent transferEvent )
                 {
-                    getLog().info( "Finished transfer of " + repositoryUrl + "/.index/" + transferEvent.getResource().toString());
+                    getLog().info( "Finished transfer of " + repositoryUrl + "/.index/" 
+                            + transferEvent.getResource().toString() );
                 }
 
                 @Override
                 public void transferError( TransferEvent transferEvent )
                 {
-                    getLog().error( "Failed transfer of " + repositoryUrl + "/.index/" + transferEvent.getResource().toString(), transferEvent.getException());
+                    getLog().error( "Failed transfer of " + repositoryUrl + "/.index/" 
+                            + transferEvent.getResource().toString(), transferEvent.getException() );
                 }
 
                 @Override
@@ -139,32 +144,32 @@ public class DownloadIndexMojo extends AbstractMojo implements Contextualizable 
                 }
             };
             // MINDEXER-42: cannot use WagonHelper.getWagonResourceFetcher
-            Wagon wagon = container.lookup(Wagon.class, protocol);
-            if (wagon instanceof HttpWagon) { //#216401
+            Wagon wagon = container.lookup( Wagon.class, protocol );
+            if ( wagon instanceof HttpWagon ) 
+            { //#216401
                 HttpWagon httpwagon = (HttpWagon) wagon;
                 //#215343
                 Properties p = new Properties();
-                p.setProperty("User-Agent", "mojo/nb-repository-plugin");
-                httpwagon.setHttpHeaders(p);
+                p.setProperty( "User-Agent", "mojo/nb-repository-plugin" );
+                httpwagon.setHttpHeaders( p );
             }
 
-            ResourceFetcher fetcher = new WagonHelper.WagonFetcher(wagon, tr, null, wagonProxy);
-            IndexUpdateRequest iur = new IndexUpdateRequest(indexingContext, fetcher);
+            ResourceFetcher fetcher = new WagonHelper.WagonFetcher( wagon, tr, null, wagonProxy );
+            IndexUpdateRequest iur = new IndexUpdateRequest( indexingContext, fetcher );
 
-            remoteIndexUpdater.fetchAndUpdateIndex(iur);
-            indexer.removeIndexingContext(indexingContext, false);
+            remoteIndexUpdater.fetchAndUpdateIndex( iur );
+            indexer.removeIndexingContext( indexingContext, false );
         }
         catch ( Exception ex )
         {
-            throw new MojoExecutionException( "Cannot download index", ex);
+            throw new MojoExecutionException( "Cannot download index", ex );
         }
     }
 
     @Override
     public void contextualize( Context context ) throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        this.container = ( PlexusContainer ) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    
 }
