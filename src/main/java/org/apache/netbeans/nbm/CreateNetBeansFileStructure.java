@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,9 +19,13 @@
  * under the License.
  */
 
-package org.apache.netbeans.nbm;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +35,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -82,29 +87,29 @@ public abstract class CreateNetBeansFileStructure
      * NetBeans module assembly build directory.
      * directory where the the NetBeans jar and nbm file get constructed.
      */
-    @Parameter(defaultValue="${project.build.directory}/nbm", property="maven.nbm.buildDir")
+    @Parameter( defaultValue = "${project.build.directory}/nbm", property = "maven.nbm.buildDir" )
     protected File nbmBuildDir;
     /**
      * Build directory
      */
-    @Parameter(required=true, readonly=true, property="project.build.directory")
+    @Parameter( required = true, readonly = true, property = "project.build.directory" )
     protected File buildDir;
     /**
      * Name of the jar packaged by the jar:jar plugin
      */
-    @Parameter(alias="jarname", property="project.build.finalName")
+    @Parameter( alias = "jarname", property = "project.build.finalName" )
     protected String finalName;
     /**
      * a NetBeans module descriptor containing dependency information and more..
      * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in 4.0 entirely
      */
-    @Parameter(defaultValue="${basedir}/src/main/nbm/module.xml")
+    @Parameter( defaultValue = "${basedir}/src/main/nbm/module.xml" )
     protected File descriptor;
     /**
      * NetBeans module's cluster. Replaces the cluster element in module descriptor.
      *
      */
-    @Parameter(required=true, defaultValue="extra")
+    @Parameter( required = true, defaultValue = "extra" )
     protected String cluster;
     /**
      * The location of JavaHelp sources for the project. The documentation
@@ -115,10 +120,10 @@ public abstract class CreateNetBeansFileStructure
      * @since 2.7
      */
     @Deprecated
-    @Parameter(defaultValue="${basedir}/src/main/javahelp")
+    @Parameter( defaultValue = "${basedir}/src/main/javahelp" )
     protected File nbmJavahelpSource;
 
-    @Parameter(required=true, readonly=true, property="project")
+    @Parameter( required = true, readonly = true, property = "project" )
     protected MavenProject project;
 
     /**
@@ -148,7 +153,7 @@ public abstract class CreateNetBeansFileStructure
      *
      * @since 3.2
      */
-    @Parameter(property="encoding", defaultValue="${project.build.sourceEncoding}")
+    @Parameter( property = "encoding", defaultValue = "${project.build.sourceEncoding}" )
     
     protected String encoding;
     
@@ -176,7 +181,7 @@ public abstract class CreateNetBeansFileStructure
      * 
      * @since 3.8
      */ 
-    @Parameter(defaultValue="normal")
+    @Parameter( defaultValue = "normal" )
     protected String moduleType;
     
     /**
@@ -185,7 +190,7 @@ public abstract class CreateNetBeansFileStructure
      * See <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest"> NetBeans Module system docs</a>
      * @since 3.8
      */
-    @Parameter(defaultValue="${project.groupId}.${project.artifactId}")
+    @Parameter( defaultValue = "${project.groupId}.${project.artifactId}" )
     private String codeNameBase;
     
     /**
@@ -203,7 +208,7 @@ public abstract class CreateNetBeansFileStructure
     @Component
     protected MavenResourcesFiltering mavenResourcesFiltering;
 
-    @Parameter(property="session", readonly=true, required=true)
+    @Parameter( property = "session", readonly = true, required = true )
     protected MavenSession session;
 
 
@@ -213,6 +218,7 @@ public abstract class CreateNetBeansFileStructure
     protected File clusterDir;
     protected String moduleJarName;
 
+    @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException
     {
@@ -220,27 +226,31 @@ public abstract class CreateNetBeansFileStructure
         if ( descriptor != null && descriptor.exists() )
         {
             module = readModuleDescriptor( descriptor );
-        } else
+        }
+        else
         {
             module = createDefaultDescriptor( project, false );
         }
         //same moduleType related code in NetBeansManifestUpdateMojo.java
         String type = moduleType;
-        if ("normal".equals(type) && module.getModuleType() != null) {
+        if ( "normal".equals( type ) && module.getModuleType() != null )
+        {
             type = module.getModuleType();
-            getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType");
+            getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType" );
         }
-        if (!"normal".equals(type) && !"autoload".equals(type) && !"eager".equals(type) && !"disabled".equals(type)) {
-            getLog().error( "Only 'normal,autoload,eager,disabled' are allowed values in the moduleType parameter");
+        if ( !"normal".equals( type ) && !"autoload".equals( type ) && !"eager".equals( type ) && !"disabled".equals( type ) )
+        {
+            getLog().error( "Only 'normal,autoload,eager,disabled' are allowed values in the moduleType parameter" );
         }
         boolean autoload = "autoload".equals( type );
         boolean eager = "eager".equals( type );
         boolean disabled = "disabled".equals( type );
         // 1. initialization
         String moduleName = codeNameBase;
-        if (module.getCodeNameBase() != null) {
+        if ( module.getCodeNameBase() != null )
+        {
             moduleName = module.getCodeNameBase();
-            getLog().warn( "codeNameBase in module descriptor is deprecated, use the plugin's parameter codeNameBase");
+            getLog().warn( "codeNameBase in module descriptor is deprecated, use the plugin's parameter codeNameBase" );
         }
         moduleName = NetBeansManifestUpdateMojo.stripVersionFromCodebaseName( moduleName.replaceAll( "-", "." ) );
         moduleJarName = moduleName.replace( '.', '-' );
@@ -325,7 +335,7 @@ public abstract class CreateNetBeansFileStructure
         if ( module != null )
         {
             // copy libraries to the designated place..
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings( "unchecked" )
             List<Artifact> artifacts = project.getRuntimeArtifacts();
             for ( Artifact artifact : artifacts )
             {
@@ -343,7 +353,7 @@ public abstract class CreateNetBeansFileStructure
                     try
                     {
                         FileUtils.getFileUtils().copyFile( source, target, null, true, false );
-                        if ( externals != null && externals.contains(artifact.getGroupId() + ":" + artifact.getArtifactId())) // MNBMODULE-138
+                        if ( externals != null && externals.contains( artifact.getGroupId() + ":" + artifact.getArtifactId() ) ) // MNBMODULE-138
                         {
                             String name = target.getName();
                             getLog().info( "Using *.external replacement for " + name );
@@ -376,14 +386,14 @@ public abstract class CreateNetBeansFileStructure
         if ( nbmJavahelpSource.exists() )
         {
             getLog().warn( "src/main/javahelp/ deprecated; use @HelpSetRegistration instead" );
-            File javahelp_target = new File( buildDir, "javahelp" );
+            File javahelpTarget = new File( buildDir, "javahelp" );
             String javahelpbase = moduleJarName.replace( '-', File.separatorChar ) + File.separator + "docs";
             String javahelpSearch = "JavaHelpSearch";
-            File b = new File( javahelp_target, javahelpbase );
+            File b = new File( javahelpTarget, javahelpbase );
             File p = new File( b, javahelpSearch );
             p.mkdirs();
             Copy cp = (Copy) antProject.createTask( "copy" );
-            cp.setTodir( javahelp_target );
+            cp.setTodir( javahelpTarget );
             FileSet set = new FileSet();
             set.setDir( nbmJavahelpSource );
             cp.addFileset( set );
@@ -412,7 +422,7 @@ public abstract class CreateNetBeansFileStructure
             Jar jar = (Jar) antProject.createTask( "jar" );
             jar.setDestFile( new File( helpJarLocation, moduleJarName + ".jar" ) );
             set = new FileSet();
-            set.setDir( javahelp_target );
+            set.setDir( javahelpTarget );
             jar.addFileset( set );
             jar.execute();
         }
@@ -562,11 +572,11 @@ public abstract class CreateNetBeansFileStructure
             clazz = Class.forName( "com.sun.java.help.search.HTMLIndexerKit" );
             fld = clazz.getDeclaredField( "defaultParser" );
             fld.setAccessible( true );
-            fld.set( null, null);
+            fld.set( null, null );
 
             fld = clazz.getDeclaredField( "defaultCallback" );
             fld.setAccessible( true );
-            fld.set( null, null);
+            fld.set( null, null );
 
         }
         catch ( IllegalArgumentException ex )

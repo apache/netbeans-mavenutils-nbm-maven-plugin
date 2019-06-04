@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,8 +19,6 @@
  * under the License.
  */
 
-package org.apache.netbeans.nbm;
-
 import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -35,7 +35,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @author Johan Andrén
  * @author Milos Kleint
  */
-@Mojo(name="standalone-zip", requiresProject=true, threadSafe = true)
+@Mojo( name = "standalone-zip", requiresProject = true, threadSafe = true )
 public class CreateStandaloneMojo
         extends AbstractMojo
 {
@@ -43,22 +43,22 @@ public class CreateStandaloneMojo
     /**
      * The branding token for the application based on NetBeans platform.
      */
-    @Parameter(property="netbeans.branding.token", required=true)
+    @Parameter( property = "netbeans.branding.token", required = true )
     protected String brandingToken;
     /**
      * output directory where the the NetBeans application will be created.
      */
-    @Parameter(required=true, defaultValue="${project.build.directory}")
+    @Parameter( required = true, defaultValue = "${project.build.directory}" )
     private File outputDirectory;
     /**
      * Name of the zip artifact produced by the goal (without .zip extension)
      */
-    @Parameter(defaultValue="${project.build.finalName}")
+    @Parameter( defaultValue = "${project.build.finalName}" )
     private String finalName;
     /**
      * The Maven project.
      */
-    @Parameter(required=true, readonly=true, property="project")
+    @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 
     /**
@@ -66,6 +66,7 @@ public class CreateStandaloneMojo
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
+    @Override
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {

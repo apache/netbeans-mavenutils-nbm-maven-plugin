@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.util.Iterator;
@@ -59,10 +59,10 @@ import org.netbeans.nbbuild.MakeUpdateDesc;
  * @author Milos Kleint
  *
  */
-@Mojo(name="autoupdate", 
-        defaultPhase= LifecyclePhase.PACKAGE, 
-        aggregator=true, 
-        requiresDependencyResolution= ResolutionScope.RUNTIME )
+@Mojo( name = "autoupdate", 
+        defaultPhase = LifecyclePhase.PACKAGE, 
+        aggregator = true, 
+        requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class CreateUpdateSiteMojo
         extends AbstractNbmMojo
         implements Contextualizable
@@ -71,12 +71,12 @@ public class CreateUpdateSiteMojo
     /**
      * output directory.
      */
-    @Parameter(required=true, defaultValue="${project.build.directory}")
+    @Parameter( required = true, defaultValue = "${project.build.directory}" )
     protected File outputDirectory;
     /**
      * autoupdate site xml file name.
      */
-    @Parameter( defaultValue="updates.xml", property="maven.nbm.updatesitexml")
+    @Parameter( defaultValue = "updates.xml", property = "maven.nbm.updatesitexml" )
     protected String fileName;
     /**
      * A custom distribution base for the nbms in the update site.
@@ -100,20 +100,20 @@ public class CreateUpdateSiteMojo
      * 
      * @since 3.0 it's also possible to add remote repository as base
      */
-    @Parameter(defaultValue=".", property="maven.nbm.customDistBase")
+    @Parameter( defaultValue = ".", property = "maven.nbm.customDistBase" )
     private String distBase;
 
     /**
      * The Maven Project.
      *
      */
-    @Parameter(required=true, readonly=true, property="project")
+    @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 
     /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
      */
-    @Parameter(required=true, readonly=true, defaultValue="${reactorProjects}")
+    @Parameter( required = true, readonly = true, defaultValue = "${reactorProjects}" )
     private List reactorProjects;
     
     /**
@@ -148,7 +148,7 @@ public class CreateUpdateSiteMojo
      * Local maven repository.
      *
      */
-    @Parameter(readonly=true, required=true, defaultValue="${localRepository}")
+    @Parameter( readonly = true, required = true, defaultValue = "${localRepository}" )
     protected ArtifactRepository localRepository;
 
     // </editor-fold>
@@ -188,7 +188,8 @@ public class CreateUpdateSiteMojo
             Set<Artifact> artifacts = project.getArtifacts();
             for ( Artifact art : artifacts )
             {
-                if (!matchesIncludes(art)) {
+                if ( !matchesIncludes( art ) )
+                {
                     continue;
                 }
                 ArtifactResult res =
@@ -387,6 +388,7 @@ public class CreateUpdateSiteMojo
         return repo;
     }
 
+    @Override
     public void contextualize( Context context )
         throws ContextException
     {
@@ -395,13 +397,16 @@ public class CreateUpdateSiteMojo
 
     private boolean matchesIncludes( Artifact art )
     {
-        if (updateSiteIncludes != null) {
+        if ( updateSiteIncludes != null )
+        {
             String s = art.getGroupId() + ":" + art.getArtifactId();
-            for (String p : updateSiteIncludes) {
+            for ( String p : updateSiteIncludes )
+            {
                 //TODO optimize and only do once per execution.
-                p = p.replace(".", "\\.").replace( "*", ".*");
+                p = p.replace( ".", "\\." ).replace( "*", ".*" );
                 Pattern patt = Pattern.compile( p );
-                if (patt.matcher( s).matches()) {
+                if ( patt.matcher( s ).matches() )
+                {
                     return true;
                 }
             }

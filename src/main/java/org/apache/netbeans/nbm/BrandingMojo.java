@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -52,10 +52,10 @@ import org.codehaus.plexus.util.FileUtils;
  *
  *
  */
-@Mojo(name="branding",
-        requiresProject=true,
+@Mojo( name = "branding",
+        requiresProject = true,
         threadSafe = true,
-        defaultPhase= LifecyclePhase.PACKAGE)
+        defaultPhase = LifecyclePhase.PACKAGE )
 public class BrandingMojo
         extends AbstractNbmMojo
 {
@@ -63,37 +63,37 @@ public class BrandingMojo
     /**
      * directory where the the binary content is created.
      */
-    @Parameter(required=true, defaultValue="${project.build.directory}/nbm")
+    @Parameter( required = true, defaultValue = "${project.build.directory}/nbm" )
     protected File nbmBuildDir;
     
     /**
     * output directory.
     */
-    @Parameter(defaultValue="${project.build.directory}", required=true)
+    @Parameter( defaultValue = "${project.build.directory}", required = true )
     protected File outputDirectory;
     
     /**
      * Location of the branded resources.
      */
-    @Parameter(required=true, defaultValue="${basedir}/src/main/nbm-branding")
+    @Parameter( required = true, defaultValue = "${basedir}/src/main/nbm-branding" )
     private File brandingSources;
     /**
      * The branding token used by the application.
      * Required unless {@code nbmBuildDir} does not exist and the mojo is thus skipped.
      */
-    @Parameter(property="netbeans.branding.token")
+    @Parameter( property = "netbeans.branding.token" )
     private String brandingToken;
     /**
      * cluster of the branding.
      */
-    @Parameter(required=true, defaultValue="extra")
+    @Parameter( required = true, defaultValue = "extra" )
     protected String cluster;
     /**
      * @parameter expression="${project}"
      * @required
      * @readonly
      */
-    @Parameter(required=true, readonly=true, property="project")
+    @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 
     public void execute()
@@ -125,7 +125,7 @@ public class BrandingMojo
             scanner.scan();
 
             final String clusterPathPart = "netbeans" + File.separator + cluster;
-            File outputDir = new File(outputDirectory, "branding_and_locales");
+            File outputDir = new File( outputDirectory, "branding_and_locales" );
             outputDir.mkdirs();
             File clusterDir = new File( nbmBuildDir, clusterPathPart );
             clusterDir.mkdirs();
@@ -134,20 +134,22 @@ public class BrandingMojo
             for ( String brandingFilePath : scanner.getIncludedFiles() )
             {
                 File brandingFile = new File( brandingSources, brandingFilePath );
-                String[] locale = getLocale( brandingFile.getName());
+                String[] locale = getLocale( brandingFile.getName() );
                 String token = locale[1] == null ? brandingToken : brandingToken + "_" + locale[1];
-                File root = new File(outputDir, token);
+                File root = new File( outputDir, token );
                 root.mkdirs();
                 String destinationName = locale[0] + "_" + token + locale[2];
-                File brandingDestination = new File( root, brandingFilePath.replace( brandingFile.getName(), destinationName) );
+                File brandingDestination = new File( root, brandingFilePath.replace( brandingFile.getName(), destinationName ) );
                 if ( !brandingDestination.getParentFile().exists() )
                 {
                     brandingDestination.getParentFile().mkdirs();
                 }
                 FileUtils.copyFile( brandingFile, brandingDestination );
             }
-            for (File rootDir : outputDir.listFiles()) {
-                if (!rootDir.isDirectory()) {
+            for ( File rootDir : outputDir.listFiles() ) 
+            {
+                if ( !rootDir.isDirectory() ) 
+                {
                     continue;
                 }
                 String effectiveBranding = rootDir.getName();
@@ -162,7 +164,7 @@ public class BrandingMojo
                 {
                     // move nnn.jar directory to nnn.jar.tmp
                     File jarDirectory = new File( rootDir, jarDirectoryPath );
-                    File destinationLocation = new File(clusterDir, jarDirectoryPath).getParentFile();
+                    File destinationLocation = new File( clusterDir, jarDirectoryPath ).getParentFile();
                     destinationLocation.mkdirs();
                     // jars should be placed in locales/ under the same directory the jar-directories are
                     File destinationJar =
@@ -192,7 +194,8 @@ public class BrandingMojo
 
         // no underscores, use dot
         int lastDot = brandingFilePath.lastIndexOf( "." );
-        if (lastDot == -1 || lastDot < lastSeparator) {
+        if ( lastDot == -1 || lastDot < lastSeparator )
+        {
             return brandingFilePath + infix;
         }
         return brandingFilePath.substring( 0, lastDot ) + infix + brandingFilePath.substring( lastDot );
@@ -201,26 +204,33 @@ public class BrandingMojo
     //[0] prefix
     //[1] locale
     //[2] suffix
-    static String[] getLocale(String name) {
+    static String[] getLocale( String name )
+    {
         String suffix = "";
-        int dot = name.indexOf( ".");
-        if (dot > -1) { //remove file extension
+        int dot = name.indexOf( "." );
+        if ( dot > -1 ) 
+        { //remove file extension
             suffix = name.substring( dot );
-            name = name.substring( 0, dot);
+            name = name.substring( 0, dot );
         }
         String locale = null;
         int count = 1;
         //iterate from back of the string, max 3 times and see if the pattern patches local pattern
-        while (count <= 3) {
-            int underscore = name.lastIndexOf( '_');
-            if (underscore > -1) {
-                String loc1 = name.substring( underscore  + 1);
-                if (loc1.length() != 2) {
+        while ( count <= 3 )
+        {
+            int underscore = name.lastIndexOf( '_' );
+            if ( underscore > -1 )
+            {
+                String loc1 = name.substring( underscore + 1 );
+                if ( loc1.length() != 2 )
+                {
                     break;
                 } 
-                locale = loc1 + (locale == null ? "" : "_" + locale);
-                name = name.substring( 0, underscore);
-            } else {
+                locale = loc1 + ( locale == null ? "" : "_" + locale );
+                name = name.substring( 0, underscore );
+            }
+            else
+            {
                 break;
             }
             count = count + 1;

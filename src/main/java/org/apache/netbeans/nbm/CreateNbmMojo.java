@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,11 +57,11 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
  *
  * @author Milos Kleint
  */
-@Mojo(name="nbm", 
-        requiresProject=true, 
+@Mojo( name = "nbm",
+        requiresProject = true,
         threadSafe = true,
-        requiresDependencyResolution= ResolutionScope.RUNTIME, 
-        defaultPhase= LifecyclePhase.PACKAGE )
+        requiresDependencyResolution = ResolutionScope.RUNTIME,
+        defaultPhase = LifecyclePhase.PACKAGE )
 public class CreateNbmMojo
         extends CreateNetBeansFileStructure
         implements Contextualizable
@@ -70,17 +70,17 @@ public class CreateNbmMojo
     /**
      * keystore location for signing the nbm file
      */
-    @Parameter(property="keystore")
+    @Parameter( property = "keystore" )
     private String keystore;
     /**
      * keystore password
      */
-    @Parameter(property="keystorepass")
+    @Parameter( property = "keystorepass" )
     private String keystorepassword;
     /**
      * keystore alias
      */
-    @Parameter(property="keystorealias")
+    @Parameter( property = "keystorealias" )
     private String keystorealias;
 
     /**
@@ -88,14 +88,14 @@ public class CreateNbmMojo
      * If skipped, just the expanded directory for cluster is created
      * @since 3.0
      */
-    @Parameter(defaultValue="false", property="maven.nbm.skip")
+    @Parameter( defaultValue = "false", property = "maven.nbm.skip" )
     private boolean skipNbm;
     
     /**
      * if true, upon installing the NBM the platform app/IDE restart is requested. Not necessary in most cases.
      * @since 3.8
      */
-    @Parameter(defaultValue="false")
+    @Parameter( defaultValue = "false" )
     private boolean requiresRestart;
     
     /**
@@ -104,14 +104,14 @@ public class CreateNbmMojo
      * information about the functionality. 
      * @since 3.8
      */
-    @Parameter(defaultValue="${project.url}")
+    @Parameter( defaultValue = "${project.url}" )
     private String homePageUrl;
     
     /**
      * Author of the module. Shown in the Module manager UI.
      * @since 3.8
      */
-    @Parameter(defaultValue="${project.organization.name}")
+    @Parameter( defaultValue = "${project.organization.name}" )
     private String author;
     
     /**
@@ -138,7 +138,7 @@ public class CreateNbmMojo
      * it's assumed to be the flat structure and the value is just the URL.
      * 
      */
-    @Parameter(property="maven.nbm.distributionURL")
+    @Parameter( property = "maven.nbm.distributionURL" )
     private String distributionUrl;
     
     /**
@@ -176,7 +176,7 @@ public class CreateNbmMojo
     // end of component params custom code folding
     // </editor-fold>
     
-    private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat ("yyyy/MM/dd");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat ( "yyyy/MM/dd" );
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -204,15 +204,17 @@ public class CreateNbmMojo
 
         nbmTask.setModule( "modules" + File.separator + moduleJarName + ".jar" );
         boolean reqRestart = requiresRestart;
-        if (!reqRestart && module.isRequiresRestart()) {
+        if ( !reqRestart && module.isRequiresRestart() )
+        {
             reqRestart = module.isRequiresRestart();
-            getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml" );
         }
         nbmTask.setNeedsrestart( Boolean.toString( reqRestart ) );
         String moduleAuthor = author;
-        if (module.getAuthor() != null) {
+        if ( module.getAuthor() != null )
+        {
             moduleAuthor = module.getAuthor();
-            getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml" );
         }
         nbmTask.setModuleauthor( moduleAuthor );
         if ( keystore != null && keystorealias != null && keystorepassword != null )
@@ -238,14 +240,16 @@ public class CreateNbmMojo
         }
         String licName = licenseName;
         File licFile = licenseFile;
-        if (module.getLicenseName() != null) {
+        if ( module.getLicenseName() != null )
+        {
             licName = module.getLicenseName();
-            getLog().warn( "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn( "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml" );
         }
-        if (module.getLicenseFile() != null) {
+        if ( module.getLicenseFile() != null )
+        {
             File lf = new File( project.getBasedir(), module.getLicenseFile() );
             licFile = lf;
-            getLog().warn( "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn( "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml" );
             
         }
         if ( licName != null && licFile != null )
@@ -273,8 +277,9 @@ public class CreateNbmMojo
             lb.addText( createDefaultLicenseText() );
         }
         String hpUrl = homePageUrl;
-        if (module.getHomepageUrl() != null) {
-            getLog().warn( "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml");
+        if ( module.getHomepageUrl() != null )
+        {
+            getLog().warn( "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml" );
             hpUrl = module.getHomepageUrl();
         }
         if ( hpUrl != null )
@@ -282,9 +287,10 @@ public class CreateNbmMojo
             nbmTask.setHomepage( hpUrl );
         }
         String distribUrl = distributionUrl;
-        if (module.getDistributionUrl() != null) {
+        if ( module.getDistributionUrl() != null )
+        {
             distribUrl = module.getDistributionUrl();
-            getLog().warn( "Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn( "Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml" );
         }
         if ( distribUrl != null )
         {
@@ -322,7 +328,7 @@ public class CreateNbmMojo
             nbmTask.setTargetcluster( cluster );
         }
         //MNBMODULE-217 avoid using the static DATE_FORMAT variable in MavenNBM.java (in ant harness)
-        nbmTask.setReleasedate( DATE_FORMAT.format(new Date(System.currentTimeMillis())) );
+        nbmTask.setReleasedate( DATE_FORMAT.format( new Date( System.currentTimeMillis() ) ) );
         try
         {
             nbmTask.execute();
@@ -343,6 +349,7 @@ public class CreateNbmMojo
         }
     }
 
+    @Override
     public void contextualize( Context context )
             throws ContextException
     {
@@ -353,55 +360,70 @@ public class CreateNbmMojo
     {
         String organization = "";
         Organization org = project.getOrganization();
-        if (org != null) {
+        if ( org != null )
+        {
             organization = org.getName();
-}
-        if (organization == null) {
+        }
+        if ( organization == null )
+        {
             List devs = project.getDevelopers();
-            if (devs.size() > 0) {
+            if ( devs.size() > 0 )
+            {
                 Iterator dvs = devs.iterator();
                 String devsString = "";
-                while (dvs.hasNext()) {
-                    Developer d = ( Developer )dvs.next();
+                while ( dvs.hasNext() )
+                {
+                    Developer d = ( Developer ) dvs.next();
                     devsString = devsString + "," + d.getName() != null ? d.getName() : d.getId();
                 }
-                organization = devsString.substring( 1 );    
+                organization = devsString.substring( 1 );
             }
         }
-        if (organization == null) {
+        if ( organization == null )
+        {
             organization = ""; //what's a good default value?
         }
         String date = "";
-        if (project.getInceptionYear() != null) {
+        if ( project.getInceptionYear() != null )
+        {
             date = project.getInceptionYear();
         }
-        String year = Integer.toString( Calendar.getInstance().get( Calendar.YEAR ));
-        if (!year.equals( date ) ) {
+        String year = Integer.toString( Calendar.getInstance().get( Calendar.YEAR ) );
+        if ( !year.equals( date ) )
+        {
             date = date.length() == 0 ? year : date + "-" + year;
         }
         return "Copyright " + organization + " " + date;
     }
     
-    private String createDefaultLicenseText() {
+    private String createDefaultLicenseText()
+    {
         String toRet = "License terms:\n";
         
         List licenses = project.getLicenses();
-        if (licenses != null && licenses.size() > 0) {
+        if ( licenses != null && licenses.size() > 0 )
+        {
             Iterator lic = licenses.iterator();
-            while (lic.hasNext()) {
-                License ll = ( License )lic.next();
+            while ( lic.hasNext() )
+            {
+                License ll = ( License ) lic.next();
                 
-                if (ll.getName() != null) {
+                if ( ll.getName() != null )
+                {
                    toRet = toRet + ll.getName() + " - "; 
                 }
-                if (ll.getUrl() != null) {
+                if ( ll.getUrl() != null )
+                {
                     toRet = toRet + ll.getUrl();
                 }
-                if (lic.hasNext()) {
+                if ( lic.hasNext() )
+                {
                     toRet = toRet + ",\n";
                 }
             }
-        } else {
+        }
+        else
+        {
            toRet = toRet + "Unknown";
         }
         return toRet;

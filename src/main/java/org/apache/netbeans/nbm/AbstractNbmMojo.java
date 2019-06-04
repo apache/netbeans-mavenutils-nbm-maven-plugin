@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.io.FileReader;
@@ -216,25 +216,31 @@ public abstract class AbstractNbmMojo
         throws MojoExecutionException
     {
         List<Dependency> deps = new ArrayList<Dependency>();
-        if (customDependencies != null) {
-            deps.addAll( Arrays.asList( customDependencies ));
+        if ( customDependencies != null ) 
+        {
+            deps.addAll( Arrays.asList( customDependencies ) );
         }
-        if (module != null && !module.getDependencies().isEmpty()) {
-            log.warn( "dependencies in module descriptor are deprecated, use the plugin's parameter moduleDependencies");
+        if ( module != null && !module.getDependencies().isEmpty() )
+        {
+            log.warn( "dependencies in module descriptor are deprecated, use the plugin's parameter moduleDependencies" );
             //we need to make sure a dependency is not twice there, module deps override the config (as is the case with other
             //configurations)
-            for (Dependency d : module.getDependencies()) {
+            for ( Dependency d : module.getDependencies() ) 
+            {
                 Dependency found = null;
-                for (Dependency d2 : deps) {
-                    if (d2.getId().equals(d.getId())) {
+                for ( Dependency d2 : deps )
+                {
+                    if ( d2.getId().equals( d.getId() ) )
+                    {
                         found = d2;
                         break;
                     }
                 }
-                if (found != null) {
+                if ( found != null )
+                {
                     deps.remove( found );
                 }
-                deps.add(d);
+                deps.add( d );
             }
         }
         List<ModuleWrapper> include = new ArrayList<ModuleWrapper>();
@@ -395,15 +401,18 @@ public abstract class AbstractNbmMojo
                 // via WorkspaceReader. That's fine here, as all we need is to know if project is osgi or nbm module.
                 // the nbm file has to be in local repository though.
                 String path = localRepository.pathOf( art );
-                File jar2 = new File(localRepository.getBasedir(), path.replace( "/", File.separator));
-                File manifest = new File(jar, "META-INF/MANIFEST.MF" );
+                File jar2 = new File( localRepository.getBasedir(), path.replace( "/", File.separator ) );
+                File manifest = new File( jar, "META-INF/MANIFEST.MF" );
                 
-                if (! jar2.isFile() || !manifest.isFile() ) {
+                if ( !jar2.isFile() || !manifest.isFile() )
+                {
                     getLog().warn( "MNBMODULE-131: need to at least run install phase on " + jar2 );
                     return new ArtifactResult( null, null );
                 }
                 mnf.setManifestFile( manifest );
-            } else {
+            }
+            else
+            {
                 mnf.setJarFile( jar );
             }
             mnf.checkFile();

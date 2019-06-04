@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +45,7 @@ import org.codehaus.plexus.util.io.InputStreamFacade;
  * Semi-deprecated; used only for standalone modules and "suites".
  * @author Milos Kleint
  */
-@Mojo(name="cluster",aggregator=true, requiresDependencyResolution= ResolutionScope.RUNTIME )
+@Mojo( name = "cluster", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class CreateClusterMojo
         extends AbstractNbmMojo
 {
@@ -53,7 +53,7 @@ public class CreateClusterMojo
     /**
      * directory where the the NetBeans cluster will be created.
      */
-    @Parameter(defaultValue="${project.build.directory}/netbeans_clusters", required=true)
+    @Parameter( defaultValue = "${project.build.directory}/netbeans_clusters", required = true )
     protected File nbmBuildDir;
 
     /**
@@ -61,12 +61,12 @@ public class CreateClusterMojo
      * typically OSGi bundles
      * @since 3.2
      */
-    @Parameter(defaultValue="extra")
+    @Parameter( defaultValue = "extra" )
     private String defaultCluster;
     /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
      */
-    @Parameter(required=true, readonly=true, property="reactorProjects")
+    @Parameter( required = true, readonly = true, property = "reactorProjects" )
     private List<MavenProject> reactorProjects;
 
     public void execute()
@@ -151,13 +151,15 @@ public class CreateClusterMojo
                         {
                             FileUtils.copyFile( jar, moduleArt );
                             final File moduleConf = new File( confModules, cnbDashed + ".xml" );
-                            FileUtils.copyStreamToFile( new InputStreamFacade() {
+                            FileUtils.copyStreamToFile( new InputStreamFacade()
+                            {
                                 public InputStream getInputStream() throws IOException
                                 {
                                     return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile( cnb, mnf.isBundleAutoload() ), "UTF-8" );
                                 }
                             }, moduleConf );
-                            FileUtils.copyStreamToFile( new InputStreamFacade() {
+                            FileUtils.copyStreamToFile( new InputStreamFacade()
+                            {
                                 public InputStream getInputStream() throws IOException
                                 {
                                     return new StringInputStream( CreateClusterAppMojo.createBundleUpdateTracking( cnb, moduleArt, moduleConf, specVer ), "UTF-8" );

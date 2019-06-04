@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -138,8 +138,8 @@ public class CollectModuleLibrariesNodeVisitor
             if ( currentModule.size() > 0 )
             {
                 ////MNBMODULE-95 we are only interested in the module owned libraries
-                if ( !currentModule.peek().startsWith( LIB_ID ) &&
-                        AbstractNbmMojo.matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log, useOSGiDependencies ) )
+                if ( !currentModule.peek().startsWith( LIB_ID )
+                        && AbstractNbmMojo.matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log, useOSGiDependencies ) )
                 {
                     if ( currentModule.size() == 1 )
                     {

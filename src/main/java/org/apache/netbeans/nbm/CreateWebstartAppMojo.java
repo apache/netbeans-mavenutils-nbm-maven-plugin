@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -67,7 +67,7 @@ import org.netbeans.nbbuild.VerifyJNLP;
  * @author Milos Kleint
  * @since 3.0
  */
-@Mojo(name="webstart-app", defaultPhase= LifecyclePhase.PACKAGE )
+@Mojo( name = "webstart-app", defaultPhase = LifecyclePhase.PACKAGE )
 public class CreateWebstartAppMojo
     extends AbstractNbmMojo
 {
@@ -76,7 +76,7 @@ public class CreateWebstartAppMojo
      * The Maven project.
 
      */
-    @org.apache.maven.plugins.annotations.Parameter(required=true, readonly=true, property="project")
+    @org.apache.maven.plugins.annotations.Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 
     @Component
@@ -85,34 +85,34 @@ public class CreateWebstartAppMojo
     /**
      * The branding token for the application based on NetBeans platform.
      */
-    @org.apache.maven.plugins.annotations.Parameter(required=true, property="netbeans.branding.token")
+    @org.apache.maven.plugins.annotations.Parameter( required = true, property = "netbeans.branding.token" )
     protected String brandingToken;
 
     /**
      * output directory where the the NetBeans application will be created.
      */
-    @org.apache.maven.plugins.annotations.Parameter(required=true, defaultValue="${project.build.directory}")
+    @org.apache.maven.plugins.annotations.Parameter( required = true, defaultValue = "${project.build.directory}" )
     private File outputDirectory;
 
     /**
      * Ready-to-deploy WAR containing application in JNLP packaging.
      * 
      */
-    @org.apache.maven.plugins.annotations.Parameter(required=true, defaultValue="${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war")
+    @org.apache.maven.plugins.annotations.Parameter( required = true, defaultValue = "${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war" )
     private File destinationFile;
 
     /**
      * Artifact Classifier to use for the webstart distributable zip file.
      * @since 3.1
      */
-    @org.apache.maven.plugins.annotations.Parameter(defaultValue="webstart", property="nbm.webstart.classifier")
+    @org.apache.maven.plugins.annotations.Parameter( defaultValue = "webstart", property = "nbm.webstart.classifier" )
     private String webstartClassifier;
 
     /**
      * Codebase value within *.jnlp files.
      * <strong>Defining this parameter is generally a bad idea.</strong>
      */
-    @org.apache.maven.plugins.annotations.Parameter(property="nbm.webstart.codebase")
+    @org.apache.maven.plugins.annotations.Parameter( property = "nbm.webstart.codebase" )
     private String codebase;
 
     /**
@@ -140,32 +140,32 @@ public class CreateWebstartAppMojo
      * Defaults to the branding token.
      * @since 3.5
      */
-    @org.apache.maven.plugins.annotations.Parameter(property="master.jnlp.file.name")
+    @org.apache.maven.plugins.annotations.Parameter( property = "master.jnlp.file.name" )
     private String masterJnlpFileName;
 
     /**
      * keystore location for signing the nbm file
      */
-    @org.apache.maven.plugins.annotations.Parameter(property="keystore")
+    @org.apache.maven.plugins.annotations.Parameter( property = "keystore" )
     private String keystore;
 
     /**
      * keystore password
      */
-    @org.apache.maven.plugins.annotations.Parameter(property="keystorepass")
+    @org.apache.maven.plugins.annotations.Parameter( property = "keystorepass" )
     private String keystorepassword;
 
     /**
      * keystore alias
      */
-    @org.apache.maven.plugins.annotations.Parameter(property="keystorealias")
+    @org.apache.maven.plugins.annotations.Parameter( property = "keystorealias" )
     private String keystorealias;
 
     /**
      * keystore type
      * @since 3.5
      */
-    @org.apache.maven.plugins.annotations.Parameter(property="keystoretype")
+    @org.apache.maven.plugins.annotations.Parameter( property = "keystoretype" )
     private String keystoretype;
 
     /**
@@ -177,14 +177,14 @@ public class CreateWebstartAppMojo
      * http://java.sun.com/j2se/1.5.0/docs/guide/javaws/developersguide/downloadservletguide.html#resources).
      *
      */
-    @org.apache.maven.plugins.annotations.Parameter(defaultValue="false", property="nbm.webstart.versions")
+    @org.apache.maven.plugins.annotations.Parameter( defaultValue = "false", property = "nbm.webstart.versions" )
     private boolean processJarVersions;
     /**
      * additional command line arguments. Eg.
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
      * can be used to debug the IDE.
      */
-    @org.apache.maven.plugins.annotations.Parameter(property="netbeans.run.params")
+    @org.apache.maven.plugins.annotations.Parameter( property = "netbeans.run.params" )
     private String additionalArguments;
 
     /**
@@ -203,7 +203,7 @@ public class CreateWebstartAppMojo
         }
         Project antProject = antProject();
         
-        getLog().warn( "WARNING: Unsigned and self-signed WebStart applications are deprecated from JDK7u21 onwards. To ensure future correct functionality please use trusted certificate.");
+        getLog().warn( "WARNING: Unsigned and self-signed WebStart applications are deprecated from JDK7u21 onwards. To ensure future correct functionality please use trusted certificate." );
 
         if ( keystore != null && keystorealias != null && keystorepassword != null )
         {
@@ -457,7 +457,8 @@ public class CreateWebstartAppMojo
                     {
                         continue;
                     }
-                    archiver.addResource( new PlexusIoResource() {
+                    archiver.addResource( new PlexusIoResource()
+                    {
                         public @Override InputStream getContents() throws IOException
                         {
                             return new ByteArrayInputStream( FileUtils.fileRead( jnlp, "UTF-8" ).replace( localCodebase, "$$codebase" ).getBytes( "UTF-8" ) );
@@ -508,20 +509,21 @@ public class CreateWebstartAppMojo
             if ( servlet.isFile() )
             {
                 archiver.addFile( servlet, "WEB-INF/lib/jnlp-servlet.jar" );
-                archiver.addResource( new PlexusIoResource() {
+                archiver.addResource( new PlexusIoResource()
+                {
                     public @Override InputStream getContents() throws IOException
                     {
-                        return new ByteArrayInputStream( ( "" +
-                            "<web-app>\n" +
-                            "    <servlet>\n" +
-                            "        <servlet-name>JnlpDownloadServlet</servlet-name>\n" +
-                            "        <servlet-class>jnlp.sample.servlet.JnlpDownloadServlet</servlet-class>\n" +
-                            "    </servlet>\n" +
-                            "    <servlet-mapping>\n" +
-                            "        <servlet-name>JnlpDownloadServlet</servlet-name>\n" +
-                            "        <url-pattern>*.jnlp</url-pattern>\n" +
-                            "    </servlet-mapping>\n" +
-                            "</web-app>\n" ).getBytes() );
+                        return new ByteArrayInputStream( ( "" 
+                            + "<web-app>\n"
+                            + "    <servlet>\n"
+                            + "        <servlet-name>JnlpDownloadServlet</servlet-name>\n"
+                            + "        <servlet-class>jnlp.sample.servlet.JnlpDownloadServlet</servlet-class>\n"
+                            + "    </servlet>\n"
+                            + "    <servlet-mapping>\n"
+                            + "        <servlet-name>JnlpDownloadServlet</servlet-name>\n"
+                            + "        <url-pattern>*.jnlp</url-pattern>\n"
+                            + "    </servlet-mapping>\n"
+                            + "</web-app>\n" ).getBytes() );
                     }
                     public @Override long getLastModified()
                     {
@@ -670,7 +672,7 @@ public class CreateWebstartAppMojo
             String codenamebase = attr.getValue( "OpenIDE-Module" );
             if ( codenamebase == null )
             {
-                codenamebase = attr.getValue("Bundle-SymbolicName");
+                codenamebase = attr.getValue( "Bundle-SymbolicName" );
             }
             if ( codenamebase == null )
             {
@@ -678,9 +680,10 @@ public class CreateWebstartAppMojo
             }
             
             // see http://hg.netbeans.org/main-silver/rev/87823abb86d9
-            if (codenamebase.equals("org.objectweb.asm.all")
-                    && jar.getParentFile().getName().equals("core")
-                    && jar.getParentFile().getParentFile().getName().startsWith("platform")) {
+            if ( codenamebase.equals( "org.objectweb.asm.all" )
+                    && jar.getParentFile().getName().equals( "core" )
+                    && jar.getParentFile().getParentFile().getName().startsWith( "platform" ) )
+            {
                 continue;
             }
             {

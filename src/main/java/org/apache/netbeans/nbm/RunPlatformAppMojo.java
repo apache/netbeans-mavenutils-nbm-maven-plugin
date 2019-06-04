@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.util.List;
@@ -40,7 +40,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  * @author Milos Kleint
  *
  */
-@Mojo(name="run-platform", requiresDependencyResolution= ResolutionScope.RUNTIME )
+@Mojo( name = "run-platform", requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class RunPlatformAppMojo
         extends AbstractMojo
 {
@@ -48,24 +48,24 @@ public class RunPlatformAppMojo
     /**
      * The branding token for the application based on NetBeans platform.
      */
-    @Parameter(required=true, property="netbeans.branding.token")
+    @Parameter( required = true, property = "netbeans.branding.token" )
     protected String brandingToken;
     /**
      * output directory where the the NetBeans application is created.
      */
-    @Parameter(required=true, defaultValue="${project.build.directory}")
+    @Parameter( required = true, defaultValue = "${project.build.directory}" )
     private File outputDirectory;
 
     /**
      * NetBeans user directory for the executed instance.
      */
-    @Parameter(required=true, defaultValue="${project.build.directory}/userdir", property="netbeans.userdir")
+    @Parameter( required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir" )
     protected File netbeansUserdir;
     /**
      * additional command line arguments passed to the application.
      * can be used to debug the IDE.
      */
-    @Parameter(property="netbeans.run.params")
+    @Parameter( property = "netbeans.run.params" )
     protected String additionalArguments;
     
     /**
@@ -75,14 +75,14 @@ public class RunPlatformAppMojo
      * parameter).
      * @since 3.11
      */
-    @Parameter(property="netbeans.run.params.debug")
+    @Parameter( property = "netbeans.run.params.debug" )
     protected String debugAdditionalArguments;
     
     /**
      * The Maven Project.
      *
      */
-    @Parameter(required=true, readonly=true, property="project")
+    @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 
     /**
@@ -95,7 +95,7 @@ public class RunPlatformAppMojo
     {
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
-            throw new MojoFailureException( "The nbm:run-platform goal shall be used within a NetBeans Application project only ('nbm-application' packaging)");
+            throw new MojoFailureException( "The nbm:run-platform goal shall be used within a NetBeans Application project only ('nbm-application' packaging)" );
         }
 
         netbeansUserdir.mkdirs();
@@ -130,8 +130,8 @@ public class RunPlatformAppMojo
                     [1] Mark Reinhold on 2017-09-25
                         https://twitter.com/mreinhold/status/912311207935090689
                     [2] Downloaded from https://www.azul.com/downloads/zulu/zulu-windows on 2018-09-05. */
-                    if (!new File(jdkHome, "jre\\bin\\JavaAccessBridge-32.dll").exists() && // 32-bit Java 8
-                        !new File(jdkHome, "\\bin\\javaaccessbridge-32.dll").exists()) // 32-bit Java 9 or 10
+                    if ( !new File( jdkHome, "jre\\bin\\JavaAccessBridge-32.dll" ).exists() && // 32-bit Java 8
+                        !new File( jdkHome, "\\bin\\javaaccessbridge-32.dll" ).exists() ) // 32-bit Java 9 or 10
                     {
                         File exec64 = new File( appbasedir, "bin\\" + brandingToken + "64.exe" );
                         if ( exec64.isFile() )

@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,7 +44,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  * @author Milos Kleint
  *
  */
-@Mojo(name="run-ide", aggregator=true, requiresDependencyResolution= ResolutionScope.RUNTIME )
+@Mojo( name = "run-ide", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class RunNetBeansMojo
         extends AbstractMojo
 {
@@ -53,23 +53,23 @@ public class RunNetBeansMojo
      * directory where the module(s)' NetBeans cluster(s) are located.
      * is related to nbm:cluster goal.
      */
-    @Parameter(required=true, defaultValue="${project.build.directory}/netbeans_clusters")
+    @Parameter( required = true, defaultValue = "${project.build.directory}/netbeans_clusters" )
     protected File clusterBuildDir;
     /**
      * directory where the the NetBeans platform/IDE installation is,
      * denotes the root directory of NetBeans installation.
      */
-    @Parameter(required=true, property="netbeans.installation")
+    @Parameter( required = true, property = "netbeans.installation" )
     protected File netbeansInstallation;
     /**
      * NetBeans user directory for the executed instance.
      */
-    @Parameter(required=true, defaultValue="${project.build.directory}/userdir", property="netbeans.userdir")
+    @Parameter( required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir" )
     protected File netbeansUserdir;
     /**
      * additional command line arguments. 
      */
-    @Parameter(property="netbeans.run.params")
+    @Parameter( property = "netbeans.run.params" )
     protected String additionalArguments;
     
     /**
@@ -79,7 +79,7 @@ public class RunNetBeansMojo
      * parameter).
      * @since 3.11.1
      */
-    @Parameter(property="netbeans.run.params.debug")
+    @Parameter( property = "netbeans.run.params.debug" )
     protected String debugAdditionalArguments;    
 
     /**

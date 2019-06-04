@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,10 +19,19 @@
  * under the License.
  */
 
-package org.apache.netbeans.nbm;
-
 import com.google.common.collect.Sets;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,11 +89,11 @@ import org.netbeans.nbbuild.MakeListOfNBM;
  *
  * @author Milos Kleint
  */
-@Mojo(name="cluster-app", 
-        defaultPhase= LifecyclePhase.PACKAGE, 
-        requiresProject=true, 
+@Mojo( name = "cluster-app", 
+        defaultPhase = LifecyclePhase.PACKAGE,
+        requiresProject = true, 
         threadSafe = true,
-        requiresDependencyResolution= ResolutionScope.RUNTIME )
+        requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class CreateClusterAppMojo
     extends AbstractNbmMojo
 {
@@ -90,33 +101,33 @@ public class CreateClusterAppMojo
     /**
      * output directory where the the NetBeans application will be created.
      */
-    @Parameter(defaultValue="${project.build.directory}", required=true)
+    @Parameter( defaultValue = "${project.build.directory}", required = true )
     private File outputDirectory;
 
     /**
      * The Maven Project.
      */
-    @Parameter(required=true, readonly=true, property="project")
+    @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 
     /**
      * The branding token for the application based on NetBeans platform.
      */
-    @Parameter(property="netbeans.branding.token", required=true)
+    @Parameter( property = "netbeans.branding.token", required = true )
     protected String brandingToken;
 
     /**
      * Optional path to custom etc/${brandingToken}.conf file. If not defined,
      * a default template will be used.
      */
-    @Parameter( property="netbeans.conf.file")
+    @Parameter( property = "netbeans.conf.file" )
     private File etcConfFile;
 
     /**
      * Optional path to custom etc/${brandingToken}.clusters file. If not defined,
      * a default one will be generated.
      */
-    @Parameter(property="netbeans.clusters.file")
+    @Parameter( property = "netbeans.clusters.file" )
     private File etcClustersFile;
 
     /**
@@ -125,7 +136,7 @@ public class CreateClusterAppMojo
      * Please note that the name of the executables shall generally
      * match the brandingToken parameter. Otherwise the application can be wrongly branded.
      */
-    @Parameter(property="netbeans.bin.directory")
+    @Parameter( property = "netbeans.bin.directory" )
     private File binDirectory;
 
     /**
@@ -133,7 +144,7 @@ public class CreateClusterAppMojo
      * use this value as default location for such module NBMs.
      * @since 3.2
      */
-    @Parameter(defaultValue="extra")
+    @Parameter( defaultValue = "extra" )
     private String defaultCluster;
     
     /**
@@ -141,13 +152,13 @@ public class CreateClusterAppMojo
      * and that all required tokens are provided
      * @since 3.10
      */
-    @Parameter(defaultValue = "true", property = "netbeans.verify.integrity")
+    @Parameter( defaultValue = "true", property = "netbeans.verify.integrity" )
     private boolean verifyIntegrity;
     
     /**
      * @since 4.12
      */
-    @Parameter(defaultValue ="org.netbeans", property = "groupIdPrefix")
+    @Parameter( defaultValue = "org.netbeans", property = "groupIdPrefix" )
     private String groupIdPrefix;
     
     private final Collection<String> defaultPlatformTokens = Arrays.asList( new String[] {
@@ -161,7 +172,7 @@ public class CreateClusterAppMojo
                     "org.openide.modules.ModuleFormat1",
                     "org.openide.modules.ModuleFormat2",
                     "org.openide.modules.jre.JavaFX" //MNBMODULE-234
-    });
+    } );
 
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
@@ -176,7 +187,7 @@ public class CreateClusterAppMojo
      * Local maven repository.
      *
      */
-    @Parameter(required=true, readonly=true, property="localRepository")
+    @Parameter( required = true, readonly = true, property = "localRepository" )
     protected ArtifactRepository localRepository;
 
 // end of component params custom code folding
@@ -197,21 +208,21 @@ public class CreateClusterAppMojo
         {
             Project antProject = registerNbmAntTasks();
 
-            Set<String> wrappedBundleCNBs = new HashSet<>(100);
+            Set<String> wrappedBundleCNBs = new HashSet<>( 100 );
             Map<String, Set<String>> clusterDependencies = new HashMap<>();
             Map<String, Set<String>> clusterModules = new HashMap<>();
             
             //verify integrity
-            Set<String> modulesCNBs = new HashSet<>(200);
-            Set<String> dependencyCNBs = new HashSet<>(200);
-            Map<String, Set<String>> dependencyCNBBacktraces = new HashMap<>(50);
-            Set<String> requireTokens = new HashSet<>(50);
-            Map<String, Set<String>> requireTokensBacktraces = new HashMap<>(50);
-            Set<String> provideTokens = new HashSet<>(50);
-            Set<String> osgiImports = new HashSet<>(50);
-            Map<String, Set<String>> osgiImportsBacktraces = new HashMap<>(50);
-            Set<String> osgiExports = new HashSet<>(50);
-            Set<String> osgiExportsSubs = new HashSet<>(50); //a way to deal with nb module declaring xxx.** (subpackages) declaration that is consumed by osgi imports
+            Set<String> modulesCNBs = new HashSet<>( 200 );
+            Set<String> dependencyCNBs = new HashSet<>( 200 );
+            Map<String, Set<String>> dependencyCNBBacktraces = new HashMap<>( 50 );
+            Set<String> requireTokens = new HashSet<>( 50 );
+            Map<String, Set<String>> requireTokensBacktraces = new HashMap<>( 50 );
+            Set<String> provideTokens = new HashSet<>( 50 );
+            Set<String> osgiImports = new HashSet<>( 50 );
+            Map<String, Set<String>> osgiImportsBacktraces = new HashMap<>( 50 );
+            Set<String> osgiExports = new HashSet<>( 50 );
+            Set<String> osgiExportsSubs = new HashSet<>( 50 ); //a way to deal with nb module declaring xxx.** (subpackages) declaration that is consumed by osgi imports
             
             List<BundleTuple> bundles = new ArrayList<>();
 
@@ -232,7 +243,7 @@ public class CreateClusterAppMojo
                         JarFile jf = new JarFile( art.getFile() );
                         try
                         {
-                            String clusterName = findCluster( jf );                            
+                            String clusterName = findCluster( jf );
                             ClusterTuple cluster = processCluster( clusterName, nbmBuildDirFile, art );
                             
                                 getLog().debug( "Copying " + art.getId() + " to cluster " + clusterName );
@@ -253,10 +264,12 @@ public class CreateClusterAppMojo
                                     JarEntry ent = enu.nextElement();
                                     String name = ent.getName();
                                     //MNBMODULE-176
-                                    if (name.equals("Info/executables.list")) {
-                                        if (cluster.newer) {
+                                    if ( name.equals( "Info/executables.list" ) )
+                                    {
+                                        if ( cluster.newer )
+                                        {
                                             InputStream is = jf.getInputStream( ent );
-                                            executables = StringUtils.split( IOUtil.toString( is, "UTF-8" ), "\n");
+                                            executables = StringUtils.split( IOUtil.toString( is, "UTF-8" ), "\n" );
                                         }
                                     }
                                     else if ( name.startsWith( "netbeans/" ) )
@@ -273,7 +286,7 @@ public class CreateClusterAppMojo
                                         {
                                             part = part.replace( ".jar.pack.gz", ".jar" );
                                         }
-                                        if (cluster.newer) 
+                                        if ( cluster.newer )
                                         {
                                             if ( ent.isDirectory() )
                                             {
@@ -339,7 +352,7 @@ public class CreateClusterAppMojo
                                             
                                             
                                             // now figure which one of the jars is the module jar..
-                                            if ( part.matches("(modules|core|lib)/[^/]+[.]jar") )
+                                            if ( part.matches( "(modules|core|lib)/[^/]+[.]jar" ) )
                                             {
                                                 ExamineManifest ex = new ExamineManifest( getLog() );
                                                 ex.setJarFile( fl );
@@ -348,33 +361,42 @@ public class CreateClusterAppMojo
                                                 if ( ex.isNetBeansModule() )
                                                 {
                                                     makeTask.setModule( part );
-                                                    addToMap(clusterDependencies, clusterName, ex.getDependencyTokens());
-                                                    addToMap(clusterModules, clusterName, Collections.singletonList( ex.getModule() ));
-                                                    if (ex.getClasspath().length() > 0) { //MNBMODULE-220
+                                                    addToMap( clusterDependencies, clusterName, ex.getDependencyTokens() );
+                                                    addToMap( clusterModules, clusterName, Collections.singletonList( ex.getModule() ) );
+                                                    if ( ex.getClasspath().length() > 0 )
+                                                    { //MNBMODULE-220
                                                         classPath = ex.getClasspath();
                                                         classpathRoot = fl.getParentFile();
                                                     }
                                                 }
-                                                if (verifyIntegrity) {
-                                                    dependencyCNBs.addAll(ex.getDependencyTokens());
-                                                    modulesCNBs.add(ex.getModule());
-                                                    for (String d : ex.getDependencyTokens()) {
-                                                        addToMap(dependencyCNBBacktraces, d, Collections.singletonList( ex.getModule() ));
+                                                if ( verifyIntegrity )
+                                                {
+                                                    dependencyCNBs.addAll( ex.getDependencyTokens() );
+                                                    modulesCNBs.add( ex.getModule() );
+                                                    for ( String d : ex.getDependencyTokens() )
+                                                    {
+                                                        addToMap( dependencyCNBBacktraces, d, Collections.singletonList( ex.getModule() ) );
                                                     }
-                                                    if (ex.isNetBeansModule()) {
-                                                        requireTokens.addAll(ex.getNetBeansRequiresTokens());
-                                                        for (String r : ex.getNetBeansRequiresTokens()) {
-                                                            addToMap( requireTokensBacktraces, r, Collections.singletonList( ex.getModule()));
+                                                    if ( ex.isNetBeansModule() )
+                                                    {
+                                                        requireTokens.addAll( ex.getNetBeansRequiresTokens() );
+                                                        for ( String r : ex.getNetBeansRequiresTokens() )
+                                                        {
+                                                            addToMap( requireTokensBacktraces, r, Collections.singletonList( ex.getModule() ) );
                                                         }
-                                                        provideTokens.addAll(ex.getNetBeansProvidesTokens());
-                                                        for (String pack : ex.getPackages()) {
-                                                            if (pack.endsWith( ".**")) {
+                                                        provideTokens.addAll( ex.getNetBeansProvidesTokens() );
+                                                        for ( String pack : ex.getPackages() )
+                                                        {
+                                                            if ( pack.endsWith( ".**" ) )
+                                                            {
                                                                 //what to do with subpackages?
-                                                                pack = pack.substring( 0, pack.length() - ".**".length());
+                                                                pack = pack.substring( 0, pack.length() - ".**".length() );
                                                                 osgiExportsSubs.add( pack );
-                                                            } else if (pack.endsWith( ".*")) {
-                                                                pack = pack.substring( 0, pack.length() - ".*".length());
-                                                                osgiExports.add(pack);                                                            
+                                                            } 
+                                                            else if ( pack.endsWith( ".*" ) )
+                                                            {
+                                                                pack = pack.substring( 0, pack.length() - ".*".length() );
+                                                                osgiExports.add( pack );
                                                             }
                                                         }
                                                         
@@ -383,38 +405,46 @@ public class CreateClusterAppMojo
                                             }
                                         }
                                     }
-                                    if (classPath != null) { //MNBMODULE-220 collect wrappedbundleCNBs, later useful in assignClustersToBundles(), these get removed from list of bundles.
-                                        String[] paths = StringUtils.split( classPath, " ");
-                                        for (String path : paths) {
+                                    if ( classPath != null )
+                                    { //MNBMODULE-220 collect wrappedbundleCNBs, later useful in assignClustersToBundles(), these get removed from list of bundles.
+                                        String[] paths = StringUtils.split( classPath, " " );
+                                        for ( String path : paths )
+                                        {
                                             path = path.trim();
-                                            File classpathFile = new File(classpathRoot, path);
-                                            if (path.equals("${java.home}/lib/ext/jfxrt.jar")) { //MNBMODULE-228
-                                                String jhm = System.getProperty("java.home");
-                                                classpathFile = new File(new File(new File(new File(jhm), "lib"), "ext"), "jfxrt.jar");
-                                                if (!classpathFile.exists()) {
-                                                    File jdk7 = new File(new File(new File(jhm), "lib"), "jfxrt.jar");
-                                                    if (jdk7.exists()) {
+                                            File classpathFile = new File( classpathRoot, path );
+                                            if ( path.equals( "${java.home}/lib/ext/jfxrt.jar" ) )
+                                            { //MNBMODULE-228
+                                                String jhm = System.getProperty( "java.home" );
+                                                classpathFile = new File( new File( new File( new File( jhm ), "lib" ), "ext" ), "jfxrt.jar" );
+                                                if ( !classpathFile.exists() )
+                                                {
+                                                    File jdk7 = new File( new File( new File( jhm ), "lib" ), "jfxrt.jar" );
+                                                    if ( jdk7.exists() )
+                                                    {
                                                         classpathFile = jdk7;
                                                     }
                                                 }
                                             }
-                                            if (!classpathFile.isFile()) {
-                                                getLog().warn( "Could not resolve Class-Path item in " + art.getId() + ", path is:" + path +  ", skipping");
+                                            if ( !classpathFile.isFile() )
+                                            {
+                                                getLog().warn( "Could not resolve Class-Path item in " + art.getId() + ", path is:" + path +  ", skipping" );
                                                 continue; //try to guard against future failures
-                                            } 
+                                            }
                                             ExamineManifest ex = new ExamineManifest( getLog() );
                                             ex.setJarFile( classpathFile );
                                             //ex.setPopulateDependencies( true );
                                             ex.checkFile();
-                                            if (ex.isOsgiBundle()) {
-                                                if ( art.getId().contains( groupIdPrefix + ".modules:org-netbeans-modules-maven-embedder") )
+                                            if ( ex.isOsgiBundle() )
+                                            {
+                                                if ( art.getId().contains( groupIdPrefix + ".modules:org-netbeans-modules-maven-embedder" ) )
                                                 {
                                                     // in this case we dont want module-maven-embedder to be considered as wrapper for his libs                                                     
                                                     // guava is provided but ide have it also 
-                                                } else 
+                                                }
+                                                else
                                                 {
-                                                    getLog().info(ex.getModule() + " added by " + art.getId() + "" + classpathFile);
-                                                    wrappedBundleCNBs.add(ex.getModule());
+                                                    getLog().info( ex.getModule() + " added by " + art.getId() + "" + classpathFile );
+                                                    wrappedBundleCNBs.add( ex.getModule() );
                                                 }
                                             }
                                         }
@@ -460,45 +490,58 @@ public class CreateClusterAppMojo
                 if ( res.isOSGiBundle() )
                 {
                     ExamineManifest ex = res.getExaminedManifest();
-                    bundles.add( new BundleTuple( art,  ex) );
-                    if (verifyIntegrity) {
-                        dependencyCNBs.addAll(ex.getDependencyTokens());
+                    bundles.add( new BundleTuple( art, ex ) );
+                    if ( verifyIntegrity ) 
+                    {
+                        dependencyCNBs.addAll( ex.getDependencyTokens() );
                         for ( String d : ex.getDependencyTokens() )
                         {
                             addToMap( dependencyCNBBacktraces, d, Collections.singletonList( ex.getModule() ) );
                         }
-                        modulesCNBs.add(ex.getModule());
-                        osgiImports.addAll( ex.getOsgiImports());
+                        modulesCNBs.add( ex.getModule() );
+                        osgiImports.addAll( ex.getOsgiImports() );
                         for ( String d : ex.getOsgiImports() )
                         {
                             addToMap( osgiImportsBacktraces, d, Collections.singletonList( ex.getModule() ) );
                         }
                         
-                        osgiExports.addAll( ex.getOsgiExports());
+                        osgiExports.addAll( ex.getOsgiExports() );
                     }
                 } 
             }
             
-            if (verifyIntegrity) {
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug( "All found codenamebases:" + Arrays.toString( modulesCNBs.toArray()) );
-                    getLog().debug( "All found OSGI exports:" + Arrays.toString( osgiExports.toArray()) );
-                    getLog().debug( "All found provided tokens:" + Arrays.toString( provideTokens.toArray()) );
+            if ( verifyIntegrity )
+            {
+                if ( getLog().isDebugEnabled() )
+                {
+                    getLog().debug( "All found codenamebases:" + Arrays.toString( modulesCNBs.toArray() ) );
+                    getLog().debug( "All found OSGI exports:" + Arrays.toString( osgiExports.toArray() ) );
+                    getLog().debug( "All found provided tokens:" + Arrays.toString( provideTokens.toArray() ) );
                 }
                 dependencyCNBs.removeAll( modulesCNBs );
-                if (modulesCNBs.contains( "org.netbeans.modules.netbinox")) {
-                    dependencyCNBs.remove( "org.eclipse.osgi"); //this is special.
+                if ( modulesCNBs.contains( "org.netbeans.modules.netbinox" ) )
+                {
+                    dependencyCNBs.remove( "org.eclipse.osgi" ); //this is special.
                 }
                 osgiImports.removeAll( osgiExports );
                 Iterator<String> it = osgiImports.iterator();
-                while (it.hasNext()) {
+                while ( it.hasNext() )
+                {
                     String s = it.next();
-                    if (s.startsWith( "java.") || s.startsWith( "javax.") || s.startsWith( "sun.") || s.startsWith( "org.xml.sax") || s.startsWith( "org.w3c.dom") || s.startsWith( "org.ietf.jgss")) {
+                    if ( s.startsWith( "java." ) 
+                            || s.startsWith( "javax." ) 
+                            || s.startsWith( "sun." ) 
+                            || s.startsWith( "org.xml.sax" ) 
+                            || s.startsWith( "org.w3c.dom" ) 
+                            || s.startsWith( "org.ietf.jgss" ) )
+                    {
                         it.remove();
                         continue;
                     }
-                    for (String sub : osgiExportsSubs) {
-                        if (s.startsWith( sub )) {
+                    for ( String sub : osgiExportsSubs )
+                    {
+                        if ( s.startsWith( sub ) )
+                        {
                             it.remove();
                             break;
                         }
@@ -506,50 +549,63 @@ public class CreateClusterAppMojo
                 }
                 requireTokens.removeAll( provideTokens );
                 requireTokens.removeAll( defaultPlatformTokens );
-                if (!dependencyCNBs.isEmpty() || !osgiImports.isEmpty() ||!requireTokens.isEmpty()) {
-                    if (!dependencyCNBs.isEmpty()) {
+                if ( !dependencyCNBs.isEmpty() || !osgiImports.isEmpty() || !requireTokens.isEmpty() )
+                {
+                    if ( !dependencyCNBs.isEmpty() )
+                    {
                         getLog().error( "Some included modules/bundles depend on these codenamebases but they are not included. The application will fail starting up. The missing codenamebases are:" );
-                        for (String s : dependencyCNBs) {
+                        for ( String s : dependencyCNBs )
+                        {
                             Set<String> back = dependencyCNBBacktraces.get( s );
-                            getLog().error("   " + s + (back != null ? "          ref: " + Arrays.toString( back.toArray()) : ""));
+                            getLog().error( "   " + s + ( back != null ? "          ref: " + Arrays.toString( back.toArray() ) : "" ) );
                         }
                     }
-                    if (!osgiImports.isEmpty()) {
-                        getLog().error("Some OSGi imports are not satisfied by included bundles' exports. The application will fail starting up. The missing imports are:");
-                        for (String s : osgiImports) {
+                    if ( !osgiImports.isEmpty() )
+                    {
+                        getLog().error( "Some OSGi imports are not satisfied by included bundles' exports. The application will fail starting up. The missing imports are:" );
+                        for ( String s : osgiImports )
+                        {
                             Set<String> back = osgiImportsBacktraces.get( s );
-                            getLog().error("   " + s + (back != null ? "          ref: " + Arrays.toString( back.toArray()) : ""));
+                            getLog().error( "   " + s + ( back != null ? "          ref: " + Arrays.toString( back.toArray() ) : "" ) );
                         }
                     }
-                     if (!requireTokens.isEmpty()) {
-                        getLog().error("Some tokens required by included modules are not provided by included modules. The application will fail starting up. The missing tokens are:");
-                        for (String s : requireTokens) {
+                    if ( !requireTokens.isEmpty() )
+                    {
+                        getLog().error( "Some tokens required by included modules are not provided by included modules. The application will fail starting up. The missing tokens are:" );
+                        for ( String s : requireTokens )
+                        {
                             Set<String> back = requireTokensBacktraces.get( s );
-                            getLog().error("   " + s + (back != null ? "          ref: " + Arrays.toString( back.toArray()) : ""));
+                            getLog().error( "   " + s + ( back != null ? "          ref: " + Arrays.toString( back.toArray() ) : "" ) );
                         }
                     }
-                    throw new MojoFailureException("See above for consistency validation check failures. Either fix those by adding the relevant dependencies to the application or disable the check by setting the verifyIntegrity parameter to false or by running with -Dnetbeans.verify.integrity=false cmd line parameter.");
-                } else {
-                    getLog().info( "Integrity verification passed.");
+                    throw new MojoFailureException( "See above for consistency validation check failures. Either fix those by adding the relevant dependencies to the application or disable the check by setting the verifyIntegrity parameter to false or by running with -Dnetbeans.verify.integrity=false cmd line parameter." );
                 }
-            } else {
-                getLog().info( "Integrity verification skipped.");
+                else
+                {
+                    getLog().info( "Integrity verification passed." );
+                }
             }
-            
+            else
+            {
+                getLog().info( "Integrity verification skipped." );
+            }
+
             //attempt to sort clusters based on the dependencies and cluster content.
             Map<String, Set<String>> cluster2depClusters = computeClusterOrdering( clusterDependencies, clusterModules );
             clusterModules.clear();
-        
+
             //now assign the cluster to bundles based on dependencies..
             assignClustersToBundles( bundles, wrappedBundleCNBs, clusterDependencies, cluster2depClusters, getLog() );
-            
-            
-            for (BundleTuple ent : bundles) {
+
+
+            for ( BundleTuple ent : bundles )
+            {
                 Artifact art = ent.artifact;
                 final ExamineManifest ex = ent.manifest;
-                
+
                 String clstr = ent.cluster;
-                if (clstr == null) {
+                if ( clstr == null )
+                {
                     clstr = defaultCluster;
                 }
                 
@@ -572,14 +628,16 @@ public class CreateClusterAppMojo
                     {
                         FileUtils.copyFile( art.getFile(), moduleArt );
                         final File moduleConf = new File( confModules, cnbDashed + ".xml" );
-                        FileUtils.copyStreamToFile( new InputStreamFacade() {
+                        FileUtils.copyStreamToFile( new InputStreamFacade()
+                        {
                             @Override
                             public InputStream getInputStream() throws IOException
                             {
                                 return new StringInputStream( createBundleConfigFile( cnb, ex.isBundleAutoload() ), "UTF-8" );
                             }
                         }, moduleConf );
-                        FileUtils.copyStreamToFile( new InputStreamFacade() {
+                        FileUtils.copyStreamToFile( new InputStreamFacade()
+                        {
                             @Override
                             public InputStream getInputStream() throws IOException
                             {
@@ -634,7 +692,7 @@ public class CreateClusterAppMojo
                 "Cannot process etc folder content creation.", ex );
         }
     }
-    private final static Pattern patt = Pattern.compile(
+    private static final Pattern PATT = Pattern.compile(
         ".*targetcluster=\"([a-zA-Z0-9_\\.\\-]+)\".*", Pattern.DOTALL );
 
     private String findCluster( JarFile jf )
@@ -643,7 +701,7 @@ public class CreateClusterAppMojo
         ZipEntry entry = jf.getEntry( "Info/info.xml" );
         InputStream ins = jf.getInputStream( entry );
         String str = IOUtil.toString( ins, "UTF8" );
-        Matcher m = patt.matcher( str );
+        Matcher m = PATT.matcher( str );
         if ( !m.matches() )
         {
             getLog().info( "Cannot find cluster for " + jf.getName() + " Falling back to default value - '"
@@ -811,12 +869,13 @@ public class CreateClusterAppMojo
             else
             {
                 File nbm = getHarnessNbm();
-                try (ZipFile zip = new ZipFile( nbm )) {
+                try ( ZipFile zip = new ZipFile( nbm ) )
+                {
                     getLog().debug( "Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file." );
-                    writeFromZip(zip, "netbeans/launchers/app.sh",  destSh, true );
-                    writeFromZip(zip, "netbeans/launchers/app.exe",  destExe, true );
-                    writeFromZip(zip, "netbeans/launchers/app64.exe",  destExe64, false );
-                    writeFromZip(zip, "netbeans/launchers/app_w.exe",  destExeW, false );
+                    writeFromZip( zip, "netbeans/launchers/app.sh",  destSh, true );
+                    writeFromZip( zip, "netbeans/launchers/app.exe",  destExe, true );
+                    writeFromZip( zip, "netbeans/launchers/app64.exe",  destExe64, false );
+                    writeFromZip( zip, "netbeans/launchers/app_w.exe",  destExeW, false );
                 }
             }
         }
@@ -961,21 +1020,24 @@ public class CreateClusterAppMojo
         @SuppressWarnings( "unchecked" )
         Set<Artifact> artifacts = project.getArtifacts();
         String version = null;
-        for (Artifact a : artifacts) {
-            if ( (groupIdPrefix + ".modules").equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
+        for ( Artifact a : artifacts )
+        {
+            if ( ( groupIdPrefix + ".modules" ).equals( a.getGroupId() ) && "org-netbeans-bootstrap".equals( a.getArtifactId() ) )
+            {
                 version = a.getBaseVersion(); //base version in non-snapshot should equals version, in snapshots to X-SNAPSHOT, not timestamp
                 break;
             }
         }
-        if (version == null) {
-            throw new MojoExecutionException( "We could not find org-netbeans-bootstrap among the modules in the application. Launchers could not be found.");
+        if ( version == null )
+        {
+            throw new MojoExecutionException( "We could not find org-netbeans-bootstrap among the modules in the application. Launchers could not be found." );
         }
         Artifact nbmArt = artifactFactory.createArtifact(
             groupIdPrefix + ".modules",
             "org-netbeans-modules-apisupport-harness",
             version,
             "compile",
-            "nbm-file");
+            "nbm-file" );
         try
         {
             artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
@@ -991,21 +1053,24 @@ public class CreateClusterAppMojo
     private void writeFromZip( final ZipFile zip, String zipPath, File destFile, boolean mandatory ) throws MojoExecutionException, IOException
     {
         final ZipEntry path = zip.getEntry( zipPath );
-        if (path == null) {
-            if (mandatory) {
-                throw new MojoExecutionException( zipPath + " not found in " + zip.getName());
+        if ( path == null )
+        {
+            if ( mandatory )
+            {
+                throw new MojoExecutionException( zipPath + " not found in " + zip.getName() );
             }
-            getLog().debug(zipPath + " is not present in " + zip.getName());
+            getLog().debug( zipPath + " is not present in " + zip.getName() );
             return;
         }
-        FileUtils.copyStreamToFile( new InputStreamFacade() {
+        FileUtils.copyStreamToFile( new InputStreamFacade()
+        {
             
             @Override
             public InputStream getInputStream() throws IOException
             {
                 return zip.getInputStream( path );
             }
-        }, destFile);
+        }, destFile );
     }
 
     private static void addToMap( Map<String, Set<String>> map, String clusterName, List<String> newValues )
@@ -1022,14 +1087,14 @@ public class CreateClusterAppMojo
         }
     }
     
-    private static List<String> findByDependencies( Map<String, Set<String>> clusterDependencies, String spec)
+    private static List<String> findByDependencies( Map<String, Set<String>> clusterDependencies, String spec )
     {
         List<String> toRet = new ArrayList<>();
         for ( Map.Entry<String, Set<String>> entry : clusterDependencies.entrySet() )
         {
             if ( entry.getValue().contains( spec ) )
             {
-                toRet.add(entry.getKey());
+                toRet.add( entry.getKey() );
             }
         }
         return toRet;
@@ -1043,7 +1108,7 @@ public class CreateClusterAppMojo
     //A few unsolved cases:
     // - we never update the cluster information once a match was found, but there is a possibility that later in the processing the cluster could be "lowered".
     // - 2 or more modules from unrelated clusters we cannot easily decide, most likely should be in common denominator cluster but our cluster2depClusters map is not transitive, only lists direct dependencies
-    static void assignClustersToBundles( List<BundleTuple> bundles, Set<String> wrappedBundleCNBs, Map<String, Set<String>> clusterDependencies, Map<String, Set<String>> cluster2depClusters, Log log)
+    static void assignClustersToBundles( List<BundleTuple> bundles, Set<String> wrappedBundleCNBs, Map<String, Set<String>> clusterDependencies, Map<String, Set<String>> cluster2depClusters, Log log )
     {
         List<BundleTuple> toProcess = new ArrayList<>();
         List<BundleTuple> known = new ArrayList<>();
@@ -1063,42 +1128,51 @@ public class CreateClusterAppMojo
                 it.remove();
                 continue;
             }
-            List<String> depclusters = findByDependencies(clusterDependencies, spec);
-            if (depclusters.size() == 1) {
+            List<String> depclusters = findByDependencies( clusterDependencies, spec );
+            if ( depclusters.size() == 1 )
+            {
                 ent.cluster = depclusters.get( 0 );
                 known.add( ent );
-            } else if (depclusters.isEmpty()) {
-                toProcess.add(ent);
-            } else {
+            }
+            else if ( depclusters.isEmpty() )
+            {
+                toProcess.add( ent );
+            }
+            else 
+            {
                 //more results.. from 2 dependent clusters pick the one that is lower in the stack.
                 for ( Iterator<String> it2 = depclusters.iterator(); it2.hasNext(); )
                 {
                     String s = it2.next();
                     Set<String> depsCs = cluster2depClusters.get( s );
                     boolean removeS = false;
-                    for (String sDep : depclusters) {
-                        if (s.equals( sDep) ) {
+                    for ( String sDep : depclusters )
+                    {
+                        if ( s.equals( sDep ) )
+                        {
                             continue;
                         }
-                        if (depsCs != null && depsCs.contains( sDep ) ) {
+                        if ( depsCs != null && depsCs.contains( sDep ) )
+                        {
                             removeS = true;
                         }
                     }
-                    if (removeS) {
+                    if ( removeS )
+                    {
                         it2.remove();
                     }
                 }
                 ent.cluster = depclusters.get( 0 ); //TODO still some free room there, what if they don't directly depend on each other but still are related
-                known.add (ent);
+                known.add ( ent );
             }
         }
-        if (!toProcess.isEmpty())
+        if ( !toProcess.isEmpty() )
         {
-            walkKnownBundleDependenciesDown(known, toProcess);
+            walkKnownBundleDependenciesDown( known, toProcess );
         }
-        if (!toProcess.isEmpty())
+        if ( !toProcess.isEmpty() )
         {
-            walkKnownBundleDependenciesUp(known, toProcess);
+            walkKnownBundleDependenciesUp( known, toProcess );
         }
     }
 
@@ -1109,31 +1183,35 @@ public class CreateClusterAppMojo
         {
             BundleTuple bundleTuple = it.next();
             boolean found = false;
-            for ( BundleTuple knownBT : known)
+            for ( BundleTuple knownBT : known )
             {
-                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiExports() , knownBT.manifest.getOsgiImports() );
-                if (!is.isEmpty()) {
+                Sets.SetView<String> is = Sets.intersection( bundleTuple.manifest.getOsgiExports() , knownBT.manifest.getOsgiImports() );
+                if ( !is.isEmpty() )
+                {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
                 }
                 //dependencyTokens are requireBundle - matches the module property
-                is = Sets.intersection(Collections.singleton( bundleTuple.manifest.getModule()), new HashSet(knownBT.manifest.getDependencyTokens()) );
-                if (!is.isEmpty()) {
+                is = Sets.intersection( Collections.singleton( bundleTuple.manifest.getModule() ), new HashSet( knownBT.manifest.getDependencyTokens() ) );
+                if ( !is.isEmpty() )
+                {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
                 }
                 
             }
-            if (found) {
+            if ( found )
+            {
                 atLeastOneWasFound = true;
                 it.remove();
-                known.add(bundleTuple);
+                known.add( bundleTuple );
             }
             
         }
-        if (!toProcess.isEmpty() && atLeastOneWasFound) {
+        if ( !toProcess.isEmpty() && atLeastOneWasFound )
+        {
             walkKnownBundleDependenciesDown( known, toProcess );
         }
     }
@@ -1145,34 +1223,39 @@ public class CreateClusterAppMojo
         {
             BundleTuple bundleTuple = it.next();
             boolean found = false;
-            for ( BundleTuple knownBT : known)
+            for ( BundleTuple knownBT : known )
             {
-                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiImports() , knownBT.manifest.getOsgiExports() );
-                if (!is.isEmpty()) {
+                Sets.SetView<String> is = Sets.intersection( bundleTuple.manifest.getOsgiImports() , knownBT.manifest.getOsgiExports() );
+                if ( !is.isEmpty() )
+                {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
                 }
                 //dependencyTokens are requireBundle - matches the module property
-                is = Sets.intersection(Collections.singleton( knownBT.manifest.getModule()), new HashSet(bundleTuple.manifest.getDependencyTokens()) );
-                if (!is.isEmpty()) {
+                is = Sets.intersection( Collections.singleton( knownBT.manifest.getModule() ), new HashSet( bundleTuple.manifest.getDependencyTokens() ) );
+                if ( !is.isEmpty() )
+                {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
                 }
                 
             }
-            if (found) {
+            if ( found )
+            {
                 atLeastOneWasFound = true;
                 it.remove();
-                known.add(bundleTuple);
+                known.add( bundleTuple );
             }
             
         }
-        if (!toProcess.isEmpty() && atLeastOneWasFound) {
+        if ( !toProcess.isEmpty() && atLeastOneWasFound )
+        {
             walkKnownBundleDependenciesDown( known, toProcess );
         }
-        if (!toProcess.isEmpty() && atLeastOneWasFound) {
+        if ( !toProcess.isEmpty() && atLeastOneWasFound )
+        {
             walkKnownBundleDependenciesUp( known, toProcess );
         }
     }
@@ -1185,12 +1268,15 @@ public class CreateClusterAppMojo
         {
             String cluster = entry.getKey();
             Set<String> deps = entry.getValue();
-            for (Map.Entry<String, Set<String>> subEnt : clusterModules.entrySet()) {
-                if (subEnt.getKey().equals( cluster) ) {
+            for ( Map.Entry<String, Set<String>> subEnt : clusterModules.entrySet() )
+            {
+                if ( subEnt.getKey().equals( cluster ) )
+                {
                     continue;
                 }
-                Sets.SetView<String> is = Sets.intersection(subEnt.getValue(), deps );
-                if (!is.isEmpty()) {
+                Sets.SetView<String> is = Sets.intersection( subEnt.getValue(), deps );
+                if ( !is.isEmpty() )
+                {
                     addToMap( cluster2depClusters, cluster, Collections.singletonList( subEnt.getKey() ) );
                 }
             }
@@ -1198,7 +1284,8 @@ public class CreateClusterAppMojo
         return cluster2depClusters;
     }
     
-    static class BundleTuple {
+    static class BundleTuple
+    {
         final Artifact artifact;
         final ExamineManifest manifest;
         String cluster;
@@ -1223,18 +1310,18 @@ public class CreateClusterAppMojo
         }
     }
 
-    static String createBundleConfigFile( String cnb, boolean autoload)
+    static String createBundleConfigFile( String cnb, boolean autoload )
     {
         return
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<!DOCTYPE module PUBLIC \"-//NetBeans//DTD Module Status 1.0//EN\"\n" +
-"                        \"http://www.netbeans.org/dtds/module-status-1_0.dtd\">\n" +
-"<module name=\"" + cnb +"\">\n" +
-"    <param name=\"autoload\">" + autoload + "</param>\n" +
-"    <param name=\"eager\">false</param>\n" + (autoload ? "" : "    <param name=\"enabled\">true</param>\n") +
-"    <param name=\"jar\">modules/" + cnb.replace( ".", "-") + ".jar</param>\n" +
-"    <param name=\"reloadable\">false</param>\n" +
-"</module>\n";
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
++ "<!DOCTYPE module PUBLIC \"-//NetBeans//DTD Module Status 1.0//EN\"\n"
++ "                        \"http://www.netbeans.org/dtds/module-status-1_0.dtd\">\n"
++ "<module name=\"" + cnb + "\">\n"
++ "    <param name=\"autoload\">" + autoload + "</param>\n"
++ "    <param name=\"eager\">false</param>\n" + ( autoload ? "" : "    <param name=\"enabled\">true</param>\n" )
++ "    <param name=\"jar\">modules/" + cnb.replace( ".", "-" ) + ".jar</param>\n"
++ "    <param name=\"reloadable\">false</param>\n"
++ "</module>\n";
     }
 
     static String createBundleUpdateTracking( String cnb, File moduleArt, File moduleConf, String specVersion )
@@ -1242,13 +1329,13 @@ public class CreateClusterAppMojo
     {
 
         return
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-"<module codename=\"" + cnb + "\">\n" +
-"    <module_version install_time=\"" + System.currentTimeMillis() + "\" last=\"true\" origin=\"installer\" specification_version=\"" + specVersion + "\">\n" +
-"        <file crc=\"" + crcForFile( moduleConf ).getValue() + "\" name=\"config/Modules/" + cnb.replace( ".", "-" ) + ".xml\"/>\n" +
-"        <file crc=\"" + crcForFile( moduleArt ).getValue() + "\" name=\"modules/" + cnb.replace( ".", "-" ) + ".jar\"/>\n" +
-"    </module_version>\n" +
-"</module>";
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
++ "<module codename=\"" + cnb + "\">\n"
++ "    <module_version install_time=\"" + System.currentTimeMillis() + "\" last=\"true\" origin=\"installer\" specification_version=\"" + specVersion + "\">\n"
++ "        <file crc=\"" + crcForFile( moduleConf ).getValue() + "\" name=\"config/Modules/" + cnb.replace( ".", "-" ) + ".xml\"/>\n"
++ "        <file crc=\"" + crcForFile( moduleArt ).getValue() + "\" name=\"modules/" + cnb.replace( ".", "-" ) + ".jar\"/>\n"
++ "    </module_version>\n"
++ "</module>";
 
     }
 
@@ -1256,7 +1343,8 @@ public class CreateClusterAppMojo
         throws FileNotFoundException, IOException
     {
         CRC32 crc = new CRC32();
-        try (InputStream inFileStream = new FileInputStream( inFile )) {
+        try ( InputStream inFileStream = new FileInputStream( inFile ) )
+        {
             byte[] array = new byte[(int) inFile.length()];
             int len = inFileStream.read( array );
             if ( len != array.length )

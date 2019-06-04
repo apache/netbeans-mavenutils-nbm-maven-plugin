@@ -1,3 +1,5 @@
+package org.apache.netbeans.nbm;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.netbeans.nbm;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -67,7 +67,8 @@ public class AdaptNbVersion
                 if ( token.indexOf( '-' ) > 0 )
                 {
                     token = token.substring( 0, token.indexOf( '-' ) );
-                } else if ( token.indexOf( '_' ) > 0 )
+                } 
+                else if ( token.indexOf( '_' ) > 0 )
                 {
                     token = token.substring( 0, token.indexOf( '_' ) );
                 }
