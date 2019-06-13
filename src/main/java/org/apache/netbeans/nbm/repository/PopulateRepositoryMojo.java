@@ -132,6 +132,12 @@ public class PopulateRepositoryMojo
     private String deployUrl;
 
     /**
+     * an string id representing the server
+     */
+    @Parameter( defaultValue = "netbeans" , property = "deployId" )
+    private String deployId;
+    
+    /**
      * By default the generated metadata is installed in local repository.
      * Setting this parameter to false will avoid installing the bits. Only meaningful together with
      * a defined "deployUrl" parameter.
@@ -308,7 +314,7 @@ public class PopulateRepositoryMojo
         {
             ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
             deploymentRepository = repositoryFactory.createDeploymentArtifactRepository(
-                "netbeans", deployUrl, layout, true );
+                deployId, deployUrl, layout, true );
         }
         else if ( skipLocalInstall )
         {
