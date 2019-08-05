@@ -32,7 +32,7 @@ under the License.
     <packaging>jar</packaging>
 
     <name>Apache NetBeans Maven Utilities - NBM Shared lib Plugins Utilities</name>
-    <description>Maven plugin for creating Maven Repository out of a Apache NetBeans installation (and other sources) for consumption by the projects using nbm-maven-plugin.
+    <description>Library used by nb-repository-plugin and nbm-maven-plugin to help building Apache NetBeans installation (and other sources).
     </description>
     <inceptionYear>2005</inceptionYear>
     <url>http://bits.netbeans.org/mavenutilities/nb-shared</url>
