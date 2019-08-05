@@ -94,13 +94,14 @@ import org.codehaus.plexus.util.StringUtils;
  * A goal for identifying NetBeans modules from the installation and populating the local
  * repository with them. Optionally you can also deploy to a remote repository.
  * <p>
- * If you are looking for an existing remote repository for NetBeans artifacts, check out
+ * If you are looking for an existing remote repository for NetBeans artifacts, check out <a href="https://search.maven.org/">Maven Central</a>. 
  * <a href="http://bits.netbeans.org/nexus/content/groups/netbeans/">http://bits.netbeans.org/nexus/content/groups/netbeans/</a>,
- * it contains API artifacts for multiple releases.
- * <a href="http://bits.netbeans.org/netbeans/trunk/maven-snapshot/">http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</a>
- * may also be used for <code>SNAPSHOT</code> artifacts if you wish to test development builds.
- * </p><p>
- * See this <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin/repository.html">HOWTO</a> on how to generate the NetBeans binaries required
+ * contains contains API artifacts for older NetBeans releases.
+ * <a href="https://repository.apache.org/content/groups/snapshots">https://repository.apache.org/content/groups/snapshots</a>
+ * may also be used for <code>dev-SNAPSHOT</code> artifacts if you wish to test development builds.
+ * </p>
+ * <p>
+ * See this <a href="repository.html">HOWTO</a> on how to generate the NetBeans binaries required
  * by this goal.
  * </p>
  *
