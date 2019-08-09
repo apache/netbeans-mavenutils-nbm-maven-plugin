@@ -29,7 +29,7 @@ under the License.
     <artifactId>nbm-maven-harness</artifactId>
     <version>11.1-SNAPSHOT</version>
     <name>Apache NetBeans Maven Utilities - NBM Harness for Maven</name>
-    <url>http://bits.netbeans.org/mavenutilities/nbm-maven-harness</url>
+    <url>https://bits.netbeans.org/mavenutilities/nbm-maven-harness</url>
     <issueManagement>
         <system>jira</system>
         <url>https://issues.apache.org/jira/browse/NETBEANS</url>

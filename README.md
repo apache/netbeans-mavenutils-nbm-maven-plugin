@@ -21,6 +21,10 @@
 
 # Apache NetBeans Maven Utilities NBM Harness
 
+[![Build Status](https://builds.apache.org/buildStatus/icon?job=netbeans-maven-TLP%2Fnetbeans-mavenutils-nbm-maven-harness%2Fmaster)](https://builds.apache.org/view/M-R/view/NetBeans/job/netbeans-maven-TLP/job/netbeans-mavenutils-nbm-maven-harness/job/master/)
+
+[Documentation Site](https://bits.netbeans.org/mavenutilities/nbm-maven-harness)
+
 ### Get In Touch
 
 [Subscribe](mailto:users-subscribe@netbeans.apache.org) or [mail](mailto:users@netbeans.apache.org) the [users@netbeans.apache.org](mailto:users@netbeans.apache.org) list - Ask questions, find answers, and also help other users.
