@@ -23,7 +23,7 @@
 
 [![Build Status](https://builds.apache.org/buildStatus/icon?job=netbeans-maven-TLP%2Fnetbeans-mavenutils-nbm-shared%2Fmaster)](https://builds.apache.org/job/netbeans-maven-TLP/job/netbeans-mavenutils-nbm-shared/job/master/)
 
-[Documentation Site](https://bits.netbeans.org/mavenutilities/nb-shared)
+[Documentation Site](https://bits.netbeans.org/mavenutilities/nbm-shared)
 
 ### Get In Touch
 
