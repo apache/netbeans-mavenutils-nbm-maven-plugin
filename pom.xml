@@ -35,7 +35,7 @@ under the License.
     <description>Library used by nb-repository-plugin and nbm-maven-plugin to help building Apache NetBeans installation (and other sources).
     </description>
     <inceptionYear>2005</inceptionYear>
-    <url>http://bits.netbeans.org/mavenutilities/nb-shared</url>
+    <url>https://bits.netbeans.org/mavenutilities/nb-shared</url>
     <issueManagement>
         <system>jira</system>
         <url>https://issues.apache.org/jira/browse/NETBEANS</url>
