@@ -21,41 +21,9 @@
 
 # Apache NetBeans Repository plugin
 
-The plugin is capable of populating the local or remote maven repository with module jars and NBM files from a given Apache NetBeans installation. Useful for
-module development, modules with public APIs are separated from those without a public API.
-See the `populate` goal.
+[![Build Status](https://builds.apache.org/buildStatus/icon?job=netbeans-maven-TLP%2Fnetbeans-mavenutils-nb-repository-plugin%2Fmaster)](https://builds.apache.org/view/M-R/view/NetBeans/job/netbeans-maven-TLP/job/netbeans-mavenutils-nb-repository-plugin/job/master/)
 
- Also see: [Building from source](http://netbeans.apache.org/download/dev/index.html)
- 
-## HOWTO: Upload NetBeans release binaries to a Maven repository
-
-There is a `populate` goal that converts the NetBeans module information into Maven metadata
-and is capable of uploading the module jar file, javadoc, sources and nbm files to local
-and remote repositories.
-
-For a binary-only upload (jar files and nbm files only), it's possible to download the bits from official sites.
-
-For the complete upload, you will need to checkout the sources of the IDE/Platform you
-want to upload. See this page [Building from source](http://netbeans.apache.org/download/dev/index.html)
-
-
- The goal has multiple input parameters that link the goal to binaries prepared beforehand.
-
-* `netbeansInstallDirectory` designates the base directory where resides the NetBeans installation
-that shall be uploaded.
-Run `ant` in your local hg clone to build the distribution at `nbbuild/netbeans` sundirectory.
-
-* `netbeansNbmDirectory` designates the base directory where the nbm files are located.
-Run `ant build-nbms` in your local `hg clone` to build the nbms at `nbbuild/nbms` directory.
-
-* `netbeansSourcesDirectory` designates the base directory containing zip files with module jar sources.
-Run `ant build-source-zips` in your local hg clone to build the nbms at `nbbuild/build/source-zips` directory.
-
-* `netbeansJavadocDirectory` designates the base directory containing zip files with javadoc zips for modules with public apis.
-Run `ant build-javadoc` in your local hg clone to build the nbms at `nbbuild/build/javadoc` directory.
-
-* To have external dependencies correctly identified by their real GAV, you will need to download the index from central (or other) repository using the `download` goal.
-
+[Documentation Site](https://bits.netbeans.org/mavenutilities/nb-repository-plugin)
 
 ### Get In Touch
 

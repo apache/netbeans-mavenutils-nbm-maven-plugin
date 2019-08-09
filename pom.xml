@@ -35,7 +35,7 @@ under the License.
     <description>Maven plugin for creating Maven Repository out of a NetBeans installation (and other sources) for consumption by the projects using nbm-maven-plugin.
     </description>
     <inceptionYear>2005</inceptionYear>
-    <url>http://bits.netbeans.org/mavenutilities/nb-repository-plugin</url>
+    <url>https://bits.netbeans.org/mavenutilities/nb-repository-plugin</url>
     <issueManagement>
         <system>jira</system>
         <url>https://issues.apache.org/jira/browse/NETBEANS</url>
