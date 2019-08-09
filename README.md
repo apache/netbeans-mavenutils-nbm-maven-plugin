@@ -21,6 +21,8 @@
 
 # Apache NetBeans Maven Utilities parent pom
 
+[![Build Status](https://builds.apache.org/buildStatus/icon?job=netbeans-maven-TLP%2Fnetbeans-mavenutils-parent%2Fmaster)](https://builds.apache.org/view/M-R/view/NetBeans/job/netbeans-maven-TLP/job/netbeans-mavenutils-parent/job/master/)
+
 ### Get In Touch
 
 [Subscribe](mailto:users-subscribe@netbeans.apache.org) or [mail](mailto:users@netbeans.apache.org) the [users@netbeans.apache.org](mailto:users@netbeans.apache.org) list - Ask questions, find answers, and also help other users.
