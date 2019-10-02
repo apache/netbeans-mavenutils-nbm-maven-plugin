@@ -934,7 +934,7 @@ public class CreateClusterAppMojo
         return new ClusterTuple( clusterFile, newer );
     }
 
-    private void externalDownload( File f, InputStream is )
+        private void externalDownload( File f, InputStream is )
         throws IOException
     {
         // Cf. org.netbeans.nbbuild.AutoUpdate
@@ -949,35 +949,36 @@ public class CreateClusterAppMojo
             {
                 crc = Long.parseLong( line.substring( 4 ).trim() );
             }
-            else if ( line.startsWith( "URL:m2:/" ) )
-            {
-                if ( ! found )
-                {
-                    String[] coords = line.substring( 8 ).trim().split( ":" );
-                    Artifact artifact;
-                    if ( coords.length == 4 )
-                    {
-                        artifact = artifactFactory.createArtifact( coords[0], coords[1], coords[2], null, coords[3] );
-                    }
-                    else
-                    {
-                        artifact = artifactFactory.createArtifactWithClassifier( coords[0], coords[1], coords[2], coords[3], coords[4] );
-                    }
-                    try
-                    {
-                        artifactResolver.resolve( artifact, project.getRemoteArtifactRepositories(), localRepository );
-                        FileUtils.copyFile( artifact.getFile(), f );
-                        found = true;
-                    }
-                    catch ( AbstractArtifactResolutionException x )
-                    {
-                        getLog().warn( "Cannot find " + line.substring( 8 ), x );
-                    }
-                }
-            }
             else if ( line.startsWith( "URL:" ) )
             {
-                if ( ! found )
+                String rest = line.substring(4).trim();
+                if ( rest.startsWith( "m2:/" ) )
+                {
+                    if ( ! found )
+                    {
+                        String[] coords = rest.substring( 4 ).trim().split( ":" );
+                        Artifact artifact;
+                        if ( coords.length == 4 )
+                        {
+                            artifact = artifactFactory.createArtifact( coords[0], coords[1], coords[2], null, coords[3] );
+                        }
+                        else
+                        {
+                            artifact = artifactFactory.createArtifactWithClassifier( coords[0], coords[1], coords[2], coords[3], coords[4] );
+                        }
+                        try
+                        {
+                            artifactResolver.resolve( artifact, project.getRemoteArtifactRepositories(), localRepository );
+                            FileUtils.copyFile( artifact.getFile(), f );
+                            found = true;
+                        }
+                        catch ( AbstractArtifactResolutionException x )
+                        {
+                            getLog().warn( "Cannot find " + line.substring( 8 ), x );
+                        }
+                    }
+                }
+                else if ( ! found )
                 {
                     String url = line.substring( 4 ).trim();
                     try
