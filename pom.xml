@@ -230,7 +230,7 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>1.5</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -258,7 +258,7 @@ under the License.
             <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
-                <version>0.12</version>
+                <version>0.13</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*.mf</exclude>
@@ -271,6 +271,6 @@ under the License.
     <properties>
         <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
         <netbeans.repo>netbeans::default::https://repo1.maven.org/maven2/</netbeans.repo>
-        <netbeans.version>RELEASE110</netbeans.version>
+        <netbeans.version>RELEASE111</netbeans.version>
     </properties>
 </project>
