@@ -117,20 +117,12 @@ under the License.
                                 </unzip>
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
                                     <patternset>
-                                        <include name="netbeans/tasks.jar.pack.gz" />
-                                        <include name="netbeans/jnlp/jnlp-launcher.jar.pack.gz" />
+                                        <include name="netbeans/tasks.jar" />
+                                        <include name="netbeans/jnlp/jnlp-launcher.jar" />
                                     </patternset>
                                     <flattenmapper />
                                 </unzip>
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/tasks.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/tasks.jar" />
-                                </exec>
                                 <mkdir dir="${project.build.directory}/classes/harness/jnlp" />
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/jnlp-launcher.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/classes/harness/jnlp/jnlp-launcher.jar" />
-                                </exec>
                                 <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes" />
                                 <unzip src="${project.build.directory}/nbi-ant.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
@@ -145,29 +137,6 @@ under the License.
                                     </patternset>
                                     <mapper type="glob" from="netbeans/*" to="harness/*" />
                                 </unzip>
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-ant.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-ant.jar" />
-                                </exec>
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-engine.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-engine.jar" />
-                                </exec>
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-engine.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-engine.jar" />
-                                </exec>
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-registries-management.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-registries-management.jar" />
-                                </exec>
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-ant-tasks.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-ant-tasks.jar" />
-                                </exec>
-                                <delete>
-                                    <fileset dir="${project.build.directory}/classes/harness/modules" includes="**/*.pack.gz" />
-                                </delete>
                                 <!-- patch product.xml - unable to delete temp files after build finishes -->
                                 <replace file="${project.build.directory}/classes/harness/nbi/.common/product.xml">
                                     <replacetoken expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}>"]]></replacetoken>
@@ -271,6 +240,6 @@ under the License.
     <properties>
         <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
         <netbeans.repo>netbeans::default::https://repo1.maven.org/maven2/</netbeans.repo>
-        <netbeans.version>RELEASE111</netbeans.version>
+        <netbeans.version>RELEASE112</netbeans.version>
     </properties>
 </project>
