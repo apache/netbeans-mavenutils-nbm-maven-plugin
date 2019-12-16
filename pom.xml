@@ -449,10 +449,10 @@ under the License.
             <scope>test</scope>
         </dependency>
         <dependency>
-            <!-- use harness from NetBeans 8.2  --> 
+            <!-- use harness from NetBeans 11.2  --> 
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
-            <version>11.1</version>
+            <version>11.2</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
