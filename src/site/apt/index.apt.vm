@@ -48,7 +48,7 @@ an autoupdate site content or build and assemble an application on top of NetBea
   <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <extensions>true</extensions>
@@ -56,7 +56,7 @@ an autoupdate site content or build and assemble an application on top of NetBea
             <plugin> <!-- required since nbm-plugin 3.0-->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifestFile>#[[${project.build.outputDirectory}]]#/META-INF/MANIFEST.MF</manifestFile>
