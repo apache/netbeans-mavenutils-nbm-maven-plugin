@@ -804,9 +804,44 @@ public class CreateClusterAppMojo
         File destExe64 = new File( destBinDir, brandingToken + "64.exe" );
         File destSh = new File( destBinDir, brandingToken );
 
+
+        File harnessDir = new File( buildDir, "harness" );
+        //we have org-netbeans-modules-apisupport-harness in target area, just use it's own launchers.
+        binDir = new File(
+                harnessDir.getAbsolutePath() + File.separator + "launchers" );
+        if ( binDir.exists() )
+        {
+            File exe = new File( binDir, "app.exe" );
+            FileUtils.copyFile( exe, destExe );
+            File exe64 = new File( binDir, "app64.exe" );
+            if ( exe64.isFile() )
+            {
+                FileUtils.copyFile( exe64, destExe64 );
+            }
+            File exew = new File( binDir, "app_w.exe" );
+            if ( exew.exists() ) //in 6.7 the _w.exe file is no more.
+            {
+                FileUtils.copyFile( exew, destExeW );
+            }
+            File sh = new File( binDir, "app.sh" );
+            FileUtils.copyFile( sh, destSh );
+        }
+        else
+        {
+            File nbm = getHarnessNbm();
+            try ( ZipFile zip = new ZipFile( nbm ) )
+            {
+                getLog().debug( "Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file." );
+                writeFromZip( zip, "netbeans/launchers/app.sh",  destSh, true );
+                writeFromZip( zip, "netbeans/launchers/app.exe",  destExe, true );
+                writeFromZip( zip, "netbeans/launchers/app64.exe",  destExe64, false );
+                writeFromZip( zip, "netbeans/launchers/app_w.exe",  destExeW, false );
+            }
+        }
+        
         if ( binDirectory != null )
         {
-            //we have custom launchers.
+            //we have custom launchers, only overwrite the ones the user provided.
             binDir = binDirectory;
             File[] fls = binDir.listFiles();
             if ( fls == null )
@@ -840,42 +875,6 @@ public class CreateClusterAppMojo
                 else
                 {
                     //warn about file not being copied
-                }
-            }
-        }
-        else
-        {
-            File harnessDir = new File( buildDir, "harness" );
-            //we have org-netbeans-modules-apisupport-harness in target area, just use it's own launchers.
-            binDir = new File(
-                    harnessDir.getAbsolutePath() + File.separator + "launchers" );
-            if ( binDir.exists() )
-            {
-                File exe = new File( binDir, "app.exe" );
-                FileUtils.copyFile( exe, destExe );
-                File exe64 = new File( binDir, "app64.exe" );
-                if ( exe64.isFile() )
-                {
-                    FileUtils.copyFile( exe64, destExe64 );
-                }
-                File exew = new File( binDir, "app_w.exe" );
-                if ( exew.exists() ) //in 6.7 the _w.exe file is no more.
-                {
-                    FileUtils.copyFile( exew, destExeW );
-                }
-                File sh = new File( binDir, "app.sh" );
-                FileUtils.copyFile( sh, destSh );
-            }
-            else
-            {
-                File nbm = getHarnessNbm();
-                try ( ZipFile zip = new ZipFile( nbm ) )
-                {
-                    getLog().debug( "Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file." );
-                    writeFromZip( zip, "netbeans/launchers/app.sh",  destSh, true );
-                    writeFromZip( zip, "netbeans/launchers/app.exe",  destExe, true );
-                    writeFromZip( zip, "netbeans/launchers/app64.exe",  destExe64, false );
-                    writeFromZip( zip, "netbeans/launchers/app_w.exe",  destExeW, false );
                 }
             }
         }
