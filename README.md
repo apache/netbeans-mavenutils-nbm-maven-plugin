@@ -33,5 +33,5 @@
 
 ### Reporting Bugs
 
-Bugs should be reported to https://issues.apache.org/jira/projects/NETBEANS/issues/ using the component **mavenutilities**
+Bugs should be reported to https://issues.apache.org/jira/projects/NETBEANSINFRA/issues/ using the component **MU - Apache NetBeans repository plugin**
 

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -43,17 +44,6 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopScoreDocCollector;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
@@ -88,7 +78,6 @@ import org.apache.tools.ant.taskdefs.Input;
 import org.apache.tools.ant.taskdefs.PathConvert;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * A goal for identifying NetBeans modules from the installation and populating the local
@@ -191,17 +180,15 @@ public class PopulateRepositoryMojo
     protected String forcedVersion;
 
     /**
-     * When specified it points to a directory containing a Maven Indexer
-     * (Nexus) Lucene index. This index will be used to find external libraries that
-     * are referenced by NetBeans modules and populate the POM metadata with correct
-     * dependencies. Any dependencies not found this way, will be generated with a unique
+     * When specified it points to a file containing a merge of all binaries-list
+     * sha1;coordinate;module
+     * Any dependencies not found this way, will be generated with a unique
      * id under the org.netbeans.external groupId.
      * <p/>
-     * Use the {@code download} goal to retrieve the index.
-     * @since 3.0
+     * @since 1.16
      */
-    @Parameter( property = "nexusIndexDirectory" )
-    private File nexusIndexDirectory;
+    @Parameter( property = "externallist" )
+    private File externallist;
 
     /**
      * Whether to create cluster POMs in the {@code org.netbeans.cluster} group.
@@ -323,22 +310,6 @@ public class PopulateRepositoryMojo
                     "When skipping install to local repository, one shall define the deployUrl parameter" );
         }
 
-        IndexSearcher searcher = null;
-        if ( nexusIndexDirectory != null && nexusIndexDirectory.exists() )
-        {
-            try
-            {
-                Directory nexusDir = FSDirectory.open( nexusIndexDirectory.toPath() );
-                IndexReader nexusReader = DirectoryReader.open( nexusDir );
-                searcher = new IndexSearcher( nexusReader );
-                getLog().info( "Opened index with " + nexusReader.numDocs() + " documents" );
-            }
-            catch ( IOException ex )
-            {
-                getLog().error( "Could not open " + nexusIndexDirectory, ex );
-            }
-        }
-
         if ( netbeansInstallDirectory == null )
         {
             Input input = (Input) antProject.createTask( "input" );
@@ -387,8 +358,8 @@ public class PopulateRepositoryMojo
 
         String prop = antProject.getProperty( "netbeansincludes" );
         StringTokenizer tok = new StringTokenizer( prop, "," );
-        HashMap<ModuleWrapper, Artifact> moduleDefinitions = new HashMap<ModuleWrapper, Artifact>();
-        HashMap<String, Collection<ModuleWrapper>> clusters = new HashMap<String, Collection<ModuleWrapper>>();
+        HashMap<ModuleWrapper, Artifact> moduleDefinitions = new HashMap<>();
+        HashMap<String, Collection<ModuleWrapper>> clusters = new HashMap<>();
         while ( tok.hasMoreTokens() )
         {
             String token = tok.nextToken();
@@ -420,7 +391,7 @@ public class PopulateRepositoryMojo
                 Artifact art = createArtifact( artifact, version, group );
                 if ( examinator.isOsgiBundle() )
                 {
-                    Dependency dep = findExternal( searcher, module );
+                    Dependency dep = findExternal( module );
                     if ( dep != null )
                     {
                         // XXX use those coords instead of publishing this
@@ -433,13 +404,13 @@ public class PopulateRepositoryMojo
                 Collection<ModuleWrapper> col = clusters.get( clust );
                 if ( col == null )
                 {
-                    col = new ArrayList<ModuleWrapper>();
+                    col = new ArrayList<>();
                     clusters.put( clust, col );
                 }
                 col.add( wr );
             }
         }
-        List<ModuleWrapper> wrapperList = new ArrayList<ModuleWrapper>( moduleDefinitions.keySet() );
+        List<ModuleWrapper> wrapperList = new ArrayList<>( moduleDefinitions.keySet() );
         int count = wrapperList.size() + 1;
         int index = 0;
         File javadocRoot = null;
@@ -477,7 +448,7 @@ public class PopulateRepositoryMojo
             }
         }
 
-        List<ExternalsWrapper> externals = new ArrayList<ExternalsWrapper>();
+        List<ExternalsWrapper> externals = new ArrayList<>();
         try
         {
             for ( Map.Entry<ModuleWrapper, Artifact> elem : moduleDefinitions.entrySet() )
@@ -486,7 +457,7 @@ public class PopulateRepositoryMojo
                 Artifact art = elem.getValue();
                 index = index + 1;
                 getLog().info( "Processing " + index + "/" + count );
-                File pom = createMavenProject( man, wrapperList, externals, searcher );
+                File pom = createMavenProject( man, wrapperList, externals );
                 ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
                 art.addMetadata( metadata );
                 File javadoc = null;
@@ -784,7 +755,7 @@ public class PopulateRepositoryMojo
     }
 
     private File createMavenProject( ModuleWrapper wrapper, List<ModuleWrapper> wrapperList,
-                                     List<ExternalsWrapper> externalsList, IndexSearcher searcher )
+                                     List<ExternalsWrapper> externalsList )
             throws MojoExecutionException
     {
         Model mavenModel = new Model();
@@ -799,7 +770,7 @@ public class PopulateRepositoryMojo
             mavenModel.setParent( artefactParent );
         }
         ExamineManifest man = wrapper.getModuleManifest();
-        List<Dependency> deps = new ArrayList<Dependency>();
+        List<Dependency> deps = new ArrayList<>();
         if ( !man.getDependencyTokens().isEmpty() )
         {
             for ( String elem : man.getDependencyTokens() )
@@ -899,7 +870,7 @@ public class PopulateRepositoryMojo
                 File f = new File( wrapper.getFile().getParentFile(), path );
                 if ( f.exists() )
                 {
-                    Dependency dep = findExternal( searcher, f );
+                    Dependency dep = findExternal( f );
                     if ( dep != null )
                     {
                         deps.add( dep );
@@ -963,61 +934,38 @@ public class PopulateRepositoryMojo
         return fil;
     }
 
-    private Dependency findExternal( IndexSearcher searcher, File f )
+    private Dependency findExternal( File f )
     {
-        if ( searcher == null )
+        if ( externallist == null )
         {
             return null;
         }
         try
         {
+            List<String> content512 = Files.readAllLines( externallist.toPath() );
             MessageDigest shaDig = MessageDigest.getInstance( "SHA1" );
-            InputStream is = new FileInputStream( f );
-            try
+            
+            try ( InputStream is = new FileInputStream( f ); OutputStream os = new DigestOutputStream( new NullOutputStream(), shaDig ); )
             {
-                OutputStream os = new DigestOutputStream( new NullOutputStream(), shaDig );
                 IOUtil.copy( is, os );
-                os.close();
             }
-            finally
+            String sha1 = encode ( shaDig.digest() ).toUpperCase();
+            for ( String string : content512 ) 
             {
-                is.close();
-            }
-            String sha = encode( shaDig.digest() );
-            TermQuery q = new TermQuery( new Term( "1", sha ) );
-            TopScoreDocCollector collector = TopScoreDocCollector.create( 5 );
-            searcher.search( q, collector );
-            ScoreDoc[] hits = collector.topDocs().scoreDocs;
-            if ( hits.length >= 1 )
-            {
-                int docId = hits[0].doc;
-                Document doc = searcher.doc( docId );
-                IndexableField idField = doc.getField( "u" );
-                if ( idField != null )
+                String[] split = string.split( ";" );
+                if ( split[0].equals( sha1 ) && split[1].contains( ":" ) ) 
                 {
-                    String id = idField.stringValue();
-                    String[] splits = StringUtils.split( id, "|" );
+                    String[] splits = split[1].split( ":" );
                     Dependency dep = new Dependency();
                     dep.setArtifactId( splits[1] );
                     dep.setGroupId( splits[0] );
                     dep.setVersion( splits[2] );
                     dep.setType( "jar" );
-                    if ( splits.length > 3 && !"NA".equals( splits[3] ) )
-                    {
-                        dep.setClassifier( splits[3] );
-                    }
                     getLog().info( "found match " + splits[0] + ":" + splits[1] + ":" + splits[2] + " for " + f.getName() );
                     return dep;
-                }
-                else
-                {
-                    getLog().error( "no idField for " + q );
-                }
+                }            
             }
-            else
-            {
-                getLog().info( "no repository match for " + f.getName() );
-            }
+            getLog().info( "no repository match for " + f.getName() + f.getAbsolutePath() + " with sha " + sha1 );            
         }
         catch ( Exception x )
         {
@@ -1089,7 +1037,7 @@ public class PopulateRepositoryMojo
         {
             mavenModel.setParent( artefactParent );
         }
-        List<Dependency> deps = new ArrayList<Dependency>();
+        List<Dependency> deps = new ArrayList<>();
         for ( ModuleWrapper wr : mods )
         {
             Dependency dep = new Dependency();
@@ -1227,12 +1175,12 @@ public class PopulateRepositoryMojo
 
         List<Dependency> deps;
 
-        public ModuleWrapper( String module )
+        ModuleWrapper( String module )
         {
             this.module = module;
         }
 
-        public ModuleWrapper( String art, String ver, String grp, ExamineManifest manifest, File fil )
+        ModuleWrapper( String art, String ver, String grp, ExamineManifest manifest, File fil )
         {
             man = manifest;
             artifact = art;
