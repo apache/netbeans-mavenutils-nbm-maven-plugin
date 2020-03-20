@@ -389,16 +389,19 @@ public class PopulateRepositoryMojo
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
                 String group = groupIdPrefix + ( examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL );
                 Artifact art = createArtifact( artifact, version, group );
+                ModuleWrapper wr = new ModuleWrapper( artifact, version, group, examinator, module, false );
                 if ( examinator.isOsgiBundle() )
                 {
                     Dependency dep = findExternal( module );
                     if ( dep != null )
                     {
-                        // XXX use those coords instead of publishing this
-                        // (for now all bundles are from Orbit, which does not publish to Central, or specially built)
+                        
+                        art = createArtifact( artifact, dep.getVersion(), dep.getGroupId() );
+                        group = dep.getGroupId();
+                        version = dep.getVersion();
+                        wr = new ModuleWrapper( artifact, version, group, examinator, module , true );
                     }
                 }
-                ModuleWrapper wr = new ModuleWrapper( artifact, version, group, examinator, module );
                 wr.setCluster( clust );
                 moduleDefinitions.put( wr, art );
                 Collection<ModuleWrapper> col = clusters.get( clust );
@@ -454,6 +457,11 @@ public class PopulateRepositoryMojo
             for ( Map.Entry<ModuleWrapper, Artifact> elem : moduleDefinitions.entrySet() )
             {
                 ModuleWrapper man = elem.getKey();
+                if ( man.repo ) 
+                {
+                    continue;
+                }
+               
                 Artifact art = elem.getValue();
                 index = index + 1;
                 getLog().info( "Processing " + index + "/" + count );
@@ -963,9 +971,9 @@ public class PopulateRepositoryMojo
                     dep.setType( "jar" );
                     getLog().info( "found match " + splits[0] + ":" + splits[1] + ":" + splits[2] + " for " + f.getName() );
                     return dep;
-                }            
+                }
             }
-            getLog().info( "no repository match for " + f.getName() + f.getAbsolutePath() + " with sha " + sha1 );            
+            getLog().info( "no repository match for " + f.getName() + f.getAbsolutePath() + " with sha " + sha1 );
         }
         catch ( Exception x )
         {
@@ -1174,19 +1182,22 @@ public class PopulateRepositoryMojo
         String module;
 
         List<Dependency> deps;
+        
+        boolean repo;
 
         ModuleWrapper( String module )
         {
             this.module = module;
         }
 
-        ModuleWrapper( String art, String ver, String grp, ExamineManifest manifest, File fil )
+        ModuleWrapper( String art, String ver, String grp, ExamineManifest manifest, File fil , boolean rep )
         {
             man = manifest;
             artifact = art;
             version = ver;
             group = grp;
             file = fil;
+            repo = rep;
         }
 
         @Override
