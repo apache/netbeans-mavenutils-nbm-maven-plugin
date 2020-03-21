@@ -358,8 +358,8 @@ public class PopulateRepositoryMojo
 
         String prop = antProject.getProperty( "netbeansincludes" );
         StringTokenizer tok = new StringTokenizer( prop, "," );
-        HashMap<ModuleWrapper, Artifact> moduleDefinitions = new HashMap<>();
-        HashMap<String, Collection<ModuleWrapper>> clusters = new HashMap<>();
+        Map<ModuleWrapper, Artifact> moduleDefinitions = new HashMap<>();
+        Map<String, Collection<ModuleWrapper>> clusters = new HashMap<>();
         while ( tok.hasMoreTokens() )
         {
             String token = tok.nextToken();
@@ -389,17 +389,17 @@ public class PopulateRepositoryMojo
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
                 String group = groupIdPrefix + ( examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL );
                 Artifact art = createArtifact( artifact, version, group );
-                ModuleWrapper wr = new ModuleWrapper( artifact, version, group, examinator, module, false );
+                ModuleWrapper wr = new ModuleWrapper( artifact, version, group, examinator, module );
                 if ( examinator.isOsgiBundle() )
                 {
                     Dependency dep = findExternal( module );
                     if ( dep != null )
                     {
                         
-                        art = createArtifact( artifact, dep.getVersion(), dep.getGroupId() );
+                        art = createArtifact( dep.getArtifactId(), dep.getVersion(), dep.getGroupId() );
                         group = dep.getGroupId();
                         version = dep.getVersion();
-                        wr = new ModuleWrapper( artifact, version, group, examinator, module , true );
+                        wr = new ModuleWrapperMaven( artifact, version, group, examinator, module , dep );
                     }
                 }
                 wr.setCluster( clust );
@@ -413,9 +413,7 @@ public class PopulateRepositoryMojo
                 col.add( wr );
             }
         }
-        List<ModuleWrapper> wrapperList = new ArrayList<>( moduleDefinitions.keySet() );
-        int count = wrapperList.size() + 1;
-        int index = 0;
+        
         File javadocRoot = null;
         if ( netbeansJavadocDirectory != null )
         {
@@ -450,18 +448,33 @@ public class PopulateRepositoryMojo
                     "The nbmDirectory parameter doesn't point to an existing folder" );
             }
         }
-
+        List<ModuleWrapper> wrapperList = new ArrayList<>( moduleDefinitions.keySet() );
+        // artifact that we need to populate
+        Map<ModuleWrapper, Artifact> tobePopulated = new HashMap<>();
+        // external artefacts
+        Map<ModuleWrapper, Artifact> oncentralWrapper = new HashMap<>();
+        // triage 
+        for ( Map.Entry<ModuleWrapper, Artifact> entry : moduleDefinitions.entrySet() ) 
+        {
+            if ( entry.getKey() instanceof ModuleWrapperMaven ) 
+            {
+                oncentralWrapper.put( entry.getKey(), entry.getValue() );
+            }
+            else
+            {
+                tobePopulated.put( entry.getKey(), entry.getValue() );
+            }
+        }
         List<ExternalsWrapper> externals = new ArrayList<>();
+        int count = tobePopulated.size() + 1;
+        int index = 0;
+        
+        
         try
         {
-            for ( Map.Entry<ModuleWrapper, Artifact> elem : moduleDefinitions.entrySet() )
+            for ( Map.Entry<ModuleWrapper, Artifact> elem : tobePopulated.entrySet() )
             {
                 ModuleWrapper man = elem.getKey();
-                if ( man.repo ) 
-                {
-                    continue;
-                }
-               
                 Artifact art = elem.getValue();
                 index = index + 1;
                 getLog().info( "Processing " + index + "/" + count );
@@ -789,10 +802,18 @@ public class PopulateRepositoryMojo
                 if ( index > -1 )
                 {
                     wr = wrapperList.get( index );
-                    Dependency dep = new Dependency();
-                    dep.setArtifactId( wr.getArtifact() );
-                    dep.setGroupId( wr.getGroup() );
-                    dep.setVersion( wr.getVersion() );
+                    Dependency dep;
+                    if ( wr instanceof ModuleWrapperMaven )
+                    {
+                       dep = ( ( ModuleWrapperMaven ) wr ).getDep();
+                    } 
+                    else 
+                    {
+                        dep = new Dependency();
+                        dep.setArtifactId( wr.getArtifact() );
+                        dep.setGroupId( wr.getGroup() );
+                        dep.setVersion( wr.getVersion() );
+                    }
                     dep.setType( "jar" );
                     //we don't want the API modules to depend on non-api ones..
                     // otherwise the transitive dependency mechanism pollutes your classpath..
@@ -1164,6 +1185,23 @@ public class PopulateRepositoryMojo
 
     }
 
+    private static class ModuleWrapperMaven extends ModuleWrapper 
+    {
+
+        private final Dependency dep;
+        
+        ModuleWrapperMaven( String art, String ver, String grp, ExamineManifest manifest, File fil, Dependency de )
+        {
+            super( art, ver, grp, manifest, fil );
+            this.dep = de;
+        }
+
+        public Dependency getDep()
+        {
+            return dep;
+        }        
+    }
+    
     private static class ModuleWrapper
     {
 
@@ -1182,22 +1220,19 @@ public class PopulateRepositoryMojo
         String module;
 
         List<Dependency> deps;
-        
-        boolean repo;
 
         ModuleWrapper( String module )
         {
             this.module = module;
         }
 
-        ModuleWrapper( String art, String ver, String grp, ExamineManifest manifest, File fil , boolean rep )
+        ModuleWrapper( String art, String ver, String grp, ExamineManifest manifest, File fil )
         {
             man = manifest;
             artifact = art;
             version = ver;
             group = grp;
             file = fil;
-            repo = rep;
         }
 
         @Override
