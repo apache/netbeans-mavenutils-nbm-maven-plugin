@@ -19,14 +19,8 @@ package org.apache.netbeans.nbm.repository;
  * under the License.
  */
 
-import org.apache.netbeans.nbm.repository.PopulateRepositoryMojo;
-import java.io.File;
 import junit.framework.TestCase;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.maven.model.Dependency;
 
 /**
  * 
@@ -58,6 +52,30 @@ public class PopulateRepositoryMojoTest extends TestCase /** AbstractMojoTestCas
 ////        mojo.install( f, art2 );
 ////        assertTrue( new File( repo, "testgrp/testarg/1.0/testarg-1.0.nbm" ).isFile() );
 ////        assertFalse( new File( repo, "testgrp/testarg/1.0/testarg-1.0.jar" ).isFile() );
+    }
+    
+    public void testSplit() throws Exception
+    {
+        Dependency dep1 = PopulateRepositoryMojo.splitDependencyString("org.apache.maven:apache-maven:3.6.3:bin@zip");
+        assertEquals("org.apache.maven", dep1.getGroupId() );
+        assertEquals("apache-maven", dep1.getArtifactId());
+        assertEquals("3.6.3", dep1.getVersion());
+        assertEquals("bin", dep1.getClassifier());
+        assertEquals("zip", dep1.getType());
+        
+        Dependency dep2 = PopulateRepositoryMojo.splitDependencyString("org.apache.maven:apache-maven:3.6.3:myclassifier");
+        assertEquals("org.apache.maven", dep2.getGroupId() );
+        assertEquals("apache-maven", dep2.getArtifactId());
+        assertEquals("3.6.3", dep2.getVersion());
+        assertEquals("myclassifier", dep2.getClassifier());
+        assertEquals("jar", dep2.getType());
+        
+        Dependency dep3 = PopulateRepositoryMojo.splitDependencyString("org.apache.maven:apache-maven:3.6.3");
+        assertEquals("org.apache.maven", dep3.getGroupId() );
+        assertEquals("apache-maven", dep3.getArtifactId());
+        assertEquals("3.6.3", dep3.getVersion());
+        assertEquals("", dep3.getClassifier());
+        assertEquals("jar", dep3.getType());
     }
 
     public void testEncode() throws Exception

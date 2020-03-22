@@ -981,16 +981,15 @@ public class PopulateRepositoryMojo
             String sha1 = encode ( shaDig.digest() ).toUpperCase();
             for ( String string : content512 ) 
             {
+                if ( string.startsWith( "#" ) ) 
+                {
+                    continue;
+                }
                 String[] split = string.split( ";" );
                 if ( split[0].equals( sha1 ) && split[1].contains( ":" ) ) 
                 {
-                    String[] splits = split[1].split( ":" );
-                    Dependency dep = new Dependency();
-                    dep.setArtifactId( splits[1] );
-                    dep.setGroupId( splits[0] );
-                    dep.setVersion( splits[2] );
-                    dep.setType( "jar" );
-                    getLog().info( "found match " + splits[0] + ":" + splits[1] + ":" + splits[2] + " for " + f.getName() );
+                    Dependency dep = splitDependencyString( split[1] );                    
+                    getLog().info( "found match " + dep.getGroupId() + ":" + dep.getArtifactId() + ":" + dep.getVersion() + " for " + f.getName() );
                     return dep;
                 }
             }
@@ -1003,6 +1002,31 @@ public class PopulateRepositoryMojo
         return null;
     }
 
+    static Dependency splitDependencyString( String split ) 
+    {
+        String[] splits = split.split( ":" );
+        Dependency dep = new Dependency();
+        dep.setArtifactId( splits[1] );
+        dep.setGroupId( splits[0] );
+        dep.setVersion( splits[2] );
+        dep.setType( "jar" );
+        dep.setClassifier( "" );
+        if ( splits.length > 3 )
+        {
+            String[] split2 = splits[3].split( "@" );
+            if ( split2.length > 1 )
+            {
+                dep.setClassifier( split2[0] );
+                dep.setType( split2[1] );
+            }
+            else
+            {
+                dep.setClassifier( splits[3] );
+            }                        
+        }
+        return dep;
+    }
+    
     File createExternalProject( ExternalsWrapper wrapper )
     {
         Model mavenModel = new Model();
