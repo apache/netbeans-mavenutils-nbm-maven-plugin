@@ -20,8 +20,10 @@ package org.apache.netbeans.nbm;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +40,9 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
- * Run NetBeans IDE with additional custom module clusters, 
- * to be used in conjunction with nbm:cluster.
- * Semi-deprecated; used only for standalone modules and "suites".
+ * Run NetBeans IDE with additional custom module clusters, to be used in conjunction with nbm:cluster. Semi-deprecated;
+ * used only for standalone modules and "suites".
+ *
  * @author Milos Kleint
  *
  */
@@ -50,14 +52,13 @@ public class RunNetBeansMojo
 {
 
     /**
-     * directory where the module(s)' NetBeans cluster(s) are located.
-     * is related to nbm:cluster goal.
+     * directory where the module(s)' NetBeans cluster(s) are located. is related to nbm:cluster goal.
      */
     @Parameter( required = true, defaultValue = "${project.build.directory}/netbeans_clusters" )
     protected File clusterBuildDir;
     /**
-     * directory where the the NetBeans platform/IDE installation is,
-     * denotes the root directory of NetBeans installation.
+     * directory where the the NetBeans platform/IDE installation is, denotes the root directory of NetBeans
+     * installation.
      */
     @Parameter( required = true, property = "netbeans.installation" )
     protected File netbeansInstallation;
@@ -67,28 +68,29 @@ public class RunNetBeansMojo
     @Parameter( required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir" )
     protected File netbeansUserdir;
     /**
-     * additional command line arguments. 
+     * additional command line arguments.
      */
     @Parameter( property = "netbeans.run.params" )
     protected String additionalArguments;
-    
+
     /**
-     * Attach a debugger to the application JVM. If set to "true", the process will suspend and wait for a debugger to attach
-     * on port 5005. If set to some other string, that string will be appended to the <code>additionalArguments</code>, allowing you to configure
-     * arbitrary debug-ability options (without overwriting the other options specified through the <code>additionalArguments</code>
-     * parameter).
+     * Attach a debugger to the application JVM. If set to "true", the process will suspend and wait for a debugger to
+     * attach on port 5005. If set to some other string, that string will be appended to the
+     * <code>additionalArguments</code>, allowing you to configure arbitrary debug-ability options (without overwriting
+     * the other options specified through the <code>additionalArguments</code> parameter).
+     *
      * @since 3.11.1
      */
     @Parameter( property = "netbeans.run.params.debug" )
-    protected String debugAdditionalArguments;    
+    protected String debugAdditionalArguments;
 
     /**
-     * 
+     *
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
         netbeansUserdir.mkdirs();
 
@@ -96,7 +98,7 @@ public class RunNetBeansMojo
         if ( !clusterBuildDir.exists() || clusterBuildDir.listFiles() == null )
         {
             throw new MojoExecutionException(
-                                              "No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one." );
+                    "No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one." );
         }
         File[] fls = clusterBuildDir.listFiles();
         for ( int i = 0; i < fls.length; i++ )
@@ -116,15 +118,13 @@ public class RunNetBeansMojo
         {
             buff.deleteCharAt( buff.lastIndexOf( ":" ) );
         }
-        //http://www.netbeans.org/issues/show_bug.cgi?id=174819
-        StringReader sr =
-            new StringReader( "netbeans_extraclusters=\"" + buff.toString() + "\"\n" + "extraclusters=\""
-                + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
+
+        getLog().debug( "cluster path:\n" + buff.toString() );
 
         //now check what the exec names are to figure the right XXX.clusters name
         File binDir = new File( netbeansInstallation, "bin" );
         File[] execs = binDir.listFiles();
-        String clust = null;
+        String appName = null;
         if ( execs != null )
         {
             for ( File f : execs )
@@ -137,30 +137,35 @@ public class RunNetBeansMojo
                 name = name.replaceFirst( "(64)?([.]exe)?$", "" );
                 if ( !name.contains( "." ) )
                 {
-                    if ( clust == null )
+                    if ( appName == null )
                     {
-                        clust = name;
+                        appName = name;
                     }
                     else
                     {
-                        if ( !clust.equals( name ) )
+                        if ( !appName.equals( name ) )
                         {
                             getLog().debug( "When examining executable names, found clashing results " + f.getName()
-                                                + " " + clust );
+                                    + " " + appName );
                         }
                     }
                 }
             }
         }
-        if ( clust == null )
+        if ( appName == null )
         {
-            clust = "netbeans";
+            appName = "netbeans";
         }
+
+        //http://www.netbeans.org/issues/show_bug.cgi?id=174819
+        StringReader sr = new StringReader( appName + "_extraclusters=\"" + buff.toString() + "\"\n"
+                + "extraclusters=\""
+                + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
 
         // write XXX.conf file with cluster information...
         File etc = new File( netbeansUserdir, "etc" );
         etc.mkdirs();
-        File confFile = new File( etc, clust + ".conf" );
+        File confFile = new File( etc, appName + ".conf" );
         FileOutputStream conf = null;
         try
         {
@@ -176,6 +181,18 @@ public class RunNetBeansMojo
             IOUtil.close( conf );
         }
 
+        if ( getLog().isDebugEnabled() )
+        {
+            try ( InputStream io = new FileInputStream( confFile ) )
+            {
+                getLog().debug( "Configuration file content:\n" + IOUtil.toString( io ) );
+            }
+            catch ( IOException ex )
+            {
+                throw new MojoExecutionException( "Error writing " + confFile, ex );
+            }
+        }
+
         boolean windows = Os.isFamily( "windows" );
         Commandline cmdLine = new Commandline();
         File exec;
@@ -185,25 +202,28 @@ public class RunNetBeansMojo
             if ( !exec.exists() )
             {
                 // in 6.7 and onward, there's no nb.exe file.
-                exec = new File( netbeansInstallation, "bin\\" + clust + ".exe" );
+                exec = new File( netbeansInstallation, "bin\\" + appName + ".exe" );
                 String jdkHome = System.getenv( "JAVA_HOME" );
                 if ( jdkHome != null )
                 {
                     if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists() )
                     {
-                        File exec64 = new File( netbeansInstallation, "bin\\" + clust + "64.exe" );
+                        File exec64 = new File( netbeansInstallation, "bin\\" + appName + "64.exe" );
                         if ( exec64.isFile() )
                         {
                             exec = exec64;
                         }
                     }
                 }
-                cmdLine.addArguments( new String[] { "--console", "suppress" } );
+                cmdLine.addArguments( new String[]
+                {
+                    "--console", "suppress"
+                } );
             }
         }
         else
         {
-            exec = new File( netbeansInstallation, "bin/" + clust );
+            exec = new File( netbeansInstallation, "bin/" + appName );
         }
         cmdLine.setExecutable( exec.getAbsolutePath() );
 
@@ -242,13 +262,13 @@ public class RunNetBeansMojo
             throw new MojoExecutionException( "Failed executing NetBeans", e );
         }
     }
-    
+
     private String getDebugAdditionalArguments()
     {
-       if ( "true".equals( debugAdditionalArguments ) )
+        if ( "true".equals( debugAdditionalArguments ) )
         {
             return "-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
         }
         return debugAdditionalArguments;
-    }    
+    }
 }

@@ -49,7 +49,7 @@ under the License.
                     <name>codeNameBase</name>
                     <version>1.0.0+</version>
                     <description>DEPRECATED, use the plugin configuration instead. Codenamebase of the module. Primary identification of the module. Usually the package name. Eg. "org.codehaus.mevenide.project". 
-                    If not defined here, the default value is constructed from groupId and artifactId.</description>
+                        If not defined here, the default value is constructed from groupId and artifactId.</description>
                     <type>String</type>
                     <annotations>
                         <annotation>@Deprecated</annotation>
@@ -77,7 +77,7 @@ under the License.
                     <name>manifest</name>
                     <version>1.0.0+</version>
                     <description>DEPRECATED, use the plugin configuration instead. Location of the manifest file with NetBeans specific manifest entries.
-                        </description>
+                    </description>
                     <type>String</type>
                     <!--defaultValue>src/main/nbm/manifest.mf</defaultValue-->
                     <annotations>
@@ -135,13 +135,13 @@ under the License.
                     <name>libraries</name>
                     <version>1.0.0+</version>
                     <description>groupId:artifactId of artifacts that shall become part of the module and be added on the classpath 
-                    (ClassPath: manifest entry gets created and the jar is included in the nbm file)</description>
+                        (ClassPath: manifest entry gets created and the jar is included in the nbm file)</description>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
                     </association>
                 </field>
-                 <field>
+                <field>
                     <name>dependencies</name>
                     <description>DEPRECATED, use the plugin configuration instead. List of module dependencies. The plugin will use it to Generate the OpenIDE-Module-Module-Dependencies manifest entry.</description>
                     <version>1.0.0+</version>
