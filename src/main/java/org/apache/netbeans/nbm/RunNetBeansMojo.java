@@ -20,8 +20,10 @@ package org.apache.netbeans.nbm;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,15 +118,14 @@ public class RunNetBeansMojo
         {
             buff.deleteCharAt( buff.lastIndexOf( ":" ) );
         }
-        //http://www.netbeans.org/issues/show_bug.cgi?id=174819
-        StringReader sr =
-            new StringReader( "netbeans_extraclusters=\"" + buff.toString() + "\"\n" + "extraclusters=\""
-                + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
+        
+        System.err.println(">>>>>>>>> " + buff.toString());
+        
 
         //now check what the exec names are to figure the right XXX.clusters name
         File binDir = new File( netbeansInstallation, "bin" );
         File[] execs = binDir.listFiles();
-        String clust = null;
+        String appName = null;
         if ( execs != null )
         {
             for ( File f : execs )
@@ -137,30 +138,36 @@ public class RunNetBeansMojo
                 name = name.replaceFirst( "(64)?([.]exe)?$", "" );
                 if ( !name.contains( "." ) )
                 {
-                    if ( clust == null )
+                    if ( appName == null )
                     {
-                        clust = name;
+                        appName = name;
                     }
                     else
                     {
-                        if ( !clust.equals( name ) )
+                        if ( !appName.equals( name ) )
                         {
                             getLog().debug( "When examining executable names, found clashing results " + f.getName()
-                                                + " " + clust );
+                                                + " " + appName );
                         }
                     }
                 }
             }
         }
-        if ( clust == null )
+        if ( appName == null )
         {
-            clust = "netbeans";
+            appName = "netbeans";
         }
 
+        //http://www.netbeans.org/issues/show_bug.cgi?id=174819
+        StringReader sr =
+            new StringReader( appName + "_extraclusters=\"" + buff.toString() + "\"\n" + "extraclusters=\""
+                + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
+
         // write XXX.conf file with cluster information...
+        
         File etc = new File( netbeansUserdir, "etc" );
         etc.mkdirs();
-        File confFile = new File( etc, clust + ".conf" );
+        File confFile = new File( etc, appName + ".conf" );
         FileOutputStream conf = null;
         try
         {
@@ -175,6 +182,14 @@ public class RunNetBeansMojo
         {
             IOUtil.close( conf );
         }
+        
+        try (InputStream io = new FileInputStream(confFile))        {
+            System.err.println(">>>>>>\n" + IOUtil.toString(io));
+        }
+        catch ( IOException ex )
+        {
+            throw new MojoExecutionException( "Error writing " + confFile, ex );
+        }
 
         boolean windows = Os.isFamily( "windows" );
         Commandline cmdLine = new Commandline();
@@ -185,13 +200,13 @@ public class RunNetBeansMojo
             if ( !exec.exists() )
             {
                 // in 6.7 and onward, there's no nb.exe file.
-                exec = new File( netbeansInstallation, "bin\\" + clust + ".exe" );
+                exec = new File( netbeansInstallation, "bin\\" + appName + ".exe" );
                 String jdkHome = System.getenv( "JAVA_HOME" );
                 if ( jdkHome != null )
                 {
                     if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists() )
                     {
-                        File exec64 = new File( netbeansInstallation, "bin\\" + clust + "64.exe" );
+                        File exec64 = new File( netbeansInstallation, "bin\\" + appName + "64.exe" );
                         if ( exec64.isFile() )
                         {
                             exec = exec64;
@@ -203,7 +218,7 @@ public class RunNetBeansMojo
         }
         else
         {
-            exec = new File( netbeansInstallation, "bin/" + clust );
+            exec = new File( netbeansInstallation, "bin/" + appName );
         }
         cmdLine.setExecutable( exec.getAbsolutePath() );
 

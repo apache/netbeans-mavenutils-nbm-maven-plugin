@@ -71,14 +71,6 @@ public class CreateClusterMojo
     protected File clusterBuildDir;
 
     /**
-     * default cluster value for reactor projects without cluster information,
-     * typically OSGi bundles
-     *
-     * @since 3.2
-     */
-    @Parameter(defaultValue = "extra")
-    private String defaultCluster;
-    /**
      * If the executed project is a reactor project, this will contains the full
      * list of projects in the reactor.
      */
@@ -96,8 +88,7 @@ public class CreateClusterMojo
         if (reactorProjects != null && reactorProjects.size() > 0) {
             for (MavenProject proj : reactorProjects) {
 
-                File nbmDir = new File(nbmBuildDir, "netbeans" + File.separator + cluster);
-
+                File nbmDir = new File(nbmBuildDir, "clusters");
                 if (nbmDir.exists()) {
                     Copy copyTask = (Copy) antProject.createTask("copy");
                     copyTask.setTodir(clusterBuildDir);
@@ -136,14 +127,14 @@ public class CreateClusterMojo
                         mnf.setJarFile(jar);
                         mnf.checkFile();
 
-                        File cluster = new File(clusterBuildDir, defaultCluster);
-                        getLog().debug("Copying " + art.getId() + " to cluster " + defaultCluster);
-                        File modules = new File(cluster, "modules");
+                        File clusterDir = new File(clusterBuildDir, cluster);
+                        getLog().debug("Copying " + art.getId() + " to cluster " + cluster);
+                        File modules = new File(clusterDir, "modules");
                         modules.mkdirs();
-                        File config = new File(cluster, "config");
+                        File config = new File(clusterDir, "config");
                         File confModules = new File(config, "Modules");
                         confModules.mkdirs();
-                        File updateTracting = new File(cluster, "update_tracking");
+                        File updateTracting = new File(clusterDir, "update_tracking");
                         updateTracting.mkdirs();
 
                         final String cnb = mnf.getModule();

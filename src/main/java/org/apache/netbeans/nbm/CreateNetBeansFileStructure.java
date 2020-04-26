@@ -261,7 +261,7 @@ public abstract class CreateNetBeansFileStructure
             cluster = module.getCluster();
         }
         File jarFile = new File( buildDir, finalName + ".jar" );
-        clusterDir = new File( nbmBuildDir, "netbeans" + File.separator + cluster );
+        clusterDir = new File( nbmBuildDir, "clusters" + File.separator + cluster );
         File moduleJarLocation = new File( clusterDir, "modules" );
         moduleJarLocation.mkdirs();
 
