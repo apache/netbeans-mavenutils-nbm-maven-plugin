@@ -18,6 +18,7 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -159,14 +160,16 @@ public class CreateClusterMojo
                             {
                                 public InputStream getInputStream() throws IOException
                                 {
-                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile( cnb, mnf.isBundleAutoload() ), "UTF-8" );
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile( cnb, mnf.
+                                            isBundleAutoload() ), "UTF-8" );
                                 }
                             }, moduleConf );
                             FileUtils.copyStreamToFile( new InputStreamFacade()
                             {
                                 public InputStream getInputStream() throws IOException
                                 {
-                                    return new StringInputStream( CreateClusterAppMojo.createBundleUpdateTracking( cnb, moduleArt, moduleConf, specVer ), "UTF-8" );
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleUpdateTracking( cnb,
+                                            moduleArt, moduleConf, specVer ), "UTF-8" );
                                 }
                             }, new File( updateTracting, cnbDashed + ".xml" ) );
                         }

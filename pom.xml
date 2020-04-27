@@ -54,8 +54,8 @@ under the License.
         <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-maven-plugin.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-maven-plugin.git</developerConnection>
         <url>https://github.com/apache/netbeans-mavenutils-nbm-maven-plugin</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <build>
         <plugins>
             <plugin>
@@ -177,7 +177,7 @@ under the License.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.12.1</version>
-                 <configuration>
+                <configuration>
                     <component>12336702</component>
                 </configuration>
    

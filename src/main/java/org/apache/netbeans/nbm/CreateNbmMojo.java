@@ -18,6 +18,7 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -205,14 +206,16 @@ public class CreateNbmMojo
         if ( !reqRestart && module.isRequiresRestart() )
         {
             reqRestart = module.isRequiresRestart();
-            getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().warn(
+                    "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml" );
         }
         nbmTask.setNeedsrestart( Boolean.toString( reqRestart ) );
         String moduleAuthor = author;
         if ( module.getAuthor() != null )
         {
             moduleAuthor = module.getAuthor();
-            getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().warn(
+                    "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml" );
         }
         nbmTask.setModuleauthor( moduleAuthor );
         if ( keystore != null && keystorealias != null && keystorepassword != null )
@@ -241,13 +244,15 @@ public class CreateNbmMojo
         if ( module.getLicenseName() != null )
         {
             licName = module.getLicenseName();
-            getLog().warn( "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().
+                    warn( "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml" );
         }
         if ( module.getLicenseFile() != null )
         {
             File lf = new File( project.getBasedir(), module.getLicenseFile() );
             licFile = lf;
-            getLog().warn( "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().
+                    warn( "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml" );
 
         }
         if ( licName != null && licFile != null )
@@ -277,7 +282,8 @@ public class CreateNbmMojo
         String hpUrl = homePageUrl;
         if ( module.getHomepageUrl() != null )
         {
-            getLog().warn( "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().
+                    warn( "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml" );
             hpUrl = module.getHomepageUrl();
         }
         if ( hpUrl != null )
@@ -288,7 +294,8 @@ public class CreateNbmMojo
         if ( module.getDistributionUrl() != null )
         {
             distribUrl = module.getDistributionUrl();
-            getLog().warn( "Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().warn(
+                    "Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml" );
         }
         if ( distribUrl != null )
         {

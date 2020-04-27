@@ -33,12 +33,12 @@ import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 
 /**
- * A dependency node visitor that collects visited nodes that are known libraries or are
- * children of known libraries
+ * A dependency node visitor that collects visited nodes that are known libraries or are children of known libraries
+ *
  * @author Milos Kleint
  */
 public class CollectLibrariesNodeVisitor
-    implements DependencyNodeVisitor
+        implements DependencyNodeVisitor
 {
 
     /**
@@ -68,6 +68,7 @@ public class CollectLibrariesNodeVisitor
 
     /**
      * Creates a dependency node visitor that collects visited nodes for further processing.
+     *
      * @param explicitLibraries list of explicit libraries
      * @param runtimeArtifacts list of runtime artifacts
      * @param examinerCache cache of netbeans manifest for artifacts
@@ -76,8 +77,8 @@ public class CollectLibrariesNodeVisitor
      * @param useOsgiDependencies whether to allow osgi dependencies or not
      */
     public CollectLibrariesNodeVisitor( List<String> explicitLibraries,
-        List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
-        Log log, DependencyNode root, boolean useOsgiDependencies )
+            List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
+            Log log, DependencyNode root, boolean useOsgiDependencies )
     {
         nodes = new ArrayList<Artifact>();
         artifacts = new HashMap<String, Artifact>();
@@ -132,7 +133,7 @@ public class CollectLibrariesNodeVisitor
                 if ( depExaminator.isNetBeansModule() )
                 {
                     log.warn(
-                        "You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId() );
+                            "You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId() );
                 }
 
                 nodes.add( artifact );
@@ -174,12 +175,12 @@ public class CollectLibrariesNodeVisitor
 
     /**
      * Gets the list of collected dependency nodes.
-     * 
+     *
      * @return the list of collected dependency nodes
      * @throws MojoExecutionException if a throwable is set
      */
     public List<Artifact> getArtifacts()
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         if ( throwable != null )
         {

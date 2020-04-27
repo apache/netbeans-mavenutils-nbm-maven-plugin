@@ -18,6 +18,7 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -157,7 +158,8 @@ public class RunNetBeansMojo
         }
 
         //http://www.netbeans.org/issues/show_bug.cgi?id=174819
-        StringReader sr = new StringReader( appName + "_extraclusters=\"" + buff.toString() + "\"\n" + "extraclusters=\""
+        StringReader sr = new StringReader( appName + "_extraclusters=\"" + buff.toString() + "\"\n"
+                + "extraclusters=\""
                 + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
 
         // write XXX.conf file with cluster information...
