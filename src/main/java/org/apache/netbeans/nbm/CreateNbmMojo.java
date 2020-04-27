@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -53,7 +52,7 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
 
 /**
  * Create the NetBeans module artifact (nbm file), part of "nbm" lifecycle/packaging.
- * 
+ *
  *
  * @author Milos Kleint
  */
@@ -84,82 +83,83 @@ public class CreateNbmMojo
     private String keystorealias;
 
     /**
-     * Boolean parameter denoting if creation of NBM file shall be skipped or not.
-     * If skipped, just the expanded directory for cluster is created
+     * Boolean parameter denoting if creation of NBM file shall be skipped or not. If skipped, just the expanded
+     * directory for cluster is created
+     *
      * @since 3.0
      */
     @Parameter( defaultValue = "false", property = "maven.nbm.skip" )
     private boolean skipNbm;
-    
+
     /**
      * if true, upon installing the NBM the platform app/IDE restart is requested. Not necessary in most cases.
+     *
      * @since 3.8
      */
     @Parameter( defaultValue = "false" )
     private boolean requiresRestart;
-    
+
     /**
-     * Get homepage URL of the module. Is accessible from NetBeans
-     * UI upon installation, should point to place with additional
-     * information about the functionality. 
+     * Get homepage URL of the module. Is accessible from NetBeans UI upon installation, should point to place with
+     * additional information about the functionality.
+     *
      * @since 3.8
      */
     @Parameter( defaultValue = "${project.url}" )
     private String homePageUrl;
-    
+
     /**
      * Author of the module. Shown in the Module manager UI.
+     *
      * @since 3.8
      */
     @Parameter( defaultValue = "${project.organization.name}" )
     private String author;
-    
+
     /**
-     * Distribution base URL for the NBM at runtime deployment time.
-     * Note: Usefulness of the parameter is questionable, it doesn't allow for mirrors and
-     * usually when downloading the nbm, one already knows the location anyway.
-     * Please note that the netbeans.org Ant scripts put a dummy url here.
-     * The actual correct value used when constructing update site is
-     * explicitly set there. The general assumption there is that all modules from one update
-     * center come from one base URL. Also see <code>distBase</code> parameter in auto-update mojo.
+     * Distribution base URL for the NBM at runtime deployment time. Note: Usefulness of the parameter is questionable,
+     * it doesn't allow for mirrors and usually when downloading the nbm, one already knows the location anyway. Please
+     * note that the netbeans.org Ant scripts put a dummy url here. The actual correct value used when constructing
+     * update site is explicitly set there. The general assumption there is that all modules from one update center come
+     * from one base URL. Also see <code>distBase</code> parameter in auto-update mojo.
      * <p/>
-     * The value is either a direct http protocol based URL that points to
-     * the location under which nbm file will be located, or
+     * The value is either a direct http protocol based URL that points to the location under which nbm file will be
+     * located, or
      * <p/>
-     * it allows to create an update site based on maven repository content.
-     * The later created autoupdate site document can use this information and
-     * compose the application from one or multiple maven repositories.
+     * it allows to create an update site based on maven repository content. The later created autoupdate site document
+     * can use this information and compose the application from one or multiple maven repositories.
      * <br/>
      * Format: id::layout::url same as in maven-deploy-plugin
      * <br/>
      * with the 'default' and 'legacy' layouts. (maven2 vs maven1 layout)
      * <br/>
-     * If the value doesn't contain :: characters,
-     * it's assumed to be the flat structure and the value is just the URL.
-     * 
+     * If the value doesn't contain :: characters, it's assumed to be the flat structure and the value is just the URL.
+     *
      */
     @Parameter( property = "maven.nbm.distributionURL" )
     private String distributionUrl;
-    
+
     /**
-     * name of the license applicable to the NBM. The value should be equal across modules with the same license. If the user already agreed to the
-     * same license before, he/she won't be asked again to agree and for multiple one installed at the same time, just one license agreement is shown.
-     * When defined, <code>licenseFile</code> needs to be defined as well.
+     * name of the license applicable to the NBM. The value should be equal across modules with the same license. If the
+     * user already agreed to the same license before, he/she won't be asked again to agree and for multiple one
+     * installed at the same time, just one license agreement is shown. When defined, <code>licenseFile</code> needs to
+     * be defined as well.
+     *
      * @since 3.8
      */
     @Parameter
     private String licenseName;
-    
+
     /**
-     * path to the license agreement file that will be shown when installing the module. When defined, <code>licenseName</code> needs to be defined as well.
+     * path to the license agreement file that will be shown when installing the module. When defined,
+     * <code>licenseName</code> needs to be defined as well.
+     *
      * @since 3.8
      */
     @Parameter
     private File licenseFile;
-    
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-
     /**
      * Contextualized.
      */
@@ -175,11 +175,10 @@ public class CreateNbmMojo
 
     // end of component params custom code folding
     // </editor-fold>
-    
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat ( "yyyy/MM/dd" );
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy/MM/dd" );
 
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
         if ( skipNbm )
         {
@@ -194,7 +193,6 @@ public class CreateNbmMojo
             return;
         }
         super.execute();
-
 
         // 3. generate nbm
         File nbmFile = new File( nbmBuildDir, finalName + ".nbm" );
@@ -250,7 +248,7 @@ public class CreateNbmMojo
             File lf = new File( project.getBasedir(), module.getLicenseFile() );
             licFile = lf;
             getLog().warn( "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml" );
-            
+
         }
         if ( licName != null && licFile != null )
         {
@@ -301,8 +299,8 @@ public class CreateNbmMojo
             {
                 if ( !distribUrl.contains( "::" ) )
                 {
-                    dist =
-                        distribUrl + ( distribUrl.endsWith( "/" ) ? "" : "/" )
+                    dist
+                            = distribUrl + ( distribUrl.endsWith( "/" ) ? "" : "/" )
                             + nbmFile.getName();
                 }
             }
@@ -312,8 +310,8 @@ public class CreateNbmMojo
                         project.getGroupId(), project.getArtifactId(),
                         project.getVersion(), null, "nbm-file" );
 
-                dist =
-                    distRepository.getUrl() + ( distRepository.getUrl().endsWith( "/" ) ? "" : "/" )
+                dist
+                        = distRepository.getUrl() + ( distRepository.getUrl().endsWith( "/" ) ? "" : "/" )
                         + distRepository.pathOf( art );
 
             }
@@ -323,7 +321,7 @@ public class CreateNbmMojo
         {
             nbmTask.setDistribution( nbmFile.getName() );
         }
-        if ( ! "extra".equals( cluster ) )
+        if ( !"extra".equals( cluster ) )
         {
             nbmTask.setTargetcluster( cluster );
         }
@@ -373,7 +371,7 @@ public class CreateNbmMojo
                 String devsString = "";
                 while ( dvs.hasNext() )
                 {
-                    Developer d = ( Developer ) dvs.next();
+                    Developer d = (Developer) dvs.next();
                     devsString = devsString + "," + d.getName() != null ? d.getName() : d.getId();
                 }
                 organization = devsString.substring( 1 );
@@ -395,22 +393,22 @@ public class CreateNbmMojo
         }
         return "Copyright " + organization + " " + date;
     }
-    
+
     private String createDefaultLicenseText()
     {
         String toRet = "License terms:\n";
-        
+
         List licenses = project.getLicenses();
         if ( licenses != null && licenses.size() > 0 )
         {
             Iterator lic = licenses.iterator();
             while ( lic.hasNext() )
             {
-                License ll = ( License ) lic.next();
-                
+                License ll = (License) lic.next();
+
                 if ( ll.getName() != null )
                 {
-                   toRet = toRet + ll.getName() + " - "; 
+                    toRet = toRet + ll.getName() + " - ";
                 }
                 if ( ll.getUrl() != null )
                 {
@@ -424,7 +422,7 @@ public class CreateNbmMojo
         }
         else
         {
-           toRet = toRet + "Unknown";
+            toRet = toRet + "Unknown";
         }
         return toRet;
     }

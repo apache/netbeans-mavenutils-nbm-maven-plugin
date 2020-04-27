@@ -145,7 +145,7 @@ public class RunNetBeansMojo
                         if ( !appName.equals( name ) )
                         {
                             getLog().debug( "When examining executable names, found clashing results " + f.getName()
-                                            + " " + appName );
+                                    + " " + appName );
                         }
                     }
                 }
@@ -158,7 +158,7 @@ public class RunNetBeansMojo
 
         //http://www.netbeans.org/issues/show_bug.cgi?id=174819
         StringReader sr = new StringReader( appName + "_extraclusters=\"" + buff.toString() + "\"\n" + "extraclusters=\""
-                                            + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
+                + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
 
         // write XXX.conf file with cluster information...
         File etc = new File( netbeansUserdir, "etc" );

@@ -116,10 +116,10 @@ public class CreateClusterMojo
                     if ( "nbm".equals( proj.getPackaging() ) )
                     {
                         String error
-                               = "The NetBeans binary directory structure for "
-                                 + proj.getId()
-                                 + " is not created yet."
-                                 + "\n Please execute 'mvn install nbm:cluster' to build all relevant projects in the reactor.";
+                                = "The NetBeans binary directory structure for "
+                                + proj.getId()
+                                + " is not created yet."
+                                + "\n Please execute 'mvn install nbm:cluster' to build all relevant projects in the reactor.";
                         throw new MojoFailureException( error );
                     }
                     if ( "bundle".equals( proj.getPackaging() ) )
@@ -131,7 +131,7 @@ public class CreateClusterMojo
                         if ( !jar.exists() )
                         {
                             getLog().error( "Skipping " + proj.getId()
-                                            + ". Cannot find the main artifact in output directory." );
+                                    + ". Cannot find the main artifact in output directory." );
                             continue;
                         }
                         mnf.setJarFile( jar );
