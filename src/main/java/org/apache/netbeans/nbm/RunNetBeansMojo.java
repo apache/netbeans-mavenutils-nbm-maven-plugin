@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,9 +39,9 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
- * Run NetBeans IDE with additional custom module clusters, 
- * to be used in conjunction with nbm:cluster.
- * Semi-deprecated; used only for standalone modules and "suites".
+ * Run NetBeans IDE with additional custom module clusters, to be used in conjunction with nbm:cluster. Semi-deprecated;
+ * used only for standalone modules and "suites".
+ *
  * @author Milos Kleint
  *
  */
@@ -52,14 +51,13 @@ public class RunNetBeansMojo
 {
 
     /**
-     * directory where the module(s)' NetBeans cluster(s) are located.
-     * is related to nbm:cluster goal.
+     * directory where the module(s)' NetBeans cluster(s) are located. is related to nbm:cluster goal.
      */
     @Parameter( required = true, defaultValue = "${project.build.directory}/netbeans_clusters" )
     protected File clusterBuildDir;
     /**
-     * directory where the the NetBeans platform/IDE installation is,
-     * denotes the root directory of NetBeans installation.
+     * directory where the the NetBeans platform/IDE installation is, denotes the root directory of NetBeans
+     * installation.
      */
     @Parameter( required = true, property = "netbeans.installation" )
     protected File netbeansInstallation;
@@ -69,28 +67,29 @@ public class RunNetBeansMojo
     @Parameter( required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir" )
     protected File netbeansUserdir;
     /**
-     * additional command line arguments. 
+     * additional command line arguments.
      */
     @Parameter( property = "netbeans.run.params" )
     protected String additionalArguments;
-    
+
     /**
-     * Attach a debugger to the application JVM. If set to "true", the process will suspend and wait for a debugger to attach
-     * on port 5005. If set to some other string, that string will be appended to the <code>additionalArguments</code>, allowing you to configure
-     * arbitrary debug-ability options (without overwriting the other options specified through the <code>additionalArguments</code>
-     * parameter).
+     * Attach a debugger to the application JVM. If set to "true", the process will suspend and wait for a debugger to
+     * attach on port 5005. If set to some other string, that string will be appended to the
+     * <code>additionalArguments</code>, allowing you to configure arbitrary debug-ability options (without overwriting
+     * the other options specified through the <code>additionalArguments</code> parameter).
+     *
      * @since 3.11.1
      */
     @Parameter( property = "netbeans.run.params.debug" )
-    protected String debugAdditionalArguments;    
+    protected String debugAdditionalArguments;
 
     /**
-     * 
+     *
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
         netbeansUserdir.mkdirs();
 
@@ -98,7 +97,7 @@ public class RunNetBeansMojo
         if ( !clusterBuildDir.exists() || clusterBuildDir.listFiles() == null )
         {
             throw new MojoExecutionException(
-                                              "No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one." );
+                    "No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one." );
         }
         File[] fls = clusterBuildDir.listFiles();
         for ( int i = 0; i < fls.length; i++ )
@@ -118,9 +117,8 @@ public class RunNetBeansMojo
         {
             buff.deleteCharAt( buff.lastIndexOf( ":" ) );
         }
-        
-        System.err.println(">>>>>>>>> " + buff.toString());
-        
+
+        getLog().debug( "cluster path:\n" + buff.toString() );
 
         //now check what the exec names are to figure the right XXX.clusters name
         File binDir = new File( netbeansInstallation, "bin" );
@@ -147,7 +145,7 @@ public class RunNetBeansMojo
                         if ( !appName.equals( name ) )
                         {
                             getLog().debug( "When examining executable names, found clashing results " + f.getName()
-                                                + " " + appName );
+                                            + " " + appName );
                         }
                     }
                 }
@@ -159,12 +157,10 @@ public class RunNetBeansMojo
         }
 
         //http://www.netbeans.org/issues/show_bug.cgi?id=174819
-        StringReader sr =
-            new StringReader( appName + "_extraclusters=\"" + buff.toString() + "\"\n" + "extraclusters=\""
-                + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
+        StringReader sr = new StringReader( appName + "_extraclusters=\"" + buff.toString() + "\"\n" + "extraclusters=\""
+                                            + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
 
         // write XXX.conf file with cluster information...
-        
         File etc = new File( netbeansUserdir, "etc" );
         etc.mkdirs();
         File confFile = new File( etc, appName + ".conf" );
@@ -182,13 +178,17 @@ public class RunNetBeansMojo
         {
             IOUtil.close( conf );
         }
-        
-        try (InputStream io = new FileInputStream(confFile))        {
-            System.err.println(">>>>>>\n" + IOUtil.toString(io));
-        }
-        catch ( IOException ex )
+
+        if ( getLog().isDebugEnabled() )
         {
-            throw new MojoExecutionException( "Error writing " + confFile, ex );
+            try ( InputStream io = new FileInputStream( confFile ) )
+            {
+                getLog().debug( "Configuration file content:\n" + IOUtil.toString( io ) );
+            }
+            catch ( IOException ex )
+            {
+                throw new MojoExecutionException( "Error writing " + confFile, ex );
+            }
         }
 
         boolean windows = Os.isFamily( "windows" );
@@ -213,7 +213,10 @@ public class RunNetBeansMojo
                         }
                     }
                 }
-                cmdLine.addArguments( new String[] { "--console", "suppress" } );
+                cmdLine.addArguments( new String[]
+                {
+                    "--console", "suppress"
+                } );
             }
         }
         else
@@ -257,13 +260,13 @@ public class RunNetBeansMojo
             throw new MojoExecutionException( "Failed executing NetBeans", e );
         }
     }
-    
+
     private String getDebugAdditionalArguments()
     {
-       if ( "true".equals( debugAdditionalArguments ) )
+        if ( "true".equals( debugAdditionalArguments ) )
         {
             return "-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
         }
         return debugAdditionalArguments;
-    }    
+    }
 }
