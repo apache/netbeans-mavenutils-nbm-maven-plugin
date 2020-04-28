@@ -66,21 +66,21 @@ import org.codehaus.plexus.util.IOUtil;
 /**
  * Goal for generating NetBeans module system specific manifest entries, part of <code>nbm</code> lifecycle/packaging.
  *
- * In order to have the generated manifest picked up by the maven-jar-plugin,
- * one shall add the following configuration snippet to maven-jar-plugin.
- * 
+ * In order to have the generated manifest picked up by the maven-jar-plugin, one shall add the following configuration
+ * snippet to maven-jar-plugin.
+ *
  * <pre>
  *  {@code
-   <plugin>
-       <groupId>org.apache.maven.plugins</groupId>
-       <artifactId>maven-jar-plugin</artifactId>
-       <version>3.0.2</version>
-       <configuration>
-           <archive>
-               <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-           </archive>
-       </configuration>
-   </plugin>
+ * <plugin>
+ * <groupId>org.apache.maven.plugins</groupId>
+ * <artifactId>maven-jar-plugin</artifactId>
+ * <version>3.0.2</version>
+ * <configuration>
+ * <archive>
+ * <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+ * </archive>
+ * </configuration>
+ * </plugin>
  * }
  * </pre>
  *
@@ -92,19 +92,20 @@ import org.codehaus.plexus.util.IOUtil;
         threadSafe = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class NetBeansManifestUpdateMojo
-    extends AbstractNbmMojo
+        extends AbstractNbmMojo
 {
 
     /**
-     * NetBeans module assembly build directory.
-     * directory where the the NetBeans jar and nbm file get constructed.
+     * NetBeans module assembly build directory. directory where the the NetBeans jar and nbm file get constructed.
      */
     @Parameter( defaultValue = "${project.build.directory}/nbm", property = "maven.nbm.buildDir" )
     protected File nbmBuildDir;
 
     /**
      * a NetBeans module descriptor containing dependency information and more
-     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in 4.0 entirely
+     *
+     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in
+     * 4.0 entirely
      */
     @Parameter( defaultValue = "${basedir}/src/main/nbm/module.xml" )
     protected File descriptor;
@@ -116,19 +117,20 @@ public class NetBeansManifestUpdateMojo
     private MavenProject project;
 
     /**
-     * The location of JavaHelp sources for the project. The documentation
-     * itself is expected to be in the directory structure based on codenamebase of the module.
-     * eg. if your codenamebase is "org.netbeans.modules.apisupport", then the actual docs
-     * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs.
+     * The location of JavaHelp sources for the project. The documentation itself is expected to be in the directory
+     * structure based on codenamebase of the module. eg. if your codenamebase is "org.netbeans.modules.apisupport",
+     * then the actual docs files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs.
      * Obsolete as of NetBeans 7.0 with &#64;HelpSetRegistration.
+     *
      * @since 2.7
      */
     @Parameter( defaultValue = "${basedir}/src/main/javahelp" )
     protected File nbmJavahelpSource;
 
     /**
-     * Path to manifest file that will be used as base and enhanced with generated content. Any entry specified in the original file
-     * will not be overwritten
+     * Path to manifest file that will be used as base and enhanced with generated content. Any entry specified in the
+     * original file will not be overwritten
+     *
      * @since 3.0
      */
     @Parameter( required = true, defaultValue = "${basedir}/src/main/nbm/manifest.mf" )
@@ -136,66 +138,68 @@ public class NetBeansManifestUpdateMojo
 
     /**
      * Path to the generated MANIFEST file to use. It will be used by jar:jar plugin.
+     *
      * @since 3.0
      */
     @Parameter( required = true, readonly = true, defaultValue = "${project.build.outputDirectory}/META-INF/MANIFEST.MF" )
     private File targetManifestFile;
 
     /**
-     * Verify the runtime NetBeans module dependencies and Class-Path items
-     * generated from Maven dependencies. The check is done by matching classes used
-     * in current project. Allowed values for the parameter are <code>fail</code>, <code>warn</code> and <code>skip</code>.
-     * The default is <code>fail</code> in which case the validation failure results in a failed build,
-     * in the vast majority of cases the module would fail at runtime anyway.
+     * Verify the runtime NetBeans module dependencies and Class-Path items generated from Maven dependencies. The check
+     * is done by matching classes used in current project. Allowed values for the parameter are <code>fail</code>,
+     * <code>warn</code> and <code>skip</code>. The default is <code>fail</code> in which case the validation failure
+     * results in a failed build, in the vast majority of cases the module would fail at runtime anyway.
      *
      * @since 3.0
      */
     @Parameter( property = "maven.nbm.verify", defaultValue = "fail" )
     private String verifyRuntime;
-    
+
     private static final String FAIL = "fail";
     private static final String WARN = "warn";
     private static final String SKIP = "skip";
 
     /**
-     * A list of module's public packages. If not defined, no packages are exported as public.
-     * Allowed values are single package names
-     * or package names ending with .* which represent the package and all subpackages.
+     * A list of module's public packages. If not defined, no packages are exported as public. Allowed values are single
+     * package names or package names ending with .* which represent the package and all subpackages.
      * <p/>
-     * Eg. "org.kleint.milos.api" designates just the one package, while "org.kleint.milos.spi.*"
-     * denotes the spi package an all it's subpackages.
+     * Eg. "org.kleint.milos.api" designates just the one package, while "org.kleint.milos.spi.*" denotes the spi
+     * package an all it's subpackages.
+     *
      * @since 3.0
      */
     @Parameter
     private List<String> publicPackages;
 
     /**
-     * When encountering an OSGi bundle among dependencies, the plugin will generate a direct dependency
-     * on the bundle and will not include the bundle's jar into the nbm. Will only work with NetBeans 6.9+ runtime.
-     * Therefore it is off by default.
-     * WARNING: Additionally existing applications/modules need to check modules wrapping
-     * external libraries for library jars that are also OSGi bundles. Such modules will no longer include the OSGi bundles
-     * as part of the module but will include a modular dependency on the bundle. Modules depending on these old wrappers
+     * When encountering an OSGi bundle among dependencies, the plugin will generate a direct dependency on the bundle
+     * and will not include the bundle's jar into the nbm. Will only work with NetBeans 6.9+ runtime. Therefore it is
+     * off by default. WARNING: Additionally existing applications/modules need to check modules wrapping external
+     * libraries for library jars that are also OSGi bundles. Such modules will no longer include the OSGi bundles as
+     * part of the module but will include a modular dependency on the bundle. Modules depending on these old wrappers
      * shall depend directly on the bundle, eventually rendering the old library wrapper module obsolete.
      *
      * @since 3.2
      */
     @Parameter( defaultValue = "false" )
     private boolean useOSGiDependencies;
-    
+
     /**
-     * codename base of the module, uniquely identifying the module within the NetBeans runtime. usually the package name equivalent.
-     * Can include the major release version.
-     * See <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest"> NetBeans Module system docs</a>
+     * codename base of the module, uniquely identifying the module within the NetBeans runtime. usually the package
+     * name equivalent. Can include the major release version. See
+     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest">
+     * NetBeans Module system docs</a>
+     *
      * @since 3.8
      */
     @Parameter( defaultValue = "${project.groupId}.${project.artifactId}" )
     private String codeNameBase;
-    
+
     /**
-     * List of explicit module dependency declarations overriding the default specification dependency. Useful when depending on a range of major versions,
-     * depending on implementation version etc.
-     * <p>The format is:
+     * List of explicit module dependency declarations overriding the default specification dependency. Useful when
+     * depending on a range of major versions, depending on implementation version etc.
+     * <p>
+     * The format is:
      * <pre>
      * &lt;dependency&gt;
      *    &lt;id&gt;groupId:artifactId&lt;/id&gt;
@@ -205,50 +209,55 @@ public class NetBeansManifestUpdateMojo
      * </pre>
      * </p>
      * <p>
-     * where <code>id</code> is composed of grouId and artifactId of a dependency defined in effective pom, separated by double colon. This is mandatory.</p>
+     * where <code>id</code> is composed of grouId and artifactId of a dependency defined in effective pom, separated by
+     * double colon. This is mandatory.</p>
      * <p>
-     * Then there are 2 exclusively optional fields <code>type</code> and <code>explicitValue</code>, if both are defined <code>explicitValue</code> gets applied.
+     * Then there are 2 exclusively optional fields <code>type</code> and <code>explicitValue</code>, if both are
+     * defined <code>explicitValue</code> gets applied.
      * </p>
-     * <p><code>type</code> values: <code>spec</code> means specification dependency.That's the default. 
-     * <code>impl</code> means implementation dependency, only the exact version match will satisfy the constraint. 
-     * <code>loose</code> means loose dependency, no requirement on version, the module just has to be present. Not very common option.
-     * 
+     * <p>
+     * <code>type</code> values: <code>spec</code> means specification dependency.That's the default. <code>impl</code>
+     * means implementation dependency, only the exact version match will satisfy the constraint. <code>loose</code>
+     * means loose dependency, no requirement on version, the module just has to be present. Not very common option.
+     *
      * @since 3.8
      */
     @Parameter
     private Dependency[] moduleDependencies;
-    
-/**
+
+    /**
      * Deployment type of the module, allowed values are <code>normal</code>,<code>eager</code>,<code>autoload</code>,
      * <code>disabled</code>.
      * <p>
-     * <code>autoload</code> - Such a module is
-     * automatically enabled when some other module requires it and
+     * <code>autoload</code> - Such a module is automatically enabled when some other module requires it and
      * automatically disabled otherwise.</p>
-     *                     <p><code>eager</code> - This module type gets
-     * automatically enabled when all it's dependencies are
-     * satisfied. Disabled otherwise.</p>
-     *                     <p><code>normal</code> - This is the default
-     * value. This kind of module is enabled/disabled manually by
-     * the user. It installs enabled.</p>
-     *                     <p><code>disabled</code> - This kind of module is enabled/disabled manually by
-     * the user. It installs disabled. Since 3.11</p>
+     * <p>
+     * <code>eager</code> - This module type gets automatically enabled when all it's dependencies are satisfied.
+     * Disabled otherwise.</p>
+     * <p>
+     * <code>normal</code> - This is the default value. This kind of module is enabled/disabled manually by the user. It
+     * installs enabled.</p>
+     * <p>
+     * <code>disabled</code> - This kind of module is enabled/disabled manually by the user. It installs disabled. Since
+     * 3.11</p>
      *
-     * For details, see <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans Module system docs</a>
-     * 
-     * Since 3.14, for autoload and eager modules, we automatically set AutoUpdate-Show-In-Client manifest entry to false, if not defined already otherwise in the manifest.
-     * See issue <a href="http://jira.codehaus.org/browse/MNBMODULE-194">MNBMODULE-194</a>
-     * 
+     * For details, see
+     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans
+     * Module system docs</a>
+     *
+     * Since 3.14, for autoload and eager modules, we automatically set AutoUpdate-Show-In-Client manifest entry to
+     * false, if not defined already otherwise in the manifest. See issue
+     * <a href="http://jira.codehaus.org/browse/MNBMODULE-194">MNBMODULE-194</a>
+     *
      * @since 3.8 (3.14 in manifest goal)
-     */ 
+     */
     @Parameter( defaultValue = "normal" )
     protected String moduleType;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-
     /**
      * The artifact repository to use.
-
+     *
      */
     @Parameter( required = true, readonly = true, defaultValue = "${localRepository}" )
     private ArtifactRepository localRepository;
@@ -279,14 +288,14 @@ public class NetBeansManifestUpdateMojo
 
 // end of component params custom code folding
 // </editor-fold> 
-
     /**
      * execute plugin
+     *
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
 
     {
         //need to do this to chekc for javahelp on CP.
@@ -301,7 +310,7 @@ public class NetBeansManifestUpdateMojo
         {
             module = createDefaultDescriptor( project, false );
         }
-        
+
         String mtype = moduleType;
         //same moduleType related code in CreateNetBeansFileStructure.java
         if ( "normal".equals( mtype ) && module.getModuleType() != null )
@@ -309,13 +318,13 @@ public class NetBeansManifestUpdateMojo
             mtype = module.getModuleType();
             getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType" );
         }
-        if ( !"normal".equals( mtype ) && !"autoload".equals( mtype ) && !"eager".equals( mtype ) && !"disabled".equals( mtype ) )
+        if ( !"normal".equals( mtype ) && !"autoload".equals( mtype ) && !"eager".equals( mtype ) && !"disabled".
+                equals( mtype ) )
         {
             getLog().error( "Only 'normal,autoload,eager,disabled' are allowed values in the moduleType parameter" );
         }
         boolean autoload = "autoload".equals( mtype );
         boolean eager = "eager".equals( mtype );
-        
 
         String moduleName = codeNameBase;
         if ( module.getCodeNameBase() != null )
@@ -328,7 +337,7 @@ public class NetBeansManifestUpdateMojo
 // ignoring the case when some of the NetBeans attributes are already defined in the jar and more is included.
         File specialManifest = sourceManifestFile;
         File nbmManifest = ( module.getManifest() != null ? new File(
-            project.getBasedir(), module.getManifest() ) : null );
+                project.getBasedir(), module.getManifest() ) : null );
         if ( nbmManifest != null && nbmManifest.exists() )
         {
             //deprecated, but if actually defined, will use it.
@@ -377,21 +386,21 @@ public class NetBeansManifestUpdateMojo
         }
         Date date = new Date();
         String specVersion = AdaptNbVersion.adaptVersion( project.getVersion(),
-            AdaptNbVersion.TYPE_SPECIFICATION, date );
+                AdaptNbVersion.TYPE_SPECIFICATION, date );
         String implVersion = AdaptNbVersion.adaptVersion( project.getVersion(),
-            AdaptNbVersion.TYPE_IMPLEMENTATION, date );
+                AdaptNbVersion.TYPE_IMPLEMENTATION, date );
         Manifest.Section mainSection = manifest.getMainSection();
         conditionallyAddAttribute( mainSection,
-            "OpenIDE-Module-Specification-Version", specVersion );
+                "OpenIDE-Module-Specification-Version", specVersion );
         conditionallyAddAttribute( mainSection,
-            "OpenIDE-Module-Implementation-Version", implVersion );
+                "OpenIDE-Module-Implementation-Version", implVersion );
         if ( autoload || eager )
         { //MNBMODULE-194
             conditionallyAddAttribute( mainSection, "AutoUpdate-Show-In-Client", "false" );
         }
         final String timestamp = createTimestamp( date );
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Build-Version",
-            timestamp );
+                timestamp );
         String projectCNB = conditionallyAddAttribute( mainSection, "OpenIDE-Module", moduleName );
         String packagesValue;
         if ( publicPackages != null && publicPackages.size() > 0 )
@@ -439,140 +448,141 @@ public class NetBeansManifestUpdateMojo
 
         //See http://www.netbeans.org/download/dev/javadoc/org-openide-modules/apichanges.html#split-of-openide-jar
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Requires",
-            "org.openide.modules.ModuleFormat1" );
+                "org.openide.modules.ModuleFormat1" );
 //        conditionallyAddAttribute(mainSection, "OpenIDE-Module-IDE-Dependencies", "IDE/1 > 3.40");
         // localization items
         if ( !examinator.isLocalized() )
         {
             conditionallyAddAttribute( mainSection,
-                "OpenIDE-Module-Display-Category", project.getGroupId() );
+                    "OpenIDE-Module-Display-Category", project.getGroupId() );
             conditionallyAddAttribute( mainSection, "OpenIDE-Module-Name",
-                project.getName() );
+                    project.getName() );
             conditionallyAddAttribute( mainSection,
-                "OpenIDE-Module-Short-Description", shorten( project.getDescription() ) );
+                    "OpenIDE-Module-Short-Description", shorten( project.getDescription() ) );
             conditionallyAddAttribute( mainSection,
-                "OpenIDE-Module-Long-Description", project.getDescription() );
+                    "OpenIDE-Module-Long-Description", project.getDescription() );
         }
         getLog().debug( "module =" + module );
-        
-            DependencyNode treeroot = createDependencyTree( project, dependencyGraphBuilder, "compile" );
-            Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-            @SuppressWarnings( "unchecked" )
-            List<Artifact> libArtifacts = getLibraryArtifacts( treeroot, module, project.getRuntimeArtifacts(),
+
+        DependencyNode treeroot = createDependencyTree( project, dependencyGraphBuilder, "compile" );
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
+        @SuppressWarnings( "unchecked" )
+        List<Artifact> libArtifacts = getLibraryArtifacts( treeroot, module, project.getRuntimeArtifacts(),
                 examinerCache, getLog(), useOSGiDependencies );
-            List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, moduleDependencies, project, examinerCache,
+        List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, moduleDependencies,
+                project, examinerCache,
                 libArtifacts, getLog(), useOSGiDependencies );
-            StringBuilder classPath = new StringBuilder();
-            StringBuilder mavenClassPath = new StringBuilder();
-            String dependencies = "";
-            String depSeparator = " ";
+        StringBuilder classPath = new StringBuilder();
+        StringBuilder mavenClassPath = new StringBuilder();
+        String dependencies = "";
+        String depSeparator = " ";
 
-            for ( Artifact a : libArtifacts )
+        for ( Artifact a : libArtifacts )
+        {
+            if ( classPath.length() > 0 )
             {
-                if ( classPath.length() > 0 )
-                {
-                    classPath.append( ' ' );
-                }
-                classPath.append( artifactToClassPathEntry( a, codeNameBase ) );
-                if ( mavenClassPath.length() > 0 )
-                {
-                    mavenClassPath.append( ' ' );
-                }
-                mavenClassPath.append( a.getGroupId() ).
-                        append( ':' ).
-                        append( a.getArtifactId() ).
-                        append( ':' ).
-                        append( a.getBaseVersion() );
-                
-                if ( a.getClassifier() != null ) 
-                {
-                    mavenClassPath.append( ":" ).append( a.getClassifier() );
-                }
+                classPath.append( ' ' );
             }
-
-            for ( ModuleWrapper wr : moduleArtifacts )
+            classPath.append( artifactToClassPathEntry( a, codeNameBase ) );
+            if ( mavenClassPath.length() > 0 )
             {
-                if ( wr.transitive )
+                mavenClassPath.append( ' ' );
+            }
+            mavenClassPath.append( a.getGroupId() ).
+                    append( ':' ).
+                    append( a.getArtifactId() ).
+                    append( ':' ).
+                    append( a.getBaseVersion() );
+
+            if ( a.getClassifier() != null )
+            {
+                mavenClassPath.append( ":" ).append( a.getClassifier() );
+            }
+        }
+
+        for ( ModuleWrapper wr : moduleArtifacts )
+        {
+            if ( wr.transitive )
+            {
+                continue;
+            }
+            Dependency dep = wr.dependency;
+            Artifact artifact = wr.artifact;
+            ExamineManifest depExaminator = examinerCache.get( artifact );
+            String type = dep.getType();
+            String depToken = dep.getExplicitValue();
+            if ( depToken == null )
+            {
+                if ( "loose".equals( type ) )
                 {
-                    continue;
+                    depToken = depExaminator.getModuleWithRelease();
                 }
-                Dependency dep = wr.dependency;
-                Artifact artifact = wr.artifact;
-                ExamineManifest depExaminator = examinerCache.get( artifact );
-                String type = dep.getType();
-                String depToken = dep.getExplicitValue();
-                if ( depToken == null )
+                else if ( "spec".equals( type ) )
                 {
-                    if ( "loose".equals( type ) )
-                    {
-                        depToken = depExaminator.getModuleWithRelease();
-                    }
-                    else if ( "spec".equals( type ) )
-                    {
-                        depToken =
-                            depExaminator.getModuleWithRelease()
-                                + " > "
-                                + ( depExaminator.isNetBeansModule() ? depExaminator.getSpecVersion()
-                                                : AdaptNbVersion.adaptVersion( depExaminator.getSpecVersion(),
-                                                                               AdaptNbVersion.TYPE_SPECIFICATION, date ) );
-                    }
-                    else if ( "impl".equals( type ) )
-                    {
-                        depToken =
-                            depExaminator.getModuleWithRelease()
-                                + " = "
-                                + ( depExaminator.isNetBeansModule() ? depExaminator.getImplVersion()
-                                                : AdaptNbVersion.adaptVersion( depExaminator.getImplVersion(),
-                                                                               AdaptNbVersion.TYPE_IMPLEMENTATION, date ) );
-                    }
-                    else
-                    {
-                        throw new MojoExecutionException(
-                            "Wrong type of NetBeans dependency: " + type + " Allowed values are: loose, spec, impl." );
-                    }
+                    depToken
+                            = depExaminator.getModuleWithRelease()
+                            + " > "
+                            + ( depExaminator.isNetBeansModule() ? depExaminator.getSpecVersion()
+                            : AdaptNbVersion.adaptVersion( depExaminator.getSpecVersion(),
+                                    AdaptNbVersion.TYPE_SPECIFICATION, date ) );
                 }
-                if ( depToken == null )
+                else if ( "impl".equals( type ) )
                 {
-                    //TODO report
-                    getLog().error(
-                        "Cannot properly resolve the NetBeans dependency for " + dep.getId() );
+                    depToken
+                            = depExaminator.getModuleWithRelease()
+                            + " = "
+                            + ( depExaminator.isNetBeansModule() ? depExaminator.getImplVersion()
+                            : AdaptNbVersion.adaptVersion( depExaminator.getImplVersion(),
+                                    AdaptNbVersion.TYPE_IMPLEMENTATION, date ) );
                 }
                 else
                 {
-                    dependencies = dependencies + depSeparator + depToken;
-                    depSeparator = ", ";
+                    throw new MojoExecutionException(
+                            "Wrong type of NetBeans dependency: " + type + " Allowed values are: loose, spec, impl." );
                 }
             }
-            if ( !verifyRuntime.equalsIgnoreCase( SKIP ) )
+            if ( depToken == null )
             {
-                try
-                {
-                    checkModuleClassPath( treeroot, libArtifacts, examinerCache, moduleArtifacts, projectCNB );
-                }
-                catch ( IOException ex )
-                {
-                    throw new MojoExecutionException( "Error while checking runtime dependencies", ex );
-                }
+                //TODO report
+                getLog().error(
+                        "Cannot properly resolve the NetBeans dependency for " + dep.getId() );
             }
+            else
+            {
+                dependencies = dependencies + depSeparator + depToken;
+                depSeparator = ", ";
+            }
+        }
+        if ( !verifyRuntime.equalsIgnoreCase( SKIP ) )
+        {
+            try
+            {
+                checkModuleClassPath( treeroot, libArtifacts, examinerCache, moduleArtifacts, projectCNB );
+            }
+            catch ( IOException ex )
+            {
+                throw new MojoExecutionException( "Error while checking runtime dependencies", ex );
+            }
+        }
 
-            if ( nbmJavahelpSource.exists() )
-            {
-                String moduleJarName = stripVersionFromCodebaseName( moduleName ).replace( ".", "-" );
-                classPath.append( " docs/" ).append( moduleJarName ).append( ".jar" );
-            }
+        if ( nbmJavahelpSource.exists() )
+        {
+            String moduleJarName = stripVersionFromCodebaseName( moduleName ).replace( ".", "-" );
+            classPath.append( " docs/" ).append( moduleJarName ).append( ".jar" );
+        }
 
-            if ( classPath.length() > 0 )
-            {
-                conditionallyAddAttribute( mainSection, "X-Class-Path", classPath.toString().trim() );
-            }
-            if ( mavenClassPath.length() > 0 )
-            {
-                conditionallyAddAttribute( mainSection, "Maven-Class-Path", mavenClassPath.toString() );
-            }
-            if ( dependencies.length() > 0 )
-            {
-                conditionallyAddAttribute( mainSection, "OpenIDE-Module-Module-Dependencies", dependencies );
-            }
+        if ( classPath.length() > 0 )
+        {
+            conditionallyAddAttribute( mainSection, "X-Class-Path", classPath.toString().trim() );
+        }
+        if ( mavenClassPath.length() > 0 )
+        {
+            conditionallyAddAttribute( mainSection, "Maven-Class-Path", mavenClassPath.toString() );
+        }
+        if ( dependencies.length() > 0 )
+        {
+            conditionallyAddAttribute( mainSection, "OpenIDE-Module-Module-Dependencies", dependencies );
+        }
 //            if ( librList.size() > 0 )
 //            {
 //                String list = "";
@@ -607,15 +617,15 @@ public class NetBeansManifestUpdateMojo
     //MNBMODULE-137
     static String artifactToClassPathEntry( Artifact a, String codenamebase )
     {
-        return "ext/" + codenamebase + "/" + a.getGroupId().replace( '.', '-' ) + "/" + a.getArtifactId() + ( a.getClassifier() != null ? "-" + a.getClassifier() : "" ) + "." + a.getArtifactHandler().getExtension();
+        return "ext/" + codenamebase + "/" + a.getGroupId().replace( '.', '-' ) + "/" + a.getArtifactId() + ( a.
+                getClassifier() != null ? "-" + a.getClassifier() : "" ) + "." + a.getArtifactHandler().getExtension();
     }
 
     /**
-     * Create a timestamp for <code>OpenIDE-Module-Build-Version</code> manifest
-     * entry.
+     * Create a timestamp for <code>OpenIDE-Module-Build-Version</code> manifest entry.
      *
-     * It's created from the current time and formatted using a UTC timezone
-     * explicitly which makes created timestamp timezone-independent.
+     * It's created from the current time and formatted using a UTC timezone explicitly which makes created timestamp
+     * timezone-independent.
      *
      * @return timestamp represented as <code>201012292045</code>
      */
@@ -662,6 +672,7 @@ public class NetBeansManifestUpdateMojo
 
     /**
      * Pick out the first sentence of a paragraph.
+     *
      * @param paragraph some text (may be null)
      * @return the first sentence (may be null)
      */
@@ -680,9 +691,10 @@ public class NetBeansManifestUpdateMojo
 // classpat checking related.
 //----------------------------------------------------------------------------------
     private void checkModuleClassPath( DependencyNode treeroot,
-        List<Artifact> libArtifacts,
-        Map<Artifact, ExamineManifest> examinerCache, List<ModuleWrapper> moduleArtifacts, String projectCodeNameBase )
-        throws IOException, MojoExecutionException, MojoFailureException
+            List<Artifact> libArtifacts,
+            Map<Artifact, ExamineManifest> examinerCache, List<ModuleWrapper> moduleArtifacts,
+            String projectCodeNameBase )
+            throws IOException, MojoExecutionException, MojoFailureException
     {
         Set<String> deps = buildProjectDependencyClasses( project, libArtifacts );
         deps.retainAll( allProjectClasses( project ) );
@@ -690,7 +702,7 @@ public class NetBeansManifestUpdateMojo
         Set<String> own = projectModuleOwnClasses( project, libArtifacts );
         deps.removeAll( own );
         CollectModuleLibrariesNodeVisitor visitor = new CollectModuleLibrariesNodeVisitor(
-            project.getRuntimeArtifacts(), examinerCache, getLog(), treeroot, useOSGiDependencies );
+                project.getRuntimeArtifacts(), examinerCache, getLog(), treeroot, useOSGiDependencies );
         treeroot.accept( visitor );
         Map<String, List<Artifact>> modules = visitor.getDeclaredArtifacts();
         Map<Artifact, Set<String>> moduleAllClasses = new HashMap<Artifact, Set<String>>();
@@ -724,16 +736,20 @@ public class NetBeansManifestUpdateMojo
                     {
                         String module = wr.osgi ? "OSGi bundle" : "module";
                         getLog().error(
-                            "Project uses classes from transitive " + module + " " + wr.artifact.getId() + " which will not be accessible at runtime." );
-                        getLog().info( "    To fix the problem, add this module as direct dependency. For OSGi bundles that are supposed to be wrapped in NetBeans modules, use the useOSGiDependencies=false parameter" );
+                                "Project uses classes from transitive " + module + " " + wr.artifact.getId()
+                                + " which will not be accessible at runtime." );
+                        getLog().info(
+                                "    To fix the problem, add this module as direct dependency. For OSGi bundles that are supposed to be wrapped in NetBeans modules, use the useOSGiDependencies=false parameter" );
                         deps.removeAll( classes[0] );
                     }
                     classes[1].retainAll( deps );
                     if ( classes[1].size() > 0 )
                     {
-                        getLog().info( "Private classes referenced in transitive module: " + Arrays.toString( classes[1].toArray() ) );
+                        getLog().info( "Private classes referenced in transitive module: " + Arrays.toString(
+                                classes[1].toArray() ) );
                         getLog().error(
-                            "Project depends on packages not accessible at runtime in transitive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
+                                "Project depends on packages not accessible at runtime in transitive module "
+                                + wr.artifact.getId() + " which will not be accessible at runtime." );
                         deps.removeAll( classes[1] );
                     }
                 }
@@ -745,33 +761,38 @@ public class NetBeansManifestUpdateMojo
                 {
                     strs.retainAll( e.getValue() );
                     getLog().info( "Private classes referenced in module: " + Arrays.toString( strs.toArray() ) );
-                    getLog().error( "Project depends on packages not accessible at runtime in module " + e.getKey().getId() );
+                    getLog().error( "Project depends on packages not accessible at runtime in module " + e.getKey().
+                            getId() );
                 }
             }
             if ( verifyRuntime.equalsIgnoreCase( FAIL ) )
             {
                 if ( !deps.isEmpty() )
                 {
-                    throw new MojoFailureException( "Uncategorized problems with NetBeans dependency verification (maybe MNBMODULE-102 or wrong maven dependency metadata). Supposedly external classes are used in the project's binaries but the classes are not found on classpath. Class usages: " + deps );
+                    throw new MojoFailureException(
+                            "Uncategorized problems with NetBeans dependency verification (maybe MNBMODULE-102 or wrong maven dependency metadata). Supposedly external classes are used in the project's binaries but the classes are not found on classpath. Class usages: "
+                            + deps );
                 }
                 else
                 {
-                    throw new MojoFailureException( "See above for failures in runtime NetBeans dependencies verification." );
+                    throw new MojoFailureException(
+                            "See above for failures in runtime NetBeans dependencies verification." );
                 }
             }
         }
     }
 
     /**
-     * The current projects's dependencies, includes classes used in teh module itself
-     * and the classpath libraries as well.
+     * The current projects's dependencies, includes classes used in teh module itself and the classpath libraries as
+     * well.
+     *
      * @param project
      * @param libraries
      * @return
      * @throws java.io.IOException
      */
     private Set<String> buildProjectDependencyClasses( MavenProject project, List<Artifact> libraries )
-        throws IOException
+            throws IOException
     {
         Set<String> dependencyClasses = new HashSet<String>();
 
@@ -787,7 +808,7 @@ public class NetBeansManifestUpdateMojo
 
     @SuppressWarnings( "unchecked" )
     private Set<String> projectModuleOwnClasses( MavenProject project, List<Artifact> libraries )
-        throws IOException
+            throws IOException
     {
         Set<String> projectClasses = new HashSet<String>();
         DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
@@ -806,15 +827,15 @@ public class NetBeansManifestUpdateMojo
     }
 
     /**
-     * complete list of classes on project runtime classpath (excluding
-     * jdk bit)
+     * complete list of classes on project runtime classpath (excluding jdk bit)
+     *
      * @param project
      * @return
      * @throws java.io.IOException
      */
     @SuppressWarnings( "unchecked" )
     private Set<String> allProjectClasses( MavenProject project )
-        throws IOException
+            throws IOException
     {
         Set<String> projectClasses = new HashSet<String>();
         DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
@@ -835,9 +856,9 @@ public class NetBeansManifestUpdateMojo
     }
 
     private Set<String>[] visibleModuleClasses( List<Artifact> moduleLibraries,
-        ExamineManifest manifest, Dependency dep, String projectCodeNameBase,
-        boolean transitive )
-        throws IOException, MojoFailureException
+            ExamineManifest manifest, Dependency dep, String projectCodeNameBase,
+            boolean transitive )
+            throws IOException, MojoFailureException
     {
         Set<String> moduleClasses = new HashSet<String>();
         Set<String> visibleModuleClasses = new HashSet<String>();
@@ -866,7 +887,8 @@ public class NetBeansManifestUpdateMojo
             String cnb = stripVersionFromCodebaseName( projectCodeNameBase );
             if ( !transitive && manifest.hasFriendPackages() && !manifest.getFriends().contains( cnb ) )
             {
-                String message = "Module has friend dependency on " + manifest.getModule() + " but is not listed as a friend.";
+                String message = "Module has friend dependency on " + manifest.getModule()
+                        + " but is not listed as a friend.";
                 if ( verifyRuntime.equalsIgnoreCase( FAIL ) )
                 {
                     throw new MojoFailureException( message );
@@ -886,7 +908,7 @@ public class NetBeansManifestUpdateMojo
             {
                 for ( Pattern patt : compiled )
                 {
-                    if ( patt.matcher( clazz ).matches() ) 
+                    if ( patt.matcher( clazz ).matches() )
                     {
                         visibleModuleClasses.add( clazz );
                         break;
@@ -906,10 +928,10 @@ public class NetBeansManifestUpdateMojo
         }
 
         return new Set[]
-            {
-                visibleModuleClasses,
-                moduleClasses
-            };
+        {
+            visibleModuleClasses,
+            moduleClasses
+        };
     }
 
     static List<Pattern> createCompiledPatternList( List<String> packages )
@@ -933,7 +955,7 @@ public class NetBeansManifestUpdateMojo
 
     @SuppressWarnings( "unchecked" )
     private Set<String> buildDependencyClasses( String path )
-        throws IOException
+            throws IOException
     {
         URL url = new File( path ).toURI().toURL();
         ASMDependencyAnalyzer dependencyAnalyzer = new ASMDependencyAnalyzer();

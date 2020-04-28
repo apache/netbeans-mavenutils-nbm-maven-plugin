@@ -22,24 +22,24 @@ under the License.
         <version>1.0-SNAPSHOT</version>
     </skin>  
     <body>
-    <menu name="Overview">
-      <item name="Usage" href="index.html"/>
-      <item name="Plugin Goals" href="plugin-info.html"/>
-      <!-- <item name="Javadoc" href="apidocs/index.html"/> -->
-      <!--item name="FAQ" href="faq.html"/-->
-    </menu>
-    <!--<menu name="Upgrade">   
-      <item name="2.4 -> 2.5 upgrade" href="2425upgrade.html"/>
-      <item name="2.6 -> 3.0 upgrade" href="2630upgrade.html"/>
-    </menu>-->
-    <menu name="HOWTOs ">
-      <item name="Customize installers" href="buildinstexample.html"/>
-      <item name="Upgrade from older versions" href="upgrade.html"/>
-    </menu>
-    <menu name="Deprecated">
-      <item name="Descriptor Format" href="nbm.html"/>
-      <item name="Example Descriptor" href="descriptor.html"/>
-    </menu>
-  </body>
+        <menu name="Overview">
+            <item name="Usage" href="index.html"/>
+            <item name="Plugin Goals" href="plugin-info.html"/>
+            <!-- <item name="Javadoc" href="apidocs/index.html"/> -->
+            <!--item name="FAQ" href="faq.html"/-->
+        </menu>
+        <!--<menu name="Upgrade">   
+          <item name="2.4 -> 2.5 upgrade" href="2425upgrade.html"/>
+          <item name="2.6 -> 3.0 upgrade" href="2630upgrade.html"/>
+        </menu>-->
+        <menu name="HOWTOs ">
+            <item name="Customize installers" href="buildinstexample.html"/>
+            <item name="Upgrade from older versions" href="upgrade.html"/>
+        </menu>
+        <menu name="Deprecated">
+            <item name="Descriptor Format" href="nbm.html"/>
+            <item name="Example Descriptor" href="descriptor.html"/>
+        </menu>
+    </body>
 </project>
 

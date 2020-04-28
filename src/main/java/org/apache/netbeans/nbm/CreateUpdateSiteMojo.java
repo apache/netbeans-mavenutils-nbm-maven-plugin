@@ -56,12 +56,13 @@ import org.netbeans.nbbuild.MakeUpdateDesc;
 
 /**
  * Create the NetBeans auto update site definition.
+ *
  * @author Milos Kleint
  *
  */
-@Mojo( name = "autoupdate", 
-        defaultPhase = LifecyclePhase.PACKAGE, 
-        aggregator = true, 
+@Mojo( name = "autoupdate",
+        defaultPhase = LifecyclePhase.PACKAGE,
+        aggregator = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class CreateUpdateSiteMojo
         extends AbstractNbmMojo
@@ -79,25 +80,23 @@ public class CreateUpdateSiteMojo
     @Parameter( defaultValue = "updates.xml", property = "maven.nbm.updatesitexml" )
     protected String fileName;
     /**
-     * A custom distribution base for the nbms in the update site.
-     * If NOT defined, the update site will use a simple relative URL, which is generally what you want.
-     * Defining it as "auto" will pick up the distribution URL from each NBM, which is generally wrong. 
-     * See <code>distributionUrl</code> in nbm mojo for what url will be used in that case.
+     * A custom distribution base for the nbms in the update site. If NOT defined, the update site will use a simple
+     * relative URL, which is generally what you want. Defining it as "auto" will pick up the distribution URL from each
+     * NBM, which is generally wrong. See <code>distributionUrl</code> in nbm mojo for what url will be used in that
+     * case.
      * <p/>
-     * The value is either a direct http protocol based URL that points to
-     * the location under which all nbm files are located, or
+     * The value is either a direct http protocol based URL that points to the location under which all nbm files are
+     * located, or
      * <p/>
-     * allows to create an update site based on maven repository content.
-     * The resulting autoupdate site document can be uploaded as tar.gz to repository as well
-     * as attached artifact to the 'nbm-application' project.
+     * allows to create an update site based on maven repository content. The resulting autoupdate site document can be
+     * uploaded as tar.gz to repository as well as attached artifact to the 'nbm-application' project.
      * <br/>
      * Format: id::layout::url same as in maven-deploy-plugin
      * <br/>
      * with the 'default' and 'legacy' layouts. (maven2 vs maven1 layout)
      * <br/>
-     * If the value doesn't contain :: characters,
-     * it's assumed to be the flat structure and the value is just the URL.
-     * 
+     * If the value doesn't contain :: characters, it's assumed to be the flat structure and the value is just the URL.
+     *
      * @since 3.0 it's also possible to add remote repository as base
      */
     @Parameter( defaultValue = ".", property = "maven.nbm.customDistBase" )
@@ -115,19 +114,18 @@ public class CreateUpdateSiteMojo
      */
     @Parameter( required = true, readonly = true, defaultValue = "${reactorProjects}" )
     private List reactorProjects;
-    
+
     /**
-     * List of Ant style patterns on artifact GA (groupID:artifactID) that should be included in the update site.
-     * Eg. org.netbeans.* matches all artifacts with any groupID starting with 'org.netbeans.',
-     * org.*:api will match any artifact with artifactId of 'api' and groupId starting with 'org.'
+     * List of Ant style patterns on artifact GA (groupID:artifactID) that should be included in the update site. Eg.
+     * org.netbeans.* matches all artifacts with any groupID starting with 'org.netbeans.', org.*:api will match any
+     * artifact with artifactId of 'api' and groupId starting with 'org.'
+     *
      * @since 3.14
      */
     @Parameter
     private List<String> updateSiteIncludes;
-    
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-
     @Component
     private ArtifactFactory artifactFactory;
     /**
@@ -152,9 +150,8 @@ public class CreateUpdateSiteMojo
     protected ArtifactRepository localRepository;
 
     // </editor-fold>
-
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
         Project antProject = registerNbmAntTasks();
         File nbmBuildDirFile = new File( outputDirectory, "netbeans_site" );
@@ -192,8 +189,8 @@ public class CreateUpdateSiteMojo
                 {
                     continue;
                 }
-                ArtifactResult res =
-                    turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
+                ArtifactResult res
+                        = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
                 if ( res.hasConvertedArtifact() )
                 {
                     art = res.getConvertedArtifact();
@@ -274,9 +271,10 @@ public class CreateUpdateSiteMojo
                         {
                             continue;
                         }
-                        Artifact art =
-                            artifactFactory.createArtifact( proj.getGroupId(), proj.getArtifactId(), proj.getVersion(),
-                                                            null, "nbm-file" );
+                        Artifact art
+                                = artifactFactory.createArtifact( proj.getGroupId(), proj.getArtifactId(), proj.
+                                        getVersion(),
+                                        null, "nbm-file" );
                         String path = distRepository.pathOf( art );
                         File f = new File( nbmBuildDirFile, path.replace( '/', File.separatorChar ) );
                         copyTask.setTofile( f );
@@ -345,7 +343,7 @@ public class CreateUpdateSiteMojo
     private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile( "(.+)::(.+)::(.+)" );
 
     static ArtifactRepository getDeploymentRepository( String distBase, PlexusContainer container, Log log )
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
 
         ArtifactRepository repo = null;
@@ -390,7 +388,7 @@ public class CreateUpdateSiteMojo
 
     @Override
     public void contextualize( Context context )
-        throws ContextException
+            throws ContextException
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -410,7 +408,7 @@ public class CreateUpdateSiteMojo
                     return true;
                 }
             }
-            return false;    
+            return false;
         }
         return true;
     }

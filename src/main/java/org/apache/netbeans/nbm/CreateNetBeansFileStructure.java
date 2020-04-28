@@ -71,7 +71,7 @@ import org.netbeans.nbbuild.JHIndexer;
 
 /**
  * Create the NetBeans module directory structure, a prerequisite for nbm creation and cluster creation.
- * 
+ *
  *
  * @author Milos Kleint
  *
@@ -81,8 +81,7 @@ public abstract class CreateNetBeansFileStructure
 {
 
     /**
-     * NetBeans module assembly build directory.
-     * directory where the the NetBeans jar and nbm file get constructed.
+     * NetBeans module assembly build directory. directory where the the NetBeans jar and nbm file get constructed.
      */
     @Parameter( defaultValue = "${project.build.directory}/nbm", property = "maven.nbm.buildDir" )
     protected File nbmBuildDir;
@@ -98,7 +97,9 @@ public abstract class CreateNetBeansFileStructure
     protected String finalName;
     /**
      * a NetBeans module descriptor containing dependency information and more..
-     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in 4.0 entirely
+     *
+     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in
+     * 4.0 entirely
      */
     @Parameter( defaultValue = "${basedir}/src/main/nbm/module.xml" )
     protected File descriptor;
@@ -109,10 +110,10 @@ public abstract class CreateNetBeansFileStructure
     @Parameter( required = true, defaultValue = "extra" )
     protected String cluster;
     /**
-     * The location of JavaHelp sources for the project. The documentation
-     * itself is expected to be in the directory structure based on codenamebase of the module.
-     * eg. if your codenamebase is "org.netbeans.modules.apisupport", then the actual docs
-     * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs.
+     * The location of JavaHelp sources for the project. The documentation itself is expected to be in the directory
+     * structure based on codenamebase of the module. eg. if your codenamebase is "org.netbeans.modules.apisupport",
+     * then the actual docs files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs.
+     *
      * @deprecated Obsolete as of NetBeans 7.0 with &#64;HelpSetRegistration.
      * @since 2.7
      */
@@ -124,21 +125,22 @@ public abstract class CreateNetBeansFileStructure
     protected MavenProject project;
 
     /**
-     * A list of additional resources to include in the NBM file.
-     * (Not in the module JAR; see <code>InstalledFileLocator</code> for retrieval.)
-     * Supersedes similarly-named configuration in the module descriptor file.
-     * <p>For example, to include native libraries:</p>
+     * A list of additional resources to include in the NBM file. (Not in the module JAR; see
+     * <code>InstalledFileLocator</code> for retrieval.) Supersedes similarly-named configuration in the module
+     * descriptor file.
+     * <p>
+     * For example, to include native libraries:</p>
      *
-     <pre>
-            &lt;nbmResource&gt;
-            &nbsp;&nbsp;&lt;directory&gt;src/main/libs&lt;/directory&gt;
-            &nbsp;&nbsp;&lt;targetPath&gt;modules/lib&lt;/targetPath&gt;
-            &nbsp;&nbsp;&lt;includes&gt;
-            &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.dll&lt;/include&gt;
-            &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.so&lt;/include&gt;
-            &nbsp;&nbsp;&lt;/includes&gt;
-            &lt;/nbmResource&gt;
-     </pre>
+     * <pre>
+     * &lt;nbmResource&gt;
+     * &nbsp;&nbsp;&lt;directory&gt;src/main/libs&lt;/directory&gt;
+     * &nbsp;&nbsp;&lt;targetPath&gt;modules/lib&lt;/targetPath&gt;
+     * &nbsp;&nbsp;&lt;includes&gt;
+     * &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.dll&lt;/include&gt;
+     * &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.so&lt;/include&gt;
+     * &nbsp;&nbsp;&lt;/includes&gt;
+     * &lt;/nbmResource&gt;
+     * </pre>
      *
      * @since 3.2
      */
@@ -151,63 +153,68 @@ public abstract class CreateNetBeansFileStructure
      * @since 3.2
      */
     @Parameter( property = "encoding", defaultValue = "${project.build.sourceEncoding}" )
-    
+
     protected String encoding;
-    
+
     /**
      * Deployment type of the module, allowed values are <code>normal</code>,<code>eager</code>,<code>autoload</code>,
      * <code>disabled</code>.
      * <p>
-     * <code>autoload</code> - Such a module is
-     * automatically enabled when some other module requires it and
+     * <code>autoload</code> - Such a module is automatically enabled when some other module requires it and
      * automatically disabled otherwise.</p>
-     *                     <p><code>eager</code> - This module type gets
-     * automatically enabled when all it's dependencies are
-     * satisfied. Disabled otherwise.</p>
-     *                     <p><code>normal</code> - This is the default
-     * value. This kind of module is enabled/disabled manually by
-     * the user. It installs enabled.</p>
-     *                     <p><code>disabled</code> - This kind of module is enabled/disabled manually by
-     * the user. It installs disabled. Since 3.11</p>
+     * <p>
+     * <code>eager</code> - This module type gets automatically enabled when all it's dependencies are satisfied.
+     * Disabled otherwise.</p>
+     * <p>
+     * <code>normal</code> - This is the default value. This kind of module is enabled/disabled manually by the user. It
+     * installs enabled.</p>
+     * <p>
+     * <code>disabled</code> - This kind of module is enabled/disabled manually by the user. It installs disabled. Since
+     * 3.11</p>
      *
-     * For details, see <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans Module system docs</a>
+     * For details, see
+     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans
+     * Module system docs</a>
      *
-     * Since 3.14, for autoload and eager modules, we automatically set AutoUpdate-Show-In-Client manifest entry to false, if not defined already otherwise in the manifest.
-     * See issue <a href="http://jira.codehaus.org/browse/MNBMODULE-194">MNBMODULE-194</a>
+     * Since 3.14, for autoload and eager modules, we automatically set AutoUpdate-Show-In-Client manifest entry to
+     * false, if not defined already otherwise in the manifest. See issue
+     * <a href="http://jira.codehaus.org/browse/MNBMODULE-194">MNBMODULE-194</a>
      *
-     * 
+     *
      * @since 3.8
-     */ 
+     */
     @Parameter( defaultValue = "normal" )
     protected String moduleType;
-    
+
     /**
-     * codename base of the module, uniquely identifying the module within the NetBeans runtime. usually the package name equivalent.
-     * Can include the major release version.
-     * See <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest"> NetBeans Module system docs</a>
+     * codename base of the module, uniquely identifying the module within the NetBeans runtime. usually the package
+     * name equivalent. Can include the major release version. See
+     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest">
+     * NetBeans Module system docs</a>
+     *
      * @since 3.8
      */
     @Parameter( defaultValue = "${project.groupId}.${project.artifactId}" )
     private String codeNameBase;
-    
+
     /**
-     * list of groupId:artifactId pairs describing libraries that go into the nbm file and will only include the .external reference in the nbm
-     * instead of the actual binary. See <a href="http://netbeans.org/bugzilla/show_bug.cgi?id=195041">NetBeans issue #195041</a> for details.
-     * Please note that the scheme will only work for artifacts present in central repository but no effort is made at build time to enforce that.
-     * Additionally at runtime when installing the module, the user has to be online and be capable of reaching central using maven. 
-     * You have been warned.
+     * list of groupId:artifactId pairs describing libraries that go into the nbm file and will only include the
+     * .external reference in the nbm instead of the actual binary. See
+     * <a href="http://netbeans.org/bugzilla/show_bug.cgi?id=195041">NetBeans issue #195041</a> for details. Please note
+     * that the scheme will only work for artifacts present in central repository but no effort is made at build time to
+     * enforce that. Additionally at runtime when installing the module, the user has to be online and be capable of
+     * reaching central using maven. You have been warned.
+     *
      * @since 3.8
-     */ 
+     */
     @Parameter
     private List<String> externals;
-
 
     @Component
     protected MavenResourcesFiltering mavenResourcesFiltering;
 
     @Parameter( property = "session", readonly = true, required = true )
     protected MavenSession session;
-
 
     //items used by the CreateNBMMojo.
     protected Project antProject;
@@ -235,7 +242,8 @@ public abstract class CreateNetBeansFileStructure
             type = module.getModuleType();
             getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType" );
         }
-        if ( !"normal".equals( type ) && !"autoload".equals( type ) && !"eager".equals( type ) && !"disabled".equals( type ) )
+        if ( !"normal".equals( type ) && !"autoload".equals( type ) && !"eager".equals( type ) && !"disabled".equals(
+                type ) )
         {
             getLog().error( "Only 'normal,autoload,eager,disabled' are allowed values in the moduleType parameter" );
         }
@@ -258,7 +266,7 @@ public abstract class CreateNetBeansFileStructure
             cluster = module.getCluster();
         }
         File jarFile = new File( buildDir, finalName + ".jar" );
-        clusterDir = new File( nbmBuildDir, "netbeans" + File.separator + cluster );
+        clusterDir = new File( nbmBuildDir, "clusters" + File.separator + cluster );
         File moduleJarLocation = new File( clusterDir, "modules" );
         moduleJarLocation.mkdirs();
 
@@ -323,9 +331,9 @@ public abstract class CreateNetBeansFileStructure
             for ( Artifact artifact : artifacts )
             {
                 File source = artifact.getFile();
-                
+
                 String path = NetBeansManifestUpdateMojo.artifactToClassPathEntry( artifact, codeNameBase );
-                
+
                 if ( classpathValue.contains( path ) )
                 {
                     File target = new File( moduleJarLocation, path );
@@ -336,7 +344,8 @@ public abstract class CreateNetBeansFileStructure
                     try
                     {
                         FileUtils.getFileUtils().copyFile( source, target, null, true, false );
-                        if ( externals != null && externals.contains( artifact.getGroupId() + ":" + artifact.getArtifactId() ) ) // MNBMODULE-138
+                        if ( externals != null && externals.contains( artifact.getGroupId() + ":" + artifact.
+                                getArtifactId() ) ) // MNBMODULE-138
                         {
                             String name = target.getName();
                             getLog().info( "Using *.external replacement for " + name );
@@ -464,13 +473,14 @@ public abstract class CreateNetBeansFileStructure
     }
 
     private void copyDeprecatedNbmResources()
-        throws BuildException, MojoExecutionException
+            throws BuildException, MojoExecutionException
     {
         // copy additional resources..
         List<NbmResource> ress = module.getNbmResources();
         if ( ress.size() > 0 )
         {
-            getLog().warn( "NBM resources defined in module descriptor are deprecated. Please configure NBM resources in plugin configuration." );
+            getLog().warn(
+                    "NBM resources defined in module descriptor are deprecated. Please configure NBM resources in plugin configuration." );
             Copy cp = (Copy) antProject.createTask( "copy" );
             cp.setTodir( clusterDir );
             HashMap<File, Collection<FileSet>> customPaths = new HashMap<File, Collection<FileSet>>();
@@ -585,18 +595,18 @@ public abstract class CreateNetBeansFileStructure
     }
 
     private void copyNbmResources()
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         try
         {
             if ( StringUtils.isEmpty( encoding ) && isFilteringEnabled( nbmResources ) )
             {
                 getLog().warn( "File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
-                                   + ", i.e. build is platform dependent!" );
+                        + ", i.e. build is platform dependent!" );
             }
-            MavenResourcesExecution mavenResourcesExecution =
-                new MavenResourcesExecution( Arrays.asList( nbmResources ), clusterDir, project, encoding,
-                                             Collections.EMPTY_LIST, Collections.EMPTY_LIST, session );
+            MavenResourcesExecution mavenResourcesExecution
+                    = new MavenResourcesExecution( Arrays.asList( nbmResources ), clusterDir, project, encoding,
+                            Collections.EMPTY_LIST, Collections.EMPTY_LIST, session );
             mavenResourcesExecution.setEscapeWindowsPaths( true );
             mavenResourcesFiltering.filterResources( mavenResourcesExecution );
         }
@@ -625,7 +635,7 @@ public abstract class CreateNetBeansFileStructure
     }
 
     static void writeExternal( PrintWriter w, Artifact artifact )
-        throws IOException
+            throws IOException
     {
         w.write( "CRC:" );
         File file = artifact.getFile();
@@ -647,7 +657,9 @@ public abstract class CreateNetBeansFileStructure
         }
         w.write( "\nURL:" );
         // artifact.repository is null, so cannot use its url, and anyway might be a mirror
-        w.write( /* M3: RepositorySystem.DEFAULT_REMOTE_REPO_URL + '/' */ "http://repo.maven.apache.org/maven2/" );
+        w.
+                write( /* M3: RepositorySystem.DEFAULT_REMOTE_REPO_URL + '/' */
+                        "http://repo.maven.apache.org/maven2/" );
         w.write( new DefaultRepositoryLayout().pathOf( artifact ) );
         w.write( '\n' );
         w.flush();
