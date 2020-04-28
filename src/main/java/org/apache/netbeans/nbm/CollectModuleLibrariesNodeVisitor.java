@@ -33,12 +33,12 @@ import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 
 /**
- * A dependency node visitor that collects visited nodes that are known libraries or are
- * children of known libraries
+ * A dependency node visitor that collects visited nodes that are known libraries or are children of known libraries
+ *
  * @author Milos Kleint
  */
 public class CollectModuleLibrariesNodeVisitor
-    implements DependencyNodeVisitor
+        implements DependencyNodeVisitor
 {
 
     /**
@@ -65,6 +65,7 @@ public class CollectModuleLibrariesNodeVisitor
 
     /**
      * Creates a dependency node visitor that collects visited nodes for further processing.
+     *
      * @param runtimeArtifacts list of runtime artifacts
      * @param examinerCache cache of netbeans manifest for artifacts
      * @param log mojo logger
@@ -72,8 +73,8 @@ public class CollectModuleLibrariesNodeVisitor
      * @param useOSGiDependencies whether to allow osgi dependencies or not
      */
     public CollectModuleLibrariesNodeVisitor(
-        List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
-        Log log, DependencyNode root, boolean useOSGiDependencies )
+            List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
+            Log log, DependencyNode root, boolean useOSGiDependencies )
     {
         directNodes = new HashMap<String, List<Artifact>>();
         transitiveNodes = new HashMap<String, List<Artifact>>();
@@ -139,7 +140,9 @@ public class CollectModuleLibrariesNodeVisitor
             {
                 ////MNBMODULE-95 we are only interested in the module owned libraries
                 if ( !currentModule.peek().startsWith( LIB_ID )
-                        && AbstractNbmMojo.matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log, useOSGiDependencies ) )
+                        && AbstractNbmMojo.
+                                matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log,
+                                        useOSGiDependencies ) )
                 {
                     if ( currentModule.size() == 1 )
                     {
@@ -179,8 +182,8 @@ public class CollectModuleLibrariesNodeVisitor
             return false;
         }
         if ( !currentModule.empty()
-            && ( currentModule.peek().equals( node.getArtifact().getDependencyConflictId() )
-                            || currentModule.peek().equals( LIB_ID + node.getArtifact().getDependencyConflictId() ) ) )
+                && ( currentModule.peek().equals( node.getArtifact().getDependencyConflictId() )
+                || currentModule.peek().equals( LIB_ID + node.getArtifact().getDependencyConflictId() ) ) )
         {
             currentModule.pop();
         }
@@ -189,11 +192,12 @@ public class CollectModuleLibrariesNodeVisitor
 
     /**
      * modules declared in the project's pom
+     *
      * @return a map of module artifact lists, key is the dependencyConflictId
      * @throws MojoExecutionException if an unexpected problem occurs
      */
     public Map<String, List<Artifact>> getDeclaredArtifacts()
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         if ( throwable != null )
         {
@@ -204,11 +208,12 @@ public class CollectModuleLibrariesNodeVisitor
 
     /**
      * modules that were picked up transitively
+     *
      * @return a map of module artifact lists, key is the dependencyConflictId
      * @throws MojoExecutionException if an unexpected problem occurs
      */
     public Map<String, List<Artifact>> getTransitiveArtifacts()
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         if ( throwable != null )
         {

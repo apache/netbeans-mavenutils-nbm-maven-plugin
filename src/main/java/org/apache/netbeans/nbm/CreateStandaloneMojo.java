@@ -62,13 +62,13 @@ public class CreateStandaloneMojo
     private MavenProject project;
 
     /**
-     * 
+     *
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
     @Override
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
 
         try
@@ -78,17 +78,19 @@ public class CreateStandaloneMojo
             ZipArchiver archiver = new ZipArchiver();
             DefaultFileSet fs = new DefaultFileSet();
             fs.setDirectory( outputDirectory );
-            fs.setIncludes( new String[] {
+            fs.setIncludes( new String[]
+            {
                 brandingToken + "/**",
             } );
-            fs.setExcludes( new String[] {
+            fs.setExcludes( new String[]
+            {
                 brandingToken + "/bin/*",
             } );
             archiver.addFileSet( fs );
             File bins = new File( nbmBuildDirFile, "bin" );
             for ( File bin : bins.listFiles() )
             {
-                archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), 0755 );
+                archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), EXEC_FILE_MOD );
             }
             File zipFile = new File( outputDirectory, finalName + ".zip" );
             //TODO - somehow check for last modified content to see if we shall be
@@ -105,4 +107,5 @@ public class CreateStandaloneMojo
         }
 
     }
+    private static final int EXEC_FILE_MOD = 0755;
 }

@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -30,42 +29,49 @@ import org.apache.tools.ant.taskdefs.Manifest;
  *
  * @author mkleint
  */
-public class NetBeansManifestUpdateMojoTest extends TestCase {
-    
-    public NetBeansManifestUpdateMojoTest(String testName) {
-        super(testName);
+public class NetBeansManifestUpdateMojoTest extends TestCase
+{
+
+    public NetBeansManifestUpdateMojoTest( String testName )
+    {
+        super( testName );
     }
 
     public void testCreateCompiledPatternList()
     {
-        List<String> subpackages = Arrays.asList( new String[] {
-                "org.milos.**",
-                "org.tomas.**"
-        });
+        List<String> subpackages = Arrays.asList( new String[]
+        {
+            "org.milos.**",
+            "org.tomas.**"
+        } );
         List<Pattern> result = NetBeansManifestUpdateMojo.createCompiledPatternList( subpackages );
-        assertTrue( matches( "org.milos.Test", result));
-        assertTrue( matches( "org.milos.pack.Test", result));
-        assertTrue( matches( "org.tomas.pack.Test$Inside", result));
-        assertFalse( matches( "org.milan", result));
-        assertFalse( matches( "org.milosclass", result));
+        assertTrue( matches( "org.milos.Test", result ) );
+        assertTrue( matches( "org.milos.pack.Test", result ) );
+        assertTrue( matches( "org.tomas.pack.Test$Inside", result ) );
+        assertFalse( matches( "org.milan", result ) );
+        assertFalse( matches( "org.milosclass", result ) );
 
-        List<String> packages = Arrays.asList( new String[] {
-                "org.milos.*",
-                "org.tomas.*"
-        });
+        List<String> packages = Arrays.asList( new String[]
+        {
+            "org.milos.*",
+            "org.tomas.*"
+        } );
         result = NetBeansManifestUpdateMojo.createCompiledPatternList( packages );
-        assertTrue( matches( "org.milos.Test", result));
-        assertFalse( matches( "org.milos.pack.Test", result));
-        assertFalse( matches( "org.tomas.pack.Test$Inside", result));
-        assertTrue( matches( "org.tomas.Test$Inside", result));
-        assertFalse( matches( "org.milan", result));
-        assertFalse( matches( "org.milosclass", result));
+        assertTrue( matches( "org.milos.Test", result ) );
+        assertFalse( matches( "org.milos.pack.Test", result ) );
+        assertFalse( matches( "org.tomas.pack.Test$Inside", result ) );
+        assertTrue( matches( "org.tomas.Test$Inside", result ) );
+        assertFalse( matches( "org.milan", result ) );
+        assertFalse( matches( "org.milosclass", result ) );
 
     }
 
-    private boolean matches(String className, List<Pattern> matchers) {
-        for (Pattern patt : matchers) {
-            if (patt.matcher( className ).matches()) {
+    private boolean matches( String className, List<Pattern> matchers )
+    {
+        for ( Pattern patt : matchers )
+        {
+            if ( patt.matcher( className ).matches() )
+            {
                 return true;
             }
         }
@@ -78,12 +84,12 @@ public class NetBeansManifestUpdateMojoTest extends TestCase {
         Locale.setDefault( Locale.US );
         try
         {
-            assertEquals( null, NetBeansManifestUpdateMojo.shorten ( null ) );
-            assertEquals( null, NetBeansManifestUpdateMojo.shorten ( "" ) );
-            assertEquals( "I typed some description here", NetBeansManifestUpdateMojo.shorten ( "I typed some description here" ) );
-            assertEquals( "Now I'm trying to be serious.", NetBeansManifestUpdateMojo.shorten ( "Now I'm trying to be serious." ) );
-            assertEquals( "A meaningful description.", NetBeansManifestUpdateMojo.shorten ( "A meaningful description. But will it work?" ) );
-            assertEquals( "I have no idea what this module does, do you?", NetBeansManifestUpdateMojo.shorten ( "I have no idea what this module does, do you? No? Fine." ) );
+            assertEquals( null, NetBeansManifestUpdateMojo.shorten( null ) );
+            assertEquals( null, NetBeansManifestUpdateMojo.shorten( "" ) );
+            assertEquals( "I typed some description here", NetBeansManifestUpdateMojo.shorten( "I typed some description here" ) );
+            assertEquals( "Now I'm trying to be serious.", NetBeansManifestUpdateMojo.shorten( "Now I'm trying to be serious." ) );
+            assertEquals( "A meaningful description.", NetBeansManifestUpdateMojo.shorten( "A meaningful description. But will it work?" ) );
+            assertEquals( "I have no idea what this module does, do you?", NetBeansManifestUpdateMojo.shorten( "I have no idea what this module does, do you? No? Fine." ) );
         }
         finally
         {
@@ -92,12 +98,12 @@ public class NetBeansManifestUpdateMojoTest extends TestCase {
     }
 
     public void testNewlines()
-        throws Exception
+            throws Exception
     {
         Manifest m = new Manifest();
         Manifest.Section s = m.getMainSection();
         new NetBeansManifestUpdateMojo().conditionallyAddAttribute( s, "Desc", "Something.\n   Else.\n" );
-        assertEquals( "Something. Else.", s.getAttributeValue( "Desc" ));
+        assertEquals( "Something. Else.", s.getAttributeValue( "Desc" ) );
     }
 
 }

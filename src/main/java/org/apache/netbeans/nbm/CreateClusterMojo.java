@@ -41,8 +41,8 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.InputStreamFacade;
 
 /**
- * Create the NetBeans module clusters from reactor.
- * Semi-deprecated; used only for standalone modules and "suites".
+ * Create the NetBeans module clusters from reactor. Semi-deprecated; used only for standalone modules and "suites".
+ *
  * @author Milos Kleint
  */
 @Mojo( name = "cluster", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME )
@@ -51,18 +51,24 @@ public class CreateClusterMojo
 {
 
     /**
-     * directory where the the NetBeans cluster will be created.
+     * NetBeans module assembly build directory. directory where the the NetBeans jar and nbm file get constructed.
      */
-    @Parameter( defaultValue = "${project.build.directory}/netbeans_clusters", required = true )
+    @Parameter( defaultValue = "${project.build.directory}/nbm", property = "maven.nbm.buildDir" )
     protected File nbmBuildDir;
 
     /**
-     * default cluster value for reactor projects without cluster information,
-     * typically OSGi bundles
-     * @since 3.2
+     * NetBeans module's cluster. Replaces the cluster element in module descriptor.
+     *
      */
-    @Parameter( defaultValue = "extra" )
-    private String defaultCluster;
+    @Parameter( required = true, defaultValue = "extra" )
+    protected String cluster;
+
+    /**
+     * directory where the the NetBeans cluster will be created.
+     */
+    @Parameter( defaultValue = "${project.build.directory}/netbeans_clusters", required = true )
+    protected File clusterBuildDir;
+
     /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
      */
@@ -70,26 +76,25 @@ public class CreateClusterMojo
     private List<MavenProject> reactorProjects;
 
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
         Project antProject = registerNbmAntTasks();
 
-        if ( !nbmBuildDir.exists() )
+        if ( !clusterBuildDir.exists() )
         {
-            nbmBuildDir.mkdirs();
+            clusterBuildDir.mkdirs();
         }
 
         if ( reactorProjects != null && reactorProjects.size() > 0 )
         {
             for ( MavenProject proj : reactorProjects )
             {
-                //TODO how to figure where the the buildDir/nbm directory is
-                File nbmDir = new File( proj.getBasedir(),
-                        "target" + File.separator + "nbm" + File.separator + "netbeans" );
+
+                File nbmDir = new File( nbmBuildDir, "clusters" );
                 if ( nbmDir.exists() )
                 {
                     Copy copyTask = (Copy) antProject.createTask( "copy" );
-                    copyTask.setTodir( nbmBuildDir );
+                    copyTask.setTodir( clusterBuildDir );
                     copyTask.setOverwrite( true );
                     FileSet set = new FileSet();
                     set.setDir( nbmDir );
@@ -111,8 +116,8 @@ public class CreateClusterMojo
                 {
                     if ( "nbm".equals( proj.getPackaging() ) )
                     {
-                        String error =
-                            "The NetBeans binary directory structure for "
+                        String error
+                                = "The NetBeans binary directory structure for "
                                 + proj.getId()
                                 + " is not created yet."
                                 + "\n Please execute 'mvn install nbm:cluster' to build all relevant projects in the reactor.";
@@ -127,20 +132,20 @@ public class CreateClusterMojo
                         if ( !jar.exists() )
                         {
                             getLog().error( "Skipping " + proj.getId()
-                                                + ". Cannot find the main artifact in output directory." );
+                                    + ". Cannot find the main artifact in output directory." );
                             continue;
                         }
                         mnf.setJarFile( jar );
                         mnf.checkFile();
 
-                        File cluster = new File( nbmBuildDir, defaultCluster );
-                        getLog().debug( "Copying " + art.getId() + " to cluster " + defaultCluster );
-                        File modules = new File( cluster, "modules" );
+                        File clusterDir = new File( clusterBuildDir, cluster );
+                        getLog().debug( "Copying " + art.getId() + " to cluster " + cluster );
+                        File modules = new File( clusterDir, "modules" );
                         modules.mkdirs();
-                        File config = new File( cluster, "config" );
+                        File config = new File( clusterDir, "config" );
                         File confModules = new File( config, "Modules" );
                         confModules.mkdirs();
-                        File updateTracting = new File( cluster, "update_tracking" );
+                        File updateTracting = new File( clusterDir, "update_tracking" );
                         updateTracting.mkdirs();
 
                         final String cnb = mnf.getModule();
@@ -155,14 +160,16 @@ public class CreateClusterMojo
                             {
                                 public InputStream getInputStream() throws IOException
                                 {
-                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile( cnb, mnf.isBundleAutoload() ), "UTF-8" );
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile( cnb, mnf.
+                                            isBundleAutoload() ), "UTF-8" );
                                 }
                             }, moduleConf );
                             FileUtils.copyStreamToFile( new InputStreamFacade()
                             {
                                 public InputStream getInputStream() throws IOException
                                 {
-                                    return new StringInputStream( CreateClusterAppMojo.createBundleUpdateTracking( cnb, moduleArt, moduleConf, specVer ), "UTF-8" );
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleUpdateTracking( cnb,
+                                            moduleArt, moduleConf, specVer ), "UTF-8" );
                                 }
                             }, new File( updateTracting, cnbDashed + ".xml" ) );
                         }
@@ -175,7 +182,7 @@ public class CreateClusterMojo
                 }
             }
             //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
-            File[] files = nbmBuildDir.listFiles();
+            File[] files = clusterBuildDir.listFiles();
             for ( int i = 0; i < files.length; i++ )
             {
                 if ( files[i].isDirectory() )
@@ -195,7 +202,7 @@ public class CreateClusterMojo
                     stamp.setLastModified( new Date().getTime() );
                 }
             }
-            getLog().info( "Created NetBeans module cluster(s) at " + nbmBuildDir );
+            getLog().info( "Created NetBeans module cluster(s) at " + clusterBuildDir );
         }
         else
         {

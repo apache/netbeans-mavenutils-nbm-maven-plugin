@@ -35,8 +35,9 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
- * Run a branded application on top of NetBeans Platform. To be used with projects
- * with nbm-application packaging only and the project needs to be built first.
+ * Run a branded application on top of NetBeans Platform. To be used with projects with nbm-application packaging only
+ * and the project needs to be built first.
+ *
  * @author Milos Kleint
  *
  */
@@ -62,22 +63,22 @@ public class RunPlatformAppMojo
     @Parameter( required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir" )
     protected File netbeansUserdir;
     /**
-     * additional command line arguments passed to the application.
-     * can be used to debug the IDE.
+     * additional command line arguments passed to the application. can be used to debug the IDE.
      */
     @Parameter( property = "netbeans.run.params" )
     protected String additionalArguments;
-    
+
     /**
-     * Attach a debugger to the application JVM. If set to "true", the process will suspend and wait for a debugger to attach
-     * on port 5005. If set to some other string, that string will be appended to the <code>additionalArguments</code>, allowing you to configure
-     * arbitrary debug-ability options (without overwriting the other options specified through the <code>additionalArguments</code>
-     * parameter).
+     * Attach a debugger to the application JVM. If set to "true", the process will suspend and wait for a debugger to
+     * attach on port 5005. If set to some other string, that string will be appended to the
+     * <code>additionalArguments</code>, allowing you to configure arbitrary debug-ability options (without overwriting
+     * the other options specified through the <code>additionalArguments</code> parameter).
+     *
      * @since 3.11
      */
     @Parameter( property = "netbeans.run.params.debug" )
     protected String debugAdditionalArguments;
-    
+
     /**
      * The Maven Project.
      *
@@ -91,11 +92,12 @@ public class RunPlatformAppMojo
      * @throws MojoFailureException if an expected problem occurs
      */
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
-            throw new MojoFailureException( "The nbm:run-platform goal shall be used within a NetBeans Application project only ('nbm-application' packaging)" );
+            throw new MojoFailureException(
+                    "The nbm:run-platform goal shall be used within a NetBeans Application project only ('nbm-application' packaging)" );
         }
 
         netbeansUserdir.mkdirs();
@@ -105,7 +107,7 @@ public class RunPlatformAppMojo
         if ( !appbasedir.exists() )
         {
             throw new MojoExecutionException( "The directory that shall contain built application, doesn't exist ("
-                + appbasedir.getAbsolutePath() + ")\n Please invoke 'mvn install' on the project first" );
+                    + appbasedir.getAbsolutePath() + ")\n Please invoke 'mvn install' on the project first" );
         }
 
         boolean windows = Os.isFamily( "windows" );
@@ -130,8 +132,9 @@ public class RunPlatformAppMojo
                     [1] Mark Reinhold on 2017-09-25
                         https://twitter.com/mreinhold/status/912311207935090689
                     [2] Downloaded from https://www.azul.com/downloads/zulu/zulu-windows on 2018-09-05. */
-                    if ( !new File( jdkHome, "jre\\bin\\JavaAccessBridge-32.dll" ).exists() && // 32-bit Java 8
-                        !new File( jdkHome, "\\bin\\javaaccessbridge-32.dll" ).exists() ) // 32-bit Java 9 or 10
+                    if ( !new File( jdkHome, "jre\\bin\\JavaAccessBridge-32.dll" ).exists()
+                            && // 32-bit Java 8
+                            !new File( jdkHome, "\\bin\\javaaccessbridge-32.dll" ).exists() ) // 32-bit Java 9 or 10
                     {
                         File exec64 = new File( appbasedir, "bin\\" + brandingToken + "64.exe" );
                         if ( exec64.isFile() )
@@ -140,7 +143,10 @@ public class RunPlatformAppMojo
                         }
                     }
                 }
-                cmdLine.addArguments( new String[] { "--console", "suppress" } );
+                cmdLine.addArguments( new String[]
+                {
+                    "--console", "suppress"
+                } );
             }
         }
         else
@@ -190,7 +196,7 @@ public class RunPlatformAppMojo
 
     private String getDebugAdditionalArguments()
     {
-       if ( "true".equals( debugAdditionalArguments ) )
+        if ( "true".equals( debugAdditionalArguments ) )
         {
             return "-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
         }

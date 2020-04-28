@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -43,7 +42,7 @@ public class CreateNetBeansFileStructureTest
         ArtifactResolver artifactResolver = (ArtifactResolver) lookup( ArtifactResolver.class.getName() );
         Artifact a = artifactFactory.createBuildArtifact( "junit", "junit", "4.12", "jar" );
 //        DefaultArtifactRepository central = new DefaultArtifactRepository( "central", "http://repo.maven.apache.org/maven2", new DefaultRepositoryLayout() );
-        artifactResolver.resolve( a, Collections.<ArtifactRepository>emptyList(), new DefaultArtifactRepository( "local", new File(localRepository).toURI().toString(), new DefaultRepositoryLayout() ) );
+        artifactResolver.resolve( a, Collections.<ArtifactRepository>emptyList(), new DefaultArtifactRepository( "local", new File( localRepository ).toURI().toString(), new DefaultRepositoryLayout() ) );
         StringWriter w = new StringWriter();
         CreateNetBeansFileStructure.writeExternal( new PrintWriter( w ), a );
         assertEquals( "CRC:1355517765\nSIZE:314932\nURL:m2:/junit:junit:4.12:jar\nURL:http://repo.maven.apache.org/maven2/junit/junit/4.12/junit-4.12.jar\n", w.toString() );

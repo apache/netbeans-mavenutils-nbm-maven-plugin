@@ -25,7 +25,8 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 /**
- *  will try to convert the maven version number to a NetBeans friendly version number.
+ * will try to convert the maven version number to a NetBeans friendly version number.
+ *
  * @author Milos Kleint
  *
  */
@@ -67,7 +68,7 @@ public class AdaptNbVersion
                 if ( token.indexOf( '-' ) > 0 )
                 {
                     token = token.substring( 0, token.indexOf( '-' ) );
-                } 
+                }
                 else if ( token.indexOf( '_' ) > 0 )
                 {
                     token = token.substring( 0, token.indexOf( '_' ) );

@@ -48,15 +48,14 @@ import org.apache.netbeans.nbm.utils.AbstractNetbeansMojo;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-
 import org.codehaus.plexus.util.IOUtil;
 
 public abstract class AbstractNbmMojo
-    extends AbstractNetbeansMojo
+        extends AbstractNetbeansMojo
 {
 
     static boolean matchesLibrary( Artifact artifact, List<String> libraries, ExamineManifest depExaminator,
-        Log log, boolean useOsgiDependencies )
+                                   Log log, boolean useOsgiDependencies )
     {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
@@ -65,14 +64,14 @@ public abstract class AbstractNbmMojo
         if ( explicit )
         {
             log.debug(
-                id + " included as module library, explicitly declared in module descriptor." );
+                    id + " included as module library, explicitly declared in module descriptor." );
             return explicit;
         }
         if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) || Artifact.SCOPE_SYSTEM.equals(
-            artifact.getScope() ) )
+                artifact.getScope() ) )
         {
             log.debug(
-                id + " omitted as module library, has scope 'provided/system'" );
+                    id + " omitted as module library, has scope 'provided/system'" );
             return false;
         }
         if ( "nbm".equals( artifact.getType() ) )
@@ -86,12 +85,12 @@ public abstract class AbstractNbmMojo
             return false;
         }
         log.debug(
-            id + " included as module library, squeezed through all the filters." );
+                id + " included as module library, squeezed through all the filters." );
         return true;
     }
 
     static Dependency resolveNetBeansDependency( Artifact artifact, List<Dependency> deps,
-        ExamineManifest manifest, Log log )
+                                                 ExamineManifest manifest, Log log )
     {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
@@ -111,7 +110,7 @@ public abstract class AbstractNbmMojo
                         return dep;
                     }
                     log.warn(
-                        id + " declared as module dependency in descriptor, but not a NetBeans module" );
+                            id + " declared as module dependency in descriptor, but not a NetBeans module" );
                     return null;
                 }
             }
@@ -136,17 +135,17 @@ public abstract class AbstractNbmMojo
     }
 
     protected final NetBeansModule readModuleDescriptor( File descriptor )
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         if ( descriptor == null )
         {
             throw new MojoExecutionException(
-                "The module descriptor has to be configured." );
+                    "The module descriptor has to be configured." );
         }
         if ( !descriptor.exists() )
         {
             throw new MojoExecutionException(
-                "The module descriptor is missing: '" + descriptor + "'." );
+                    "The module descriptor is missing: '" + descriptor + "'." );
         }
         Reader r = null;
         try
@@ -159,14 +158,14 @@ public abstract class AbstractNbmMojo
         catch ( IOException exc )
         {
             throw new MojoExecutionException(
-                "Error while reading module descriptor '" + descriptor + "'.",
-                exc );
+                    "Error while reading module descriptor '" + descriptor + "'.",
+                    exc );
         }
         catch ( XmlPullParserException xml )
         {
             throw new MojoExecutionException(
-                "Error while reading module descriptor '" + descriptor + "'.",
-                xml );
+                    "Error while reading module descriptor '" + descriptor + "'.",
+                    xml );
         }
         finally
         {
@@ -180,7 +179,7 @@ public abstract class AbstractNbmMojo
         if ( log )
         {
             getLog().info(
-                "No Module Descriptor defined, trying to fallback to generated values:" );
+                    "No Module Descriptor defined, trying to fallback to generated values:" );
         }
         NetBeansModule module = new NetBeansModule();
         return module;
@@ -190,7 +189,7 @@ public abstract class AbstractNbmMojo
                                                List<Artifact> runtimeArtifacts,
                                                Map<Artifact, ExamineManifest> examinerCache, Log log,
                                                boolean useOsgiDependencies )
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         List<Artifact> include = new ArrayList<Artifact>();
         if ( module != null )
@@ -201,7 +200,8 @@ public abstract class AbstractNbmMojo
                 librList.addAll( module.getLibraries() );
             }
             CollectLibrariesNodeVisitor visitor = new CollectLibrariesNodeVisitor( librList,
-                runtimeArtifacts, examinerCache, log, treeRoot, useOsgiDependencies );
+                                                                                   runtimeArtifacts, examinerCache, log,
+                                                                                   treeRoot, useOsgiDependencies );
             treeRoot.accept( visitor );
             include.addAll( visitor.getArtifacts() );
         }
@@ -213,19 +213,21 @@ public abstract class AbstractNbmMojo
                                                              Map<Artifact, ExamineManifest> examinerCache,
                                                              List<Artifact> libraryArtifacts, Log log,
                                                              boolean useOsgiDependencies )
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         List<Dependency> deps = new ArrayList<Dependency>();
-        if ( customDependencies != null ) 
+        if ( customDependencies != null )
         {
             deps.addAll( Arrays.asList( customDependencies ) );
         }
         if ( module != null && !module.getDependencies().isEmpty() )
         {
-            log.warn( "dependencies in module descriptor are deprecated, use the plugin's parameter moduleDependencies" );
+            log.warn(
+                    "dependencies in module descriptor are deprecated, use the plugin's parameter moduleDependencies" );
+
             //we need to make sure a dependency is not twice there, module deps override the config (as is the case with other
             //configurations)
-            for ( Dependency d : module.getDependencies() ) 
+            for ( Dependency d : module.getDependencies() )
             {
                 Dependency found = null;
                 for ( Dependency d2 : deps )
@@ -244,86 +246,90 @@ public abstract class AbstractNbmMojo
             }
         }
         List<ModuleWrapper> include = new ArrayList<ModuleWrapper>();
-        
-            @SuppressWarnings( "unchecked" )
-            List<Artifact> artifacts = project.getCompileArtifacts();
-            for ( Artifact artifact : artifacts )
+
+        @SuppressWarnings( "unchecked" )
+        List<Artifact> artifacts = project.getCompileArtifacts();
+        for ( Artifact artifact : artifacts )
+        {
+            if ( libraryArtifacts.contains( artifact ) )
             {
-                if ( libraryArtifacts.contains( artifact ) )
+                continue;
+            }
+            ExamineManifest depExaminator = examinerCache.get( artifact );
+            if ( depExaminator == null )
+            {
+                depExaminator = new ExamineManifest( log );
+                depExaminator.setArtifactFile( artifact.getFile() );
+                depExaminator.checkFile();
+                examinerCache.put( artifact, depExaminator );
+            }
+            Dependency dep = resolveNetBeansDependency( artifact, deps, depExaminator, log );
+            if ( dep != null )
+            {
+                ModuleWrapper wr = new ModuleWrapper();
+                wr.dependency = dep;
+                wr.artifact = artifact;
+                wr.transitive = false;
+                //only direct deps matter to us..
+                if ( depExaminator.isNetBeansModule() && artifact.getDependencyTrail().size() > 2 )
                 {
-                    continue;
+                    log.debug(
+                            artifact.getId()
+                            + " omitted as NetBeans module dependency, not a direct one. "
+                            + "Declare it in the pom for inclusion." );
+                    wr.transitive = true;
+
                 }
-                ExamineManifest depExaminator = examinerCache.get( artifact );
-                if ( depExaminator == null )
-                {
-                    depExaminator = new ExamineManifest( log );
-                    depExaminator.setArtifactFile( artifact.getFile() );
-                    depExaminator.checkFile();
-                    examinerCache.put( artifact, depExaminator );
-                }
-                Dependency dep = resolveNetBeansDependency( artifact, deps, depExaminator, log );
-                if ( dep != null )
+                include.add( wr );
+            }
+            else
+            {
+                if ( useOsgiDependencies && depExaminator.isOsgiBundle() )
                 {
                     ModuleWrapper wr = new ModuleWrapper();
-                    wr.dependency = dep;
+                    wr.osgi = true;
+                    String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
+                    for ( Dependency depe : deps )
+                    {
+                        if ( id.equals( depe.getId() ) )
+                        {
+                            wr.dependency = depe;
+                        }
+                    }
+                    boolean print = false;
+                    if ( wr.dependency == null )
+                    {
+                        Dependency depe = new Dependency();
+                        depe.setId( id );
+                        depe.setType( "spec" );
+                        wr.dependency = depe;
+                        print = true;
+                    }
+
                     wr.artifact = artifact;
                     wr.transitive = false;
                     //only direct deps matter to us..
-                    if ( depExaminator.isNetBeansModule() && artifact.getDependencyTrail().size() > 2 )
+                    if ( artifact.getDependencyTrail().size() > 2 )
                     {
                         log.debug(
-                            artifact.getId() + " omitted as NetBeans module dependency, not a direct one. Declare it in the pom for inclusion." );
+                                artifact.getId()
+                                + " omitted as NetBeans module OSGi dependency, not a direct one. "
+                                + "Declare it in the pom for inclusion." );
                         wr.transitive = true;
 
                     }
+                    else
+                    {
+                        if ( print )
+                        {
+                            log.info( "Adding OSGi bundle dependency - " + id );
+                        }
+                    }
+
                     include.add( wr );
                 }
-                else
-                {
-                    if ( useOsgiDependencies && depExaminator.isOsgiBundle() )
-                    {
-                        ModuleWrapper wr = new ModuleWrapper();
-                        wr.osgi = true;
-                        String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
-                        for ( Dependency depe : deps )
-                        {
-                            if ( id.equals( depe.getId() ) )
-                            {
-                                wr.dependency = depe;
-                            }
-                        }
-                        boolean print = false;
-                        if ( wr.dependency == null )
-                        {
-                            Dependency depe = new Dependency();
-                            depe.setId( id );
-                            depe.setType( "spec" );
-                            wr.dependency = depe;
-                            print = true;
-                        }
-
-                        wr.artifact = artifact;
-                        wr.transitive = false;
-                        //only direct deps matter to us..
-                        if ( artifact.getDependencyTrail().size() > 2 )
-                        {
-                            log.debug(
-                                artifact.getId() + " omitted as NetBeans module OSGi dependency, not a direct one. Declare it in the pom for inclusion." );
-                            wr.transitive = true;
-
-                        }
-                        else
-                        {
-                            if ( print )
-                            {
-                                log.info( "Adding OSGi bundle dependency - " + id );
-                            }
-                        }
-
-                        include.add( wr );
-                    }
-                }
             }
+        }
         return include;
     }
 
@@ -335,7 +341,7 @@ public abstract class AbstractNbmMojo
         Artifact artifact;
 
         boolean transitive = true;
-        
+
         boolean osgi = false;
 
     }
@@ -343,7 +349,7 @@ public abstract class AbstractNbmMojo
     //copied from dependency:tree mojo
     protected DependencyNode createDependencyTree( MavenProject project, DependencyGraphBuilder dependencyGraphBuilder,
                                                    String scope )
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         ArtifactFilter artifactFilter = createResolvingArtifactFilter( scope );
         try
@@ -385,7 +391,7 @@ public abstract class AbstractNbmMojo
     protected final ArtifactResult turnJarToNbmFile( Artifact art, ArtifactFactory artifactFactory,
                                                      ArtifactResolver artifactResolver, MavenProject project,
                                                      ArtifactRepository localRepository )
-        throws MojoExecutionException
+            throws MojoExecutionException
     {
         if ( "jar".equals( art.getType() ) || "nbm".equals( art.getType() ) )
         {
@@ -403,7 +409,7 @@ public abstract class AbstractNbmMojo
                 String path = localRepository.pathOf( art );
                 File jar2 = new File( localRepository.getBasedir(), path.replace( "/", File.separator ) );
                 File manifest = new File( jar, "META-INF/MANIFEST.MF" );
-                
+
                 if ( !jar2.isFile() || !manifest.isFile() )
                 {
                     getLog().warn( "MNBMODULE-131: need to at least run install phase on " + jar2 );
@@ -419,12 +425,12 @@ public abstract class AbstractNbmMojo
             if ( mnf.isNetBeansModule() )
             {
                 Artifact nbmArt = artifactFactory.createDependencyArtifact(
-                    art.getGroupId(),
-                    art.getArtifactId(),
-                    art.getVersionRange(),
-                    "nbm-file",
-                    art.getClassifier(),
-                    art.getScope() );
+                        art.getGroupId(),
+                        art.getArtifactId(),
+                        art.getVersionRange(),
+                        "nbm-file",
+                        art.getClassifier(),
+                        art.getScope() );
                 try
                 {
                     artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
@@ -460,6 +466,7 @@ public abstract class AbstractNbmMojo
 
     protected static final class ArtifactResult
     {
+
         private final Artifact converted;
         private final ExamineManifest manifest;
 

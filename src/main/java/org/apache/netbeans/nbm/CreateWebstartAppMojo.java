@@ -63,18 +63,19 @@ import org.netbeans.nbbuild.VerifyJNLP;
 
 /**
  * Create webstartable binaries for a 'nbm-application'.
+ *
  * @author Johan Andrén
  * @author Milos Kleint
  * @since 3.0
  */
 @Mojo( name = "webstart-app", defaultPhase = LifecyclePhase.PACKAGE )
 public class CreateWebstartAppMojo
-    extends AbstractNbmMojo
+        extends AbstractNbmMojo
 {
 
     /**
      * The Maven project.
-
+     *
      */
     @org.apache.maven.plugins.annotations.Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
@@ -96,13 +97,15 @@ public class CreateWebstartAppMojo
 
     /**
      * Ready-to-deploy WAR containing application in JNLP packaging.
-     * 
+     *
      */
-    @org.apache.maven.plugins.annotations.Parameter( required = true, defaultValue = "${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war" )
+    @org.apache.maven.plugins.annotations.Parameter( required = true, defaultValue
+            = "${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war" )
     private File destinationFile;
 
     /**
      * Artifact Classifier to use for the webstart distributable zip file.
+     *
      * @since 3.1
      */
     @org.apache.maven.plugins.annotations.Parameter( defaultValue = "webstart", property = "nbm.webstart.classifier" )
@@ -116,10 +119,9 @@ public class CreateWebstartAppMojo
     private String codebase;
 
     /**
-     * A custom master JNLP file. If not defined, the 
-     * <a href="http://mojo.codehaus.org/nbm-maven-plugin/masterjnlp.txt">default one</a> is used.
-     * The following expressions can be used within the file and will
-     * be replaced when generating content.
+     * A custom master JNLP file. If not defined, the
+     * <a href="http://mojo.codehaus.org/nbm-maven-plugin/masterjnlp.txt">default one</a> is used. The following
+     * expressions can be used within the file and will be replaced when generating content.
      * <ul>
      * <li>${jnlp.resources}</li>
      * <li>${jnlp.codebase} - the 'codebase' parameter value is passed in.</li>
@@ -133,11 +135,11 @@ public class CreateWebstartAppMojo
      */
     @org.apache.maven.plugins.annotations.Parameter
     private File masterJnlpFile;
-    
+
     /**
-     * The basename (minus .jnlp extension) of the master JNLP file in the output.
-     * This file will be the entry point for javaws.
-     * Defaults to the branding token.
+     * The basename (minus .jnlp extension) of the master JNLP file in the output. This file will be the entry point for
+     * javaws. Defaults to the branding token.
+     *
      * @since 3.5
      */
     @org.apache.maven.plugins.annotations.Parameter( property = "master.jnlp.file.name" )
@@ -163,47 +165,46 @@ public class CreateWebstartAppMojo
 
     /**
      * keystore type
+     *
      * @since 3.5
      */
     @org.apache.maven.plugins.annotations.Parameter( property = "keystoretype" )
     private String keystoretype;
 
     /**
-     * If set true, build-jnlp target creates versioning info in jnlp descriptors and version.xml files.
-     * This allows for incremental updates of Webstart applications, but requires download via
-     * JnlpDownloadServlet
-     * Defaults to false, which means versioning
-     * info is not generated (see
+     * If set true, build-jnlp target creates versioning info in jnlp descriptors and version.xml files. This allows for
+     * incremental updates of Webstart applications, but requires download via JnlpDownloadServlet Defaults to false,
+     * which means versioning info is not generated (see
      * http://java.sun.com/j2se/1.5.0/docs/guide/javaws/developersguide/downloadservletguide.html#resources).
      *
      */
     @org.apache.maven.plugins.annotations.Parameter( defaultValue = "false", property = "nbm.webstart.versions" )
     private boolean processJarVersions;
     /**
-     * additional command line arguments. Eg.
-     * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
-     * can be used to debug the IDE.
+     * additional command line arguments. Eg. -J-Xdebug -J-Xnoagent
+     * -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888 can be used to debug the IDE.
      */
     @org.apache.maven.plugins.annotations.Parameter( property = "netbeans.run.params" )
     private String additionalArguments;
 
     /**
-     * 
+     *
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
     @Override
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
             throw new MojoExecutionException(
-                "This goal only makes sense on project with nbm-application packaging." );
+                    "This goal only makes sense on project with nbm-application packaging." );
         }
         Project antProject = antProject();
-        
-        getLog().warn( "WARNING: Unsigned and self-signed WebStart applications are deprecated from JDK7u21 onwards. To ensure future correct functionality please use trusted certificate." );
+
+        getLog().warn(
+                "WARNING: Unsigned and self-signed WebStart applications are deprecated from JDK7u21 onwards. To ensure future correct functionality please use trusted certificate." );
 
         if ( keystore != null && keystorealias != null && keystorepassword != null )
         {
@@ -220,12 +221,12 @@ public class CreateWebstartAppMojo
         else if ( keystore != null || keystorepassword != null || keystorealias != null )
         {
             throw new MojoFailureException(
-                "If you want to sign the jnlp application, you need to define all three keystore related parameters." );
+                    "If you want to sign the jnlp application, you need to define all three keystore related parameters." );
         }
         else
         {
             File generatedKeystore = new File( outputDirectory, "generated.keystore" );
-            if ( ! generatedKeystore.exists() )
+            if ( !generatedKeystore.exists() )
             {
                 getLog().warn( "Keystore related parameters not set, generating a default keystore." );
                 GenerateKey genTask = (GenerateKey) antProject.createTask( "genkey" );
@@ -250,11 +251,10 @@ public class CreateWebstartAppMojo
         taskdef.setName( "verifyjnlp" );
         taskdef.execute();
 
-
         try
         {
             File webstartBuildDir = new File(
-                outputDirectory + File.separator + "webstart" + File.separator + brandingToken );
+                    outputDirectory + File.separator + "webstart" + File.separator + brandingToken );
             if ( webstartBuildDir.exists() )
             {
                 FileUtils.deleteDirectory( webstartBuildDir );
@@ -266,7 +266,6 @@ public class CreateWebstartAppMojo
             File nbmBuildDirFile = new File( outputDirectory, brandingToken );
 
 //            FileUtils.copyDirectoryStructureIfModified( nbmBuildDirFile, webstartBuildDir );
-
             MakeJNLP jnlpTask = (MakeJNLP) antProject.createTask( "makejnlp" );
             jnlpTask.setDir( webstartBuildDir );
             jnlpTask.setCodebase( localCodebase );
@@ -309,11 +308,11 @@ public class CreateWebstartAppMojo
             exModules.setName( "excludeModules" );
             exModules.setValue( "" );
             ms.setParameters( new Parameter[]
-                {
-                    included,
-                    excluded,
-                    exModules
-                } );
+            {
+                included,
+                excluded,
+                exModules
+            } );
             and.add( or );
             and.add( ms );
             fs.addAnd( and );
@@ -324,7 +323,7 @@ public class CreateWebstartAppMojo
 
             if ( masterJnlpFileName == null )
             {
-               masterJnlpFileName = brandingToken;
+                masterJnlpFileName = brandingToken;
             }
 
             Properties props = new Properties();
@@ -365,13 +364,12 @@ public class CreateWebstartAppMojo
             props.setProperty( "netbeans.run.params", stBuilder.toString() );
 
             File masterJnlp = new File(
-                webstartBuildDir.getAbsolutePath() + File.separator + masterJnlpFileName + ".jnlp" );
+                    webstartBuildDir.getAbsolutePath() + File.separator + masterJnlpFileName + ".jnlp" );
             filterCopy( masterJnlpFile, "master.jnlp", masterJnlp, props );
-
 
             File startup = copyLauncher( outputDirectory, nbmBuildDirFile );
             File jnlpDestination = new File(
-                webstartBuildDir.getAbsolutePath() + File.separator + "startup.jar" );
+                    webstartBuildDir.getAbsolutePath() + File.separator + "startup.jar" );
 
             SignJar signTask = (SignJar) antProject.createTask( "signjar" );
             signTask.setKeystore( keystore );
@@ -389,9 +387,9 @@ public class CreateWebstartAppMojo
             DirectoryScanner ds = new DirectoryScanner();
             ds.setBasedir( nbmBuildDirFile );
             ds.setIncludes( new String[]
-                {
-                    "**/locale/*.jar"
-                } );
+            {
+                "**/locale/*.jar"
+            } );
             ds.scan();
             String[] includes = ds.getIncludedFiles();
             StringBuilder brandRefs = new StringBuilder();
@@ -415,7 +413,7 @@ public class CreateWebstartAppMojo
                 {
                     signTask.setStoretype( keystoretype );
                 }
-                
+
                 FileSet set = new FileSet();
                 set.setDir( brandingDir );
                 set.setIncludes( "*.jar" );
@@ -424,10 +422,10 @@ public class CreateWebstartAppMojo
             }
 
             File modulesJnlp = new File(
-                webstartBuildDir.getAbsolutePath() + File.separator + "modules.jnlp" );
+                    webstartBuildDir.getAbsolutePath() + File.separator + "modules.jnlp" );
             props.setProperty( "jnlp.branding.jars", brandRefs.toString() );
             props.setProperty( "jnlp.resources", extSnippet );
-            filterCopy( null, /* filename is historical */"branding.jnlp", modulesJnlp, props );
+            filterCopy( null, /* filename is historical */ "branding.jnlp", modulesJnlp, props );
 
             getLog().info( "Verifying generated webstartable content." );
             VerifyJNLP verifyTask = (VerifyJNLP) antProject.createTask( "verifyjnlp" );
@@ -435,7 +433,6 @@ public class CreateWebstartAppMojo
             verify.setFile( masterJnlp );
             verifyTask.addConfiguredFileset( verify );
             verifyTask.execute();
-
 
             // create zip archive
             if ( destinationFile.exists() )
@@ -450,7 +447,10 @@ public class CreateWebstartAppMojo
             }
             else
             {
-                archiver.addDirectory( webstartBuildDir, null, new String[] { "**/*.jnlp" } );
+                archiver.addDirectory( webstartBuildDir, null, new String[]
+                {
+                    "**/*.jnlp"
+                } );
                 for ( final File jnlp : webstartBuildDir.listFiles() )
                 {
                     if ( !jnlp.getName().endsWith( ".jnlp" ) )
@@ -459,35 +459,51 @@ public class CreateWebstartAppMojo
                     }
                     archiver.addResource( new PlexusIoResource()
                     {
-                        public @Override InputStream getContents() throws IOException
+                        public @Override
+                        InputStream getContents() throws IOException
                         {
-                            return new ByteArrayInputStream( FileUtils.fileRead( jnlp, "UTF-8" ).replace( localCodebase, "$$codebase" ).getBytes( "UTF-8" ) );
+                            return new ByteArrayInputStream( FileUtils.fileRead( jnlp, "UTF-8" ).replace( localCodebase,
+                                    "$$codebase" ).getBytes( "UTF-8" ) );
                         }
-                        public @Override long getLastModified()
+
+                        public @Override
+                        long getLastModified()
                         {
                             return jnlp.lastModified();
                         }
-                        public @Override boolean isExisting()
+
+                        public @Override
+                        boolean isExisting()
                         {
                             return true;
                         }
-                        public @Override long getSize()
+
+                        public @Override
+                        long getSize()
                         {
                             return UNKNOWN_RESOURCE_SIZE;
                         }
-                        public @Override URL getURL() throws IOException
+
+                        public @Override
+                        URL getURL() throws IOException
                         {
                             return null;
                         }
-                        public @Override String getName()
+
+                        public @Override
+                        String getName()
                         {
                             return jnlp.getAbsolutePath();
                         }
-                        public @Override boolean isFile()
+
+                        public @Override
+                        boolean isFile()
                         {
                             return true;
                         }
-                        public @Override boolean isDirectory()
+
+                        public @Override
+                        boolean isDirectory()
                         {
                             return false;
                         }
@@ -502,7 +518,7 @@ public class CreateWebstartAppMojo
             }
             File jdkhome = new File( System.getProperty( "java.home" ) );
             File servlet = new File( jdkhome, "sample/jnlp/servlet/jnlp-servlet.jar" );
-            if ( ! servlet.isFile() )
+            if ( !servlet.isFile() )
             {
                 servlet = new File( jdkhome.getParentFile(), "sample/jnlp/servlet/jnlp-servlet.jar" );
             }
@@ -511,45 +527,60 @@ public class CreateWebstartAppMojo
                 archiver.addFile( servlet, "WEB-INF/lib/jnlp-servlet.jar" );
                 archiver.addResource( new PlexusIoResource()
                 {
-                    public @Override InputStream getContents() throws IOException
+                    public @Override
+                    InputStream getContents() throws IOException
                     {
-                        return new ByteArrayInputStream( ( "" 
-                            + "<web-app>\n"
-                            + "    <servlet>\n"
-                            + "        <servlet-name>JnlpDownloadServlet</servlet-name>\n"
-                            + "        <servlet-class>jnlp.sample.servlet.JnlpDownloadServlet</servlet-class>\n"
-                            + "    </servlet>\n"
-                            + "    <servlet-mapping>\n"
-                            + "        <servlet-name>JnlpDownloadServlet</servlet-name>\n"
-                            + "        <url-pattern>*.jnlp</url-pattern>\n"
-                            + "    </servlet-mapping>\n"
-                            + "</web-app>\n" ).getBytes() );
+                        return new ByteArrayInputStream( ( ""
+                                + "<web-app>\n"
+                                + "    <servlet>\n"
+                                + "        <servlet-name>JnlpDownloadServlet</servlet-name>\n"
+                                + "        <servlet-class>jnlp.sample.servlet.JnlpDownloadServlet</servlet-class>\n"
+                                + "    </servlet>\n"
+                                + "    <servlet-mapping>\n"
+                                + "        <servlet-name>JnlpDownloadServlet</servlet-name>\n"
+                                + "        <url-pattern>*.jnlp</url-pattern>\n"
+                                + "    </servlet-mapping>\n"
+                                + "</web-app>\n" ).getBytes() );
                     }
-                    public @Override long getLastModified()
+
+                    public @Override
+                    long getLastModified()
                     {
                         return UNKNOWN_MODIFICATION_DATE;
                     }
-                    public @Override boolean isExisting()
+
+                    public @Override
+                    boolean isExisting()
                     {
                         return true;
                     }
-                    public @Override long getSize()
+
+                    public @Override
+                    long getSize()
                     {
                         return UNKNOWN_RESOURCE_SIZE;
                     }
-                    public @Override URL getURL() throws IOException
+
+                    public @Override
+                    URL getURL() throws IOException
                     {
                         return null;
                     }
-                    public @Override String getName()
+
+                    public @Override
+                    String getName()
                     {
                         return "web.xml";
                     }
-                    public @Override boolean isFile()
+
+                    public @Override
+                    boolean isFile()
                     {
                         return true;
                     }
-                    public @Override boolean isDirectory()
+
+                    public @Override
+                    boolean isDirectory()
                     {
                         return false;
                     }
@@ -579,11 +610,11 @@ public class CreateWebstartAppMojo
      * @return The name of the jnlp-launcher jarfile in the build directory
      */
     private File copyLauncher( File standaloneBuildDir, File builtInstallation )
-        throws IOException
+            throws IOException
     {
-        File jnlpStarter =
-            new File( builtInstallation.getAbsolutePath() + File.separator + "harness" + File.separator + "jnlp"
-                + File.separator + "jnlp-launcher.jar" );
+        File jnlpStarter
+                = new File( builtInstallation.getAbsolutePath() + File.separator + "harness" + File.separator + "jnlp"
+                        + File.separator + "jnlp-launcher.jar" );
         // buffer so it isn't reading a byte at a time!
         InputStream source = null;
         FileOutputStream outstream = null;
@@ -592,14 +623,14 @@ public class CreateWebstartAppMojo
             if ( !jnlpStarter.exists() )
             {
                 source = getClass().getClassLoader().getResourceAsStream(
-                    "harness/jnlp/jnlp-launcher.jar" );
+                        "harness/jnlp/jnlp-launcher.jar" );
             }
             else
             {
                 source = new FileInputStream( jnlpStarter );
             }
             File jnlpDestination = new File(
-                standaloneBuildDir.getAbsolutePath() + File.separator + "jnlp-launcher.jar" );
+                    standaloneBuildDir.getAbsolutePath() + File.separator + "jnlp-launcher.jar" );
 
             outstream = new FileOutputStream( jnlpDestination );
             IOUtil.copy( source, outstream );
@@ -613,7 +644,7 @@ public class CreateWebstartAppMojo
     }
 
     private void filterCopy( File sourceFile, String resourcePath, File destinationFile, Properties filterProperties )
-        throws IOException
+            throws IOException
     {
         // buffer so it isn't reading a byte at a time!
         Reader source = null;
@@ -648,6 +679,7 @@ public class CreateWebstartAppMojo
 
     /**
      * copied from MakeMasterJNLP ant task.
+     *
      * @param files
      * @param antProject
      * @param masterPrefix
@@ -655,7 +687,7 @@ public class CreateWebstartAppMojo
      * @throws java.io.IOException
      */
     private String generateExtensions( FileSet files, Project antProject, String masterPrefix )
-        throws IOException
+            throws IOException
     {
         StringBuilder buff = new StringBuilder();
         for ( String nm : files.getDirectoryScanner( antProject ).getIncludedFiles() )
@@ -678,7 +710,7 @@ public class CreateWebstartAppMojo
             {
                 throw new IOException( "Not a NetBeans Module: " + jar );
             }
-            
+
             // see http://hg.netbeans.org/main-silver/rev/87823abb86d9
             if ( codenamebase.equals( "org.objectweb.asm.all" )
                     && jar.getParentFile().getName().equals( "core" )
@@ -695,7 +727,8 @@ public class CreateWebstartAppMojo
             }
             String dashcnb = codenamebase.replace( '.', '-' );
 
-            buff.append( "    <extension name='" ).append( codenamebase ).append( "' href='" ).append( masterPrefix ).append( dashcnb ).append( ".jnlp' />\n" );
+            buff.append( "    <extension name='" ).append( codenamebase ).append( "' href='" ).append( masterPrefix ).
+                    append( dashcnb ).append( ".jnlp' />\n" );
             theJar.close();
         }
         return buff.toString();

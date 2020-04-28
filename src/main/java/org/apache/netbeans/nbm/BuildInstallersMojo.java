@@ -19,7 +19,6 @@ package org.apache.netbeans.nbm;
  * under the License.
  */
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,14 +51,16 @@ import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.util.StringUtils;
 
 /**
- * Build installers for Mavenized NetBeans application.
- * Creates installers for supported operating systems
- * and packages each installer as a deployable artifact.
- * <p>See a <a href="http://www.mojohaus.org/nbm-maven-plugin/buildinstexample.html">how-to</a> on customizing the installer.
+ * Build installers for Mavenized NetBeans application. Creates installers for supported operating systems and packages
+ * each installer as a deployable artifact.
+ * <p>
+ * See a <a href="http://www.mojohaus.org/nbm-maven-plugin/buildinstexample.html">how-to</a> on customizing the
+ * installer.
+ *
  * @author <a href="mailto:frantisek@mantlik.cz">Frantisek Mantlik</a>
  */
-@Mojo( name = "build-installers", 
-        requiresProject = true, 
+@Mojo( name = "build-installers",
+        requiresProject = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         threadSafe = true,
         defaultPhase = LifecyclePhase.PACKAGE )
@@ -68,24 +69,23 @@ public class BuildInstallersMojo
 {
 
     /**
-    * output directory.
-    */
+     * output directory.
+     */
     @Parameter( defaultValue = "${project.build.directory}", required = true )
     protected File outputDirectory;
     /**
-    * The branding token for the application based on NetBeans platform.
-    */
+     * The branding token for the application based on NetBeans platform.
+     */
     @Parameter( property = "netbeans.branding.token", required = true )
     protected String brandingToken;
     /**
-    * Installation directory name at the destination system
-    * Deprecated, to be removed, was never actually used.
-    */
+     * Installation directory name at the destination system Deprecated, to be removed, was never actually used.
+     */
     @Parameter( property = "netbeans.branding.token" )
     protected String installDirName;
     /**
-    * Prefix of all generated installers files
-    */
+     * Prefix of all generated installers files
+     */
     @Parameter( defaultValue = "${project.build.finalName}" )
     private String installersFilePrefix;
     /**
@@ -119,21 +119,18 @@ public class BuildInstallersMojo
     @Parameter( defaultValue = "${basedir}/license.txt" )
     private File installerLicenseFile;
     /**
-     * Custom installer template.
-     * This file, if provided, will replace default template from
+     * Custom installer template. This file, if provided, will replace default template from
      * &lt;NetBeansInstallation&gt;/harness/nbi/stub/template.xml
      */
     @Parameter
     private File templateFile;
     /**
-     * Parameters passed to templateFile 
-     * or to installer/nbi/stub/template.xml 
-     * to customize generated installers.
+     * Parameters passed to templateFile or to installer/nbi/stub/template.xml to customize generated installers.
      *
      */
     @Parameter
     private Map<String, String> userSettings;
-    
+
     /**
      * Name of the zip artifact used to produce installers from (without .zip extension)
      */
@@ -146,19 +143,19 @@ public class BuildInstallersMojo
      */
     @Component
     private MavenProjectHelper projectHelper;
-        
+
     @Parameter( readonly = true, required = true, property = "basedir" )
     private File basedir;
     /**
-    * The Maven Project.
-    */
+     * The Maven Project.
+     */
     @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 
     // </editor-fold>
     @Override
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+            throws MojoExecutionException, MojoFailureException
     {
         Project antProject = antProject();
 
@@ -167,7 +164,7 @@ public class BuildInstallersMojo
             throw new MojoExecutionException(
                     "This goal only makes sense on project with 'nbm-application' packaging." );
         }
-        
+
         if ( !installerOsLinux && !installerOsMacosx && !installerOsSolaris && !installerOsWindows )
         {
             getLog().warn( "None of the Operating System Installers selected, skipping 'build-installers' goal." );
@@ -178,7 +175,6 @@ public class BuildInstallersMojo
         File zipFile = new File( outputDirectory, zipName );
         getLog().info( String.format( "Running Build Installers action for (existing=%2$s) zip file %1$s",
                 zipFile, zipFile.exists() ) );
-
 
         File appIconIcnsFile;
 
@@ -197,23 +193,25 @@ public class BuildInstallersMojo
         appIconIcnsFile = new File( harnessDir, "etc" + File.separatorChar + "applicationIcon.icns" );
         getLog().info( "Application icon:" + appIconIcnsFile.getAbsolutePath() );
 
-        Map<String, String> props = new HashMap<String, String> ();
+        Map<String, String> props = new HashMap<String, String>();
 
         props.put( "suite.location", basedir.getAbsolutePath().replace( "\\", "/" ) );
         props.put( "suite.props.app.name", brandingToken );
         props.put( "suite.dist.zip", zipFile.getAbsolutePath().replace( "\\", "/" ) );
         props.put( "suite.dist.directory", outputDirectory.getAbsolutePath().replace( "\\", "/" ) );
-        props.put( "installer.build.dir", new File( outputDirectory, "installerbuild" ).getAbsolutePath().replace( "\\", "/" ) );
-        
+        props.put( "installer.build.dir", new File( outputDirectory, "installerbuild" ).getAbsolutePath().replace( "\\",
+                "/" ) );
+
         props.put( "installers.file.prefix", installersFilePrefix );
 
 //        props.put( "install.dir.name", installDirName );
-
         //mkleint: this is a flawed pattern! cannot make any assumption on multimodule layout
-        String appName = project.getParent().getArtifactId().replace( ".", "" ).replace( "-", "" ).replace( "_", "" ).replaceAll( "[0-9]+", "" );
+        String appName = project.getParent().getArtifactId().replace( ".", "" ).replace( "-", "" ).replace( "_", "" ).
+                replaceAll( "[0-9]+", "" );
         props.put( "suite.nbi.product.uid", appName.toLowerCase( Locale.ENGLISH ) );
 
-        props.put( "suite.props.app.title", ( project.getName() + " " + project.getVersion() ).replaceAll( "-SNAPSHOT", "" ) );
+        props.put( "suite.props.app.title", ( project.getName() + " " + project.getVersion() ).replaceAll( "-SNAPSHOT",
+                "" ) );
 
         String appVersion = project.getVersion().replaceAll( "-SNAPSHOT", "" );
         props.put( "suite.nbi.product.version.short", appVersion );
@@ -225,17 +223,22 @@ public class BuildInstallersMojo
 
         props.put( "nbi.stub.location", new File( harnessDir, "nbi/stub" ).getAbsolutePath().replace( "\\", "/" ) );
 
-        props.put( "nbi.stub.common.location", new File( harnessDir, "nbi/.common" ).getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "nbi.stub.common.location", new File( harnessDir, "nbi/.common" ).getAbsolutePath().replace( "\\",
+                "/" ) );
 
-        props.put( "nbi.ant.tasks.jar", new File( harnessDir, "modules/ext/nbi-ant-tasks.jar" ).getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "nbi.ant.tasks.jar", new File( harnessDir, "modules/ext/nbi-ant-tasks.jar" ).getAbsolutePath().
+                replace( "\\", "/" ) );
 
-        props.put( "nbi.registries.management.jar", new File( harnessDir, "modules/ext/nbi-registries-management.jar" ).getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "nbi.registries.management.jar", new File( harnessDir, "modules/ext/nbi-registries-management.jar" ).
+                getAbsolutePath().replace( "\\", "/" ) );
 
-        props.put( "nbi.engine.jar", new File( harnessDir, "modules/ext/nbi-engine.jar" ).getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "nbi.engine.jar", new File( harnessDir, "modules/ext/nbi-engine.jar" ).getAbsolutePath().replace(
+                "\\", "/" ) );
 
         if ( installerLicenseFile != null )
         {
-            getLog().info( String.format( "License file is at %1s, exist = %2$s", installerLicenseFile, installerLicenseFile.exists() ) );
+            getLog().info( String.format( "License file is at %1s, exist = %2$s", installerLicenseFile,
+                    installerLicenseFile.exists() ) );
             props.put( "nbi.license.file", installerLicenseFile.getAbsolutePath() ); //mkleint: no path replacement here??
         }
 
@@ -299,7 +302,8 @@ public class BuildInstallersMojo
 
         try
         {
-            antProject.setUserProperty( "ant.file", new File( harnessDir, "nbi/stub/template.xml" ).getAbsolutePath().replace( "\\", "/" ) );
+            antProject.setUserProperty( "ant.file", new File( harnessDir, "nbi/stub/template.xml" ).getAbsolutePath().
+                    replace( "\\", "/" ) );
             ProjectHelper helper = ProjectHelper.getProjectHelper();
             antProject.addReference( "ant.projectHelper", helper );
             helper.parse( antProject, new File( harnessDir, "nbi/stub/template.xml" ) );
@@ -327,7 +331,7 @@ public class BuildInstallersMojo
     {
 
         boolean copyFile( final File toCopy, final File destFile )
-            throws MojoExecutionException
+                throws MojoExecutionException
         {
             try
             {
@@ -340,7 +344,7 @@ public class BuildInstallersMojo
         }
 
         boolean copyFilesRecusively( final File toCopy, final File destDir )
-            throws MojoExecutionException
+                throws MojoExecutionException
         {
             assert destDir.isDirectory();
 
@@ -367,7 +371,7 @@ public class BuildInstallersMojo
         }
 
         boolean copyJarResourcesRecursively( final File destDir, final JarURLConnection jarConnection )
-            throws IOException, MojoExecutionException
+                throws IOException, MojoExecutionException
         {
 
             final JarFile jarFile = jarConnection.getJarFile();
@@ -404,7 +408,7 @@ public class BuildInstallersMojo
         }
 
         boolean copyResourcesRecursively( final URL originUrl, final File destination )
-            throws MojoExecutionException
+                throws MojoExecutionException
         {
             try
             {
@@ -425,7 +429,7 @@ public class BuildInstallersMojo
         }
 
         boolean copyStream( final InputStream is, final File f )
-            throws MojoExecutionException
+                throws MojoExecutionException
         {
             try
             {
@@ -438,7 +442,7 @@ public class BuildInstallersMojo
         }
 
         boolean copyStream( final InputStream is, final OutputStream os )
-            throws MojoExecutionException
+                throws MojoExecutionException
         {
             try
             {
