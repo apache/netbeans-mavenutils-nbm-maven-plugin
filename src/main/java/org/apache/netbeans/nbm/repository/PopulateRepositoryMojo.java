@@ -83,7 +83,7 @@ import org.codehaus.plexus.util.IOUtil;
  * A goal for identifying NetBeans modules from the installation and populating the local
  * repository with them. Optionally you can also deploy to a remote repository.
  * <p>
- * If you are looking for an existing remote repository for NetBeans artifacts, check out <a href="https://search.maven.org/">Maven Central</a>. 
+ * If you are looking for an existing remote repository for NetBeans artifacts, check out <a href="https://search.maven.org/">Maven Central</a>.
  * <a href="http://bits.netbeans.org/nexus/content/groups/netbeans/">http://bits.netbeans.org/nexus/content/groups/netbeans/</a>,
  * contains contains API artifacts for older NetBeans releases.
  * <a href="https://repository.apache.org/content/groups/snapshots">https://repository.apache.org/content/groups/snapshots</a>
@@ -105,15 +105,15 @@ public class PopulateRepositoryMojo
     private static final String GROUP_EXTERNAL = ".external";
     private static final String GROUP_CLUSTER = ".cluster";
 
-    
+
     /**
-     * a prefix for groupId of generated content, 
+     * a prefix for groupId of generated content,
      * eg. for org.netbeans value will generate org.netbeans.cluster groupId for clusters and org.netbeans.modules for module artifacts.
      * @since 1.2
      */
     @Parameter( property = "groupIdPrefix", defaultValue = "org.netbeans" )
     private String groupIdPrefix;
-    
+
     /**
      * an url where to deploy the NetBeans artifacts. Optional, if not specified, the artifacts will be only installed
      * in local repository, if you need to give credentials to access remote repo, the id of the server is hardwired to "netbeans".
@@ -126,7 +126,7 @@ public class PopulateRepositoryMojo
      */
     @Parameter( defaultValue = "netbeans" , property = "deployId" )
     private String deployId;
-    
+
     /**
      * By default the generated metadata is installed in local repository.
      * Setting this parameter to false will avoid installing the bits. Only meaningful together with
@@ -195,7 +195,7 @@ public class PopulateRepositoryMojo
      * Only meaningful when {@code forcedVersion} is defined.
      * @since 3.7
      */
-    @Parameter( defaultValue = "true", property = "defineCluster" )   
+    @Parameter( defaultValue = "true", property = "defineCluster" )
     private boolean defineCluster;
 
     /**
@@ -224,7 +224,7 @@ public class PopulateRepositoryMojo
      */
     @Parameter( property = "parentGAV", required = false )
     private String parentGAV;
-    
+
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
      * Local maven repository.
@@ -283,12 +283,12 @@ public class PopulateRepositoryMojo
         Project antProject = antProject();
         ArtifactRepository deploymentRepository = null;
 
-        if ( parentGAV != null ) 
+        if ( parentGAV != null )
         {
             // populate artefactParent
             artefactParent = new Parent();
             String[] split = parentGAV.split( ":" );
-            if ( split.length != 3 ) 
+            if ( split.length != 3 )
             {
                 throw new MojoExecutionException(
                     "parentGAV should respect the following format groupId:artefactId:version" );
@@ -385,7 +385,7 @@ public class PopulateRepositoryMojo
                 if ( "core-base".equals( artifact ) )
                 {
                     artifact = "org-netbeans-core-startup-base";
-                }                
+                }
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
                 String group = groupIdPrefix + ( examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL );
                 Artifact art = createArtifact( artifact, version, group );
@@ -395,7 +395,7 @@ public class PopulateRepositoryMojo
                     Dependency dep = findExternal( module );
                     if ( dep != null )
                     {
-                        
+
                         art = createArtifact( dep.getArtifactId(), dep.getVersion(), dep.getGroupId() );
                         group = dep.getGroupId();
                         version = dep.getVersion();
@@ -413,7 +413,7 @@ public class PopulateRepositoryMojo
                 col.add( wr );
             }
         }
-        
+
         File javadocRoot = null;
         if ( netbeansJavadocDirectory != null )
         {
@@ -453,10 +453,10 @@ public class PopulateRepositoryMojo
         Map<ModuleWrapper, Artifact> tobePopulated = new HashMap<>();
         // external artefacts
         Map<ModuleWrapper, Artifact> oncentralWrapper = new HashMap<>();
-        // triage 
-        for ( Map.Entry<ModuleWrapper, Artifact> entry : moduleDefinitions.entrySet() ) 
+        // triage
+        for ( Map.Entry<ModuleWrapper, Artifact> entry : moduleDefinitions.entrySet() )
         {
-            if ( entry.getKey() instanceof ModuleWrapperMaven ) 
+            if ( entry.getKey() instanceof ModuleWrapperMaven )
             {
                 oncentralWrapper.put( entry.getKey(), entry.getValue() );
             }
@@ -468,8 +468,8 @@ public class PopulateRepositoryMojo
         List<ExternalsWrapper> externals = new ArrayList<>();
         int count = tobePopulated.size() + 1;
         int index = 0;
-        
-        
+
+
         try
         {
             for ( Map.Entry<ModuleWrapper, Artifact> elem : tobePopulated.entrySet() )
@@ -553,7 +553,7 @@ public class PopulateRepositoryMojo
                                             b.append( ' ' );
                                         }
                                         b.append( dep.getGroupId() ).append( ':' ).append( dep.getArtifactId() ).append( ':' ).append( dep.getVersion() );
-                                        if ( dep.getClassifier() != null ) 
+                                        if ( dep.getClassifier() != null )
                                         {
                                             b.append( ":" ).append( dep.getClassifier() );
                                         }
@@ -786,7 +786,7 @@ public class PopulateRepositoryMojo
         mavenModel.setVersion( wrapper.getVersion() );
         mavenModel.setPackaging( "jar" );
         mavenModel.setModelVersion( "4.0.0" );
-        if ( artefactParent != null ) 
+        if ( artefactParent != null )
         {
             mavenModel.setParent( artefactParent );
         }
@@ -806,8 +806,8 @@ public class PopulateRepositoryMojo
                     if ( wr instanceof ModuleWrapperMaven )
                     {
                        dep = ( ( ModuleWrapperMaven ) wr ).getDep();
-                    } 
-                    else 
+                    }
+                    else
                     {
                         dep = new Dependency();
                         dep.setArtifactId( wr.getArtifact() );
@@ -817,7 +817,7 @@ public class PopulateRepositoryMojo
                     dep.setType( "jar" );
                     //we don't want the API modules to depend on non-api ones..
                     // otherwise the transitive dependency mechanism pollutes your classpath..
-                    if ( wrapper.getModuleManifest().hasPublicPackages() 
+                    if ( wrapper.getModuleManifest().hasPublicPackages()
                             && !wr.getModuleManifest().hasPublicPackages() )
                     {
                         dep.setScope( "runtime" );
@@ -837,13 +837,13 @@ public class PopulateRepositoryMojo
                     dep.setVersion( forcedVersion );
                     ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
                     List<ArtifactRepository> repos = Collections.singletonList(
-                            repositoryFactory.createArtifactRepository( 
+                            repositoryFactory.createArtifactRepository(
                                     dependencyRepositoryId, dependencyRepositoryUrl, artifactRepositoryLayout, policy, policy ) );
                     try
                     {
                         artifactResolver.resolve(
                                 artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_API, artifactId, forcedVersion, "pom" ),
-                                repos, 
+                                repos,
                                 localRepository );
                         dep.setGroupId( groupIdPrefix + GROUP_API );
                     }
@@ -875,7 +875,7 @@ public class PopulateRepositoryMojo
                                 throw new MojoExecutionException( "No module found for dependency '" + elem + "'", x );
                             }
 
-                           
+
                         }
 
                     }
@@ -973,22 +973,22 @@ public class PopulateRepositoryMojo
         {
             List<String> content512 = Files.readAllLines( externallist.toPath() );
             MessageDigest shaDig = MessageDigest.getInstance( "SHA1" );
-            
+
             try ( InputStream is = new FileInputStream( f ); OutputStream os = new DigestOutputStream( new NullOutputStream(), shaDig ); )
             {
                 IOUtil.copy( is, os );
             }
             String sha1 = encode ( shaDig.digest() ).toUpperCase();
-            for ( String string : content512 ) 
+            for ( String string : content512 )
             {
-                if ( string.startsWith( "#" ) ) 
+                if ( string.startsWith( "#" ) )
                 {
                     continue;
                 }
                 String[] split = string.split( ";" );
-                if ( split[0].equals( sha1 ) && split[1].contains( ":" ) ) 
+                if ( split[0].equals( sha1 ) && split[1].contains( ":" ) )
                 {
-                    Dependency dep = splitDependencyString( split[1] );                    
+                    Dependency dep = splitDependencyString( split[1] );
                     getLog().info( "found match " + dep.getGroupId() + ":" + dep.getArtifactId() + ":" + dep.getVersion() + " for " + f.getName() );
                     return dep;
                 }
@@ -1002,7 +1002,7 @@ public class PopulateRepositoryMojo
         return null;
     }
 
-    static Dependency splitDependencyString( String split ) 
+    static Dependency splitDependencyString( String split )
     {
         String[] splits = split.split( ":" );
         Dependency dep = new Dependency();
@@ -1022,11 +1022,11 @@ public class PopulateRepositoryMojo
             else
             {
                 dep.setClassifier( splits[3] );
-            }                        
+            }
         }
         return dep;
     }
-    
+
     File createExternalProject( ExternalsWrapper wrapper )
     {
         Model mavenModel = new Model();
@@ -1036,13 +1036,13 @@ public class PopulateRepositoryMojo
         mavenModel.setVersion( wrapper.getVersion() );
         mavenModel.setPackaging( "jar" );
         mavenModel.setModelVersion( "4.0.0" );
-        if ( artefactParent != null ) 
+        if ( artefactParent != null )
         {
             mavenModel.setParent( artefactParent );
         }
-        mavenModel.setName( 
+        mavenModel.setName(
             "Maven definition for " + wrapper.getFile().getName() + " - external part of NetBeans module." );
-        mavenModel.setDescription( 
+        mavenModel.setDescription(
             "POM and identification for artifact that was not possible to uniquely identify as a maven dependency." );
         FileWriter writer = null;
         File fil = null;
@@ -1086,7 +1086,7 @@ public class PopulateRepositoryMojo
 //        mavenModel.setPackaging("nbm-application");
         mavenModel.setPackaging( "pom" );
         mavenModel.setModelVersion( "4.0.0" );
-        if ( artefactParent != null ) 
+        if ( artefactParent != null )
         {
             mavenModel.setParent( artefactParent );
         }
@@ -1094,18 +1094,33 @@ public class PopulateRepositoryMojo
         for ( ModuleWrapper wr : mods )
         {
             Dependency dep = new Dependency();
-            dep.setArtifactId( wr.getArtifact() );
-            dep.setGroupId( wr.getGroup() );
-            dep.setVersion( wr.getVersion() );
             if ( wr.getModuleManifest().isNetBeansModule() )
             {
+                dep.setArtifactId( wr.getArtifact() );
+                dep.setGroupId( wr.getGroup() );
+                dep.setVersion( wr.getVersion() );
                 dep.setType( "nbm-file" );
+            }
+            else if ( wr instanceof ModuleWrapperMaven )
+            {
+                ModuleWrapperMaven mwr = ( ModuleWrapperMaven ) wr;
+                dep.setArtifactId( mwr.getDep().getArtifactId() );
+                dep.setGroupId( mwr.getDep().getGroupId() );
+                dep.setVersion( mwr.getDep().getVersion() );
+                dep.setClassifier( mwr.getDep().getClassifier() );
+                dep.setScope( mwr.getDep().getScope());
+            }
+            else
+            {
+                dep.setArtifactId( wr.getArtifact() );
+                dep.setGroupId( wr.getGroup() );
+                dep.setVersion( wr.getVersion() );
             }
             deps.add( dep );
         }
         mavenModel.setDependencies( deps );
-//        
-//        
+//
+//
 //        Build build = new Build();
 //        Plugin plg = new Plugin();
 //        plg.setGroupId("org.codehaus.mojo");
@@ -1145,7 +1160,7 @@ public class PopulateRepositoryMojo
     {
         return artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_CLUSTER, artifact, version, "pom" );
     }
-    
+
     private static final Pattern PATTERN_CLUSTER = Pattern.compile( "([a-zA-Z]+)[0-9\\.]*" );
     static String stripClusterName( String key )
     {
@@ -1209,11 +1224,11 @@ public class PopulateRepositoryMojo
 
     }
 
-    private static class ModuleWrapperMaven extends ModuleWrapper 
+    private static class ModuleWrapperMaven extends ModuleWrapper
     {
 
         private final Dependency dep;
-        
+
         ModuleWrapperMaven( String art, String ver, String grp, ExamineManifest manifest, File fil, Dependency de )
         {
             super( art, ver, grp, manifest, fil );
@@ -1223,9 +1238,9 @@ public class PopulateRepositoryMojo
         public Dependency getDep()
         {
             return dep;
-        }        
+        }
     }
-    
+
     private static class ModuleWrapper
     {
 
