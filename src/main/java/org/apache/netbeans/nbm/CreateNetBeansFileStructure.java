@@ -19,12 +19,16 @@ package org.apache.netbeans.nbm;
  * under the License.
  */
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +38,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -280,42 +285,42 @@ public abstract class CreateNetBeansFileStructure
         }
         catch ( IOException x )
         {
-            throw new MojoExecutionException( "Cannot copy module jar", x );
+            throw new MojoExecutionException( "Cannot copy module JAR", x );
         }
-        
-        {   // Temporary scope so that the Variables m,a & s (see below) can be reclaimed earlier
-            // and do not pollute the current scope
-            // Check if Manifest needs to be patched
-            Manifest m = null;
-            try ( JarInputStream jis = new JarInputStream( new FileInputStream( moduleFile ) ) )
-            {
-                // save the manifest & done
-                m = jis.getManifest(); 
-            }
-            catch ( IOException x )
-            {
-                throw new MojoExecutionException( "Could not read manifest of copied module jar", x );
-            }
-         
+
+        try ( JarInputStream jis = new JarInputStream( Files.newInputStream( jarFile.toPath() ) ) )
+        {
+            Manifest m = jis.getManifest();               
             Attributes a = m.getMainAttributes();
             String classPath = ( String ) a.remove( new Attributes.Name( "X-Class-Path" ) );
-         
+
             if ( classPath != null )
             {
                 // update the manifest
-                getLog().info( "Updating manifest of module jar" );
+                getLog().info( "Updating manifest of copied module JAR" );
                 a.putValue( "Class-Path", classPath );
                 a.remove( new Attributes.Name( "Maven-Class-Path" ) );
-                try ( JarOutputStream jos = new JarOutputStream( new FileOutputStream( moduleFile ), m ) )
+
+                try ( FileSystem fs = FileSystems.newFileSystem( moduleFile.toPath(), null ) )
                 {
-                    // nothing to do here. just close the stream. 
-                    // The updated manifest gets written in the constructor
+                    try ( BufferedOutputStream mfWriter = new BufferedOutputStream( Files.newOutputStream( fs.getPath( JarFile.MANIFEST_NAME ) ) ) )
+                    {
+                        m.write( mfWriter );
+                    }
+                    catch ( IOException ioex )
+                    {
+                        throw new MojoExecutionException( "Could not overwrite manifest entry", ioex );
+                    }
                 }
-                catch ( IOException x )
+                catch ( IOException ex )
                 {
-                    throw new MojoExecutionException( "Could not update manifest of copied module jar", x );
+                    throw new MojoExecutionException( "Unable to create zip filesystem", ex );
                 }
             }
+        }
+        catch ( IOException x )
+        {
+            throw new MojoExecutionException( "Could not read manifest of module JAR", x );
         }
         
         ExamineManifest modExaminator = new ExamineManifest( getLog() );
