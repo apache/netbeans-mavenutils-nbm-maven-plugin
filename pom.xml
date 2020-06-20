@@ -41,7 +41,7 @@ under the License.
         <url>https://issues.apache.org/jira/browse/NETBEANSINFRA</url>
     </issueManagement>
     <prerequisites>
-        <maven>3.0.5</maven>
+        <maven>3.6.3</maven>
     </prerequisites>
     <licenses>
         <license>
@@ -62,7 +62,7 @@ under the License.
                 <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.5</version>
+                <version>3.6.0</version>
                 <configuration>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
@@ -118,8 +118,8 @@ under the License.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>

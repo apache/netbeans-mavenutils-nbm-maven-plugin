@@ -21,8 +21,6 @@ package org.apache.netbeans.nbm;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
@@ -40,13 +38,11 @@ import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
-import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-//import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -301,8 +297,7 @@ public abstract class CreateNetBeansFileStructure
                 a.putValue( "Class-Path", classPath );
                 a.remove( new Attributes.Name( "Maven-Class-Path" ) );
 
-                try ( FileSystem fs = FileSystems.newFileSystem( moduleFile.toPath(), null ) )
-                {
+                try (FileSystem fs = FileSystems.newFileSystem(moduleFile.toPath(), (ClassLoader) null))                {
                     try ( BufferedOutputStream mfWriter = new BufferedOutputStream( Files.newOutputStream( fs.getPath( JarFile.MANIFEST_NAME ) ) ) )
                     {
                         m.write( mfWriter );
@@ -354,14 +349,8 @@ public abstract class CreateNetBeansFileStructure
                         {
                             String name = target.getName();
                             getLog().info( "Using *.external replacement for " + name );
-                            PrintWriter external = new PrintWriter( new File( targetDir, name + ".external" ), "UTF-8" );
-                            try
-                            {
+                            try (PrintWriter external = new PrintWriter(new File(targetDir, name + ".external"), "UTF-8")) {
                                 writeExternal( external, artifact );
-                            }
-                            finally
-                            {
-                                external.close();
                             }
                         }
                     }
@@ -488,7 +477,7 @@ public abstract class CreateNetBeansFileStructure
                     "NBM resources defined in module descriptor are deprecated. Please configure NBM resources in plugin configuration." );
             Copy cp = (Copy) antProject.createTask( "copy" );
             cp.setTodir( clusterDir );
-            HashMap<File, Collection<FileSet>> customPaths = new HashMap<File, Collection<FileSet>>();
+            HashMap<File, Collection<FileSet>> customPaths = new HashMap<>();
             boolean hasStandard = false;
             for ( NbmResource res : ress )
             {
@@ -512,7 +501,7 @@ public abstract class CreateNetBeansFileStructure
                         Collection<FileSet> col = customPaths.get( path );
                         if ( col == null )
                         {
-                            col = new ArrayList<FileSet>();
+                            col = new ArrayList<>();
                             customPaths.put( path, col );
                         }
                         col.add( set );
@@ -576,25 +565,7 @@ public abstract class CreateNetBeansFileStructure
             fld.setAccessible( true );
             fld.set( null, null );
 
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-        catch ( IllegalAccessException ex )
-        {
-            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-        catch ( NoSuchFieldException ex )
-        {
-            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-        catch ( SecurityException ex )
-        {
-            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-        catch ( ClassNotFoundException ex )
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException | ClassNotFoundException ex) {
             Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }
