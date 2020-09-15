@@ -206,7 +206,8 @@ public class RunNetBeansMojo
                 String jdkHome = System.getenv( "JAVA_HOME" );
                 if ( jdkHome != null )
                 {
-                    if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists() )
+                    if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists() ||
+                            new File( jdkHome, "bin\\windowsaccessbridge-64.dll" ).exists()
                     {
                         File exec64 = new File( netbeansInstallation, "bin\\" + appName + "64.exe" );
                         if ( exec64.isFile() )
