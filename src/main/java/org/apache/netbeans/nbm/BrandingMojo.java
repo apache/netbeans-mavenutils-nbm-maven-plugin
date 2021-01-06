@@ -125,7 +125,7 @@ public class BrandingMojo
             scanner.setBasedir( brandingSources );
             scanner.scan();
 
-            final String clusterPathPart = "netbeans" + File.separator + cluster;
+            final String clusterPathPart = "clusters" + File.separator + cluster;
             File outputDir = new File( outputDirectory, "branding_and_locales" );
             outputDir.mkdirs();
             File clusterDir = new File( nbmBuildDir, clusterPathPart );
