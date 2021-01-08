@@ -718,13 +718,13 @@ public class CreateWebstartAppMojo
             {
                 continue;
             }
+
+            int slash = codenamebase.indexOf( '/' );
+            if ( slash >= 0 )
             {
-                int slash = codenamebase.indexOf( '/' );
-                if ( slash >= 0 )
-                {
-                    codenamebase = codenamebase.substring( 0, slash );
-                }
+                codenamebase = codenamebase.substring( 0, slash );
             }
+
             String dashcnb = codenamebase.replace( '.', '-' );
 
             buff.append( "    <extension name='" ).append( codenamebase ).append( "' href='" ).append( masterPrefix ).
