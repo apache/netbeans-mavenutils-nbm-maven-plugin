@@ -27,7 +27,7 @@ under the License.
         <version>1</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
-    <version>11.3-SNAPSHOT</version>
+    <version>12.2-SNAPSHOT</version>
     <name>Apache NetBeans Maven Utilities - NBM Harness for Maven</name>
     <url>https://bits.netbeans.org/mavenutilities/nbm-maven-harness</url>
     <issueManagement>
@@ -146,12 +146,12 @@ under the License.
                                 <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
                                 <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true">
                                     <replacetoken expandProperties="false">@EXEC@</replacetoken>
-                                    <replacevalue expandProperties="false"><![CDATA[ant inheritrefs="false" 
+                                    <replacevalue expandProperties="false"><![CDATA[ant inheritrefs="false"
                 dir="${cvs.dir}/${nbproject.path}">
                   <target name="clean" />
                   <property name="ignore.native" value="true" />
                   <property name="no.dependencies" value="true" />
-                  <property name="dont.build.custom.tasks" value="true" /> 
+                  <property name="dont.build.custom.tasks" value="true" />
                   <property name="custom.tasks.cls" value="${custom.tasks.cls}" />
             </ant]]></replacevalue>
                                 </replace>
@@ -178,13 +178,13 @@ under the License.
             <contains string="${nb.custom.parameter}" substring="javac.classpath" />
         </condition>
         <echoproperties />
-        <ant inheritRefs="false" dir="${cvs.dir}/${nbproject.path}" > 
+        <ant inheritRefs="false" dir="${cvs.dir}/${nbproject.path}" >
                   <target name="clean" />
                   <target name="compile" />
                   <property name="platforms.JDK_1.5.home" value="${nb.jdk.home.value}" />
                   <property name="ignore.native" value="true" />
                   <property name="no.dependencies" value="true" />
-                  <property name="dont.build.custom.tasks" value="true" /> 
+                  <property name="dont.build.custom.tasks" value="true" />
                   <property name="custom.tasks.cls" value="${custom.tasks.cls}" />
                   <property name="${custom.parameter.name}" value="${custom.parameter.value}" />
         </ant]]></replacevalue>
@@ -240,6 +240,6 @@ under the License.
     <properties>
         <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
         <netbeans.repo>netbeans::default::https://repo1.maven.org/maven2/</netbeans.repo>
-        <netbeans.version>RELEASE112</netbeans.version>
+        <netbeans.version>RELEASE122</netbeans.version>
     </properties>
 </project>
