@@ -104,6 +104,7 @@ under the License.
                                     <goal>autoupdate</goal>
                                     <goal>webstart-app</goal>
                                     <goal>build-installers</goal>
+                                    <goal>build-mac</goal>
                                 </goals>
                             </execution>
                         </executions>
