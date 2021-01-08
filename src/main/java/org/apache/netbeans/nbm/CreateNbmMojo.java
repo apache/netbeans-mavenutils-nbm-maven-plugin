@@ -244,15 +244,15 @@ public class CreateNbmMojo
         if ( module.getLicenseName() != null )
         {
             licName = module.getLicenseName();
-            getLog().
-                    warn( "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().warn(
+                    "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml" );
         }
         if ( module.getLicenseFile() != null )
         {
             File lf = new File( project.getBasedir(), module.getLicenseFile() );
             licFile = lf;
-            getLog().
-                    warn( "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().warn(
+                    "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml" );
 
         }
         if ( licName != null && licFile != null )
@@ -282,8 +282,8 @@ public class CreateNbmMojo
         String hpUrl = homePageUrl;
         if ( module.getHomepageUrl() != null )
         {
-            getLog().
-                    warn( "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().warn(
+                    "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml" );
             hpUrl = module.getHomepageUrl();
         }
         if ( hpUrl != null )

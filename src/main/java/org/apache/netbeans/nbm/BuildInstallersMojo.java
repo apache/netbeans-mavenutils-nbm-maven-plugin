@@ -239,7 +239,8 @@ public class BuildInstallersMojo
         {
             getLog().info( String.format( "License file is at %1s, exist = %2$s", installerLicenseFile,
                     installerLicenseFile.exists() ) );
-            props.put( "nbi.license.file", installerLicenseFile.getAbsolutePath() ); //mkleint: no path replacement here??
+            //mkleint: no path replacement here??
+            props.put( "nbi.license.file", installerLicenseFile.getAbsolutePath() );
         }
 
         List<String> platforms = new ArrayList<String>();
@@ -287,7 +288,8 @@ public class BuildInstallersMojo
         props.put( "generate.installer.for.platforms", sb.toString() );
 
         File javaHome = new File( System.getProperty( "java.home" ) );
-        if ( new File( javaHome, "lib/rt.jar" ).exists() && javaHome.getName().equals( "jre" ) ) //mkleint: does this work on mac? no rt.jar there
+        //mkleint: does this work on mac? no rt.jar there
+        if ( new File( javaHome, "lib/rt.jar" ).exists() && javaHome.getName().equals( "jre" ) )
         {
             javaHome = javaHome.getParentFile();
         }

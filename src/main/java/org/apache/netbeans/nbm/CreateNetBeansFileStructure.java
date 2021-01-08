@@ -286,7 +286,7 @@ public abstract class CreateNetBeansFileStructure
 
         try ( JarInputStream jis = new JarInputStream( Files.newInputStream( jarFile.toPath() ) ) )
         {
-            Manifest m = jis.getManifest();               
+            Manifest m = jis.getManifest();
             Attributes a = m.getMainAttributes();
             String classPath = ( String ) a.remove( new Attributes.Name( "X-Class-Path" ) );
 
@@ -297,8 +297,10 @@ public abstract class CreateNetBeansFileStructure
                 a.putValue( "Class-Path", classPath );
                 a.remove( new Attributes.Name( "Maven-Class-Path" ) );
 
-                try (FileSystem fs = FileSystems.newFileSystem(moduleFile.toPath(), (ClassLoader) null))                {
-                    try ( BufferedOutputStream mfWriter = new BufferedOutputStream( Files.newOutputStream( fs.getPath( JarFile.MANIFEST_NAME ) ) ) )
+                try ( FileSystem fs = FileSystems.newFileSystem( moduleFile.toPath(), ( ClassLoader ) null ) )
+                {
+                    try ( BufferedOutputStream mfWriter =
+                            new BufferedOutputStream( Files.newOutputStream( fs.getPath( JarFile.MANIFEST_NAME ) ) ) )
                     {
                         m.write( mfWriter );
                     }
@@ -317,7 +319,7 @@ public abstract class CreateNetBeansFileStructure
         {
             throw new MojoExecutionException( "Could not read manifest of module JAR", x );
         }
-        
+
         ExamineManifest modExaminator = new ExamineManifest( getLog() );
         modExaminator.setJarFile( moduleFile );
         modExaminator.checkFile();
@@ -349,7 +351,9 @@ public abstract class CreateNetBeansFileStructure
                         {
                             String name = target.getName();
                             getLog().info( "Using *.external replacement for " + name );
-                            try (PrintWriter external = new PrintWriter(new File(targetDir, name + ".external"), "UTF-8")) {
+                            try ( PrintWriter external =
+                                    new PrintWriter( new File( targetDir, name + ".external" ), "UTF-8" ) )
+                            {
                                 writeExternal( external, artifact );
                             }
                         }
@@ -473,8 +477,8 @@ public abstract class CreateNetBeansFileStructure
         List<NbmResource> ress = module.getNbmResources();
         if ( ress.size() > 0 )
         {
-            getLog().warn(
-                    "NBM resources defined in module descriptor are deprecated. Please configure NBM resources in plugin configuration." );
+            getLog().warn( "NBM resources defined in module descriptor are deprecated. "
+                          + "Please configure NBM resources in plugin configuration." );
             Copy cp = (Copy) antProject.createTask( "copy" );
             cp.setTodir( clusterDir );
             HashMap<File, Collection<FileSet>> customPaths = new HashMap<>();
@@ -565,7 +569,10 @@ public abstract class CreateNetBeansFileStructure
             fld.setAccessible( true );
             fld.set( null, null );
 
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException | ClassNotFoundException ex) {
+        }
+        catch ( IllegalArgumentException | IllegalAccessException | NoSuchFieldException
+              | SecurityException | ClassNotFoundException ex )
+        {
             Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }

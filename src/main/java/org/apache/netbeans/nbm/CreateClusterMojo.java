@@ -120,7 +120,8 @@ public class CreateClusterMojo
                                 = "The NetBeans binary directory structure for "
                                 + proj.getId()
                                 + " is not created yet."
-                                + "\n Please execute 'mvn install nbm:cluster' to build all relevant projects in the reactor.";
+                                + "\n Please execute 'mvn install nbm:cluster' "
+                                + "to build all relevant projects in the reactor.";
                         throw new MojoFailureException( error );
                     }
                     if ( "bundle".equals( proj.getPackaging() ) )
@@ -150,7 +151,8 @@ public class CreateClusterMojo
 
                         final String cnb = mnf.getModule();
                         final String cnbDashed = cnb.replace( ".", "-" );
-                        final File moduleArt = new File( modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
+                        //do we need the file in some canotical name pattern for moduleArt?
+                        final File moduleArt = new File( modules, cnbDashed + ".jar" );
                         final String specVer = mnf.getSpecVersion();
                         try
                         {

@@ -218,7 +218,8 @@ public class CreateClusterAppMojo
             Set<String> osgiImports = new HashSet<>( MAP_INITIALSIZE );
             Map<String, Set<String>> osgiImportsBacktraces = new HashMap<>( MAP_INITIALSIZE );
             Set<String> osgiExports = new HashSet<>( MAP_INITIALSIZE );
-            Set<String> osgiExportsSubs = new HashSet<>( MAP_INITIALSIZE ); //a way to deal with nb module declaring xxx.** (subpackages) declaration that is consumed by osgi imports
+            //a way to deal with nb module declaring xxx.** (subpackages) declaration that is consumed by osgi imports
+            Set<String> osgiExportsSubs = new HashSet<>( MAP_INITIALSIZE );
 
             List<BundleTuple> bundles = new ArrayList<>();
 
@@ -350,10 +351,11 @@ public class CreateClusterAppMojo
                                         }
                                     }
 
-                                    //TODO examine netbeans/config/Modules to see if the module is autoload/eager
+                                    // TODO examine netbeans/config/Modules to see if the module is autoload/eager
                                     // in verifyIntegrity these could be handled more gracefully than regular modules.
-                                    //eager is simpler, does not need to have module dependencies satisfied.
-                                    //autoload needs checking if any of the other modules declares a dependency on it. if not, also safe to ignore?
+                                    // eager is simpler, does not need to have module dependencies satisfied.
+                                    // autoload needs checking if any of the other modules declares a dependency on it.
+                                    // if not, also safe to ignore?
                                     // now figure which one of the jars is the module jar..
                                     if ( part.matches( "(modules|core|lib)/[^/]+[.]jar" ) )
                                     {
@@ -412,7 +414,8 @@ public class CreateClusterAppMojo
                                 }
                             }
                             if ( classPath != null )
-                            { //MNBMODULE-220 collect wrappedbundleCNBs, later useful in assignClustersToBundles(), these get removed from list of bundles.
+                            { // MNBMODULE-220 collect wrappedbundleCNBs, later useful in assignClustersToBundles(),
+                              // these get removed from list of bundles.
                                 String[] paths = StringUtils.split( classPath, " " );
                                 for ( String path : paths )
                                 {
@@ -447,8 +450,8 @@ public class CreateClusterAppMojo
                                         if ( art.getId().contains( groupIdPrefix
                                                 + ".modules:org-netbeans-modules-maven-embedder" ) )
                                         {
-                                            // in this case we dont want module-maven-embedder to be considered as wrapper for his libs                                                     
-                                            // guava is provided but ide have it also 
+                                            // in this case we dont want module-maven-embedder to be considered as
+                                            // wrapper for his libs guava is provided but ide have it also
                                         }
                                         else
                                         {
@@ -564,7 +567,8 @@ public class CreateClusterAppMojo
                     if ( !dependencyCNBs.isEmpty() )
                     {
                         getLog().error(
-                                "Some included modules/bundles depend on these codenamebases but they are not included. The application will fail starting up. The missing codenamebases are:" );
+                                "Some included modules/bundles depend on these codenamebases but they are not included."
+                                + " The application will fail starting up. The missing codenamebases are:" );
                         for ( String s : dependencyCNBs )
                         {
                             Set<String> back = dependencyCNBBacktraces.get( s );
@@ -575,7 +579,8 @@ public class CreateClusterAppMojo
                     if ( !osgiImports.isEmpty() )
                     {
                         getLog().error(
-                                "Some OSGi imports are not satisfied by included bundles' exports. The application will fail starting up. The missing imports are:" );
+                                "Some OSGi imports are not satisfied by included bundles' exports. "
+                                + "The application will fail starting up. The missing imports are:" );
                         for ( String s : osgiImports )
                         {
                             Set<String> back = osgiImportsBacktraces.get( s );
@@ -586,7 +591,8 @@ public class CreateClusterAppMojo
                     if ( !requireTokens.isEmpty() )
                     {
                         getLog().error(
-                                "Some tokens required by included modules are not provided by included modules. The application will fail starting up. The missing tokens are:" );
+                                "Some tokens required by included modules are not provided by included modules. "
+                                + "The application will fail starting up. The missing tokens are:" );
                         for ( String s : requireTokens )
                         {
                             Set<String> back = requireTokensBacktraces.get( s );
@@ -595,7 +601,10 @@ public class CreateClusterAppMojo
                         }
                     }
                     throw new MojoFailureException(
-                            "See above for consistency validation check failures. Either fix those by adding the relevant dependencies to the application or disable the check by setting the verifyIntegrity parameter to false or by running with -Dnetbeans.verify.integrity=false cmd line parameter." );
+                            "See above for consistency validation check failures. "
+                            + " Either fix those by adding the relevant dependencies to the application or "
+                            + "disable the check by setting the verifyIntegrity parameter to false or by running with "
+                            + "-Dnetbeans.verify.integrity=false cmd line parameter." );
                 }
                 else
                 {
@@ -608,7 +617,8 @@ public class CreateClusterAppMojo
             }
 
             //attempt to sort clusters based on the dependencies and cluster content.
-            Map<String, Set<String>> cluster2depClusters = computeClusterOrdering( clusterDependencies, clusterModules );
+            Map<String, Set<String>> cluster2depClusters =
+                    computeClusterOrdering( clusterDependencies, clusterModules );
             clusterModules.clear();
 
             //now assign the cluster to bundles based on dependencies..
@@ -638,7 +648,8 @@ public class CreateClusterAppMojo
                     updateTracking.mkdirs();
                     final String cnb = ex.getModule();
                     final String cnbDashed = cnb.replace( ".", "-" );
-                    final File moduleArt = new File( modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
+                    //do we need the file in some canotical name pattern in moduleArt?
+                    final File moduleArt = new File( modules, cnbDashed + ".jar" );
                     final String specVer = ex.getSpecVersion();
                     try
                     {
@@ -850,7 +861,7 @@ public class CreateClusterAppMojo
             try ( ZipFile zip = new ZipFile( nbm ) )
             {
                 getLog().debug(
-                        "Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file." );
+                       "Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file." );
                 writeFromZip( zip, "netbeans/launchers/app.sh", destSh, true );
                 writeFromZip( zip, "netbeans/launchers/app.exe", destExe, true );
                 writeFromZip( zip, "netbeans/launchers/app64.exe", destExe64, false );
@@ -1047,14 +1058,16 @@ public class CreateClusterAppMojo
             if ( ( groupIdPrefix + ".modules" ).equals( a.getGroupId() ) && "org-netbeans-bootstrap".equals( a.
                     getArtifactId() ) )
             {
-                version = a.getBaseVersion(); //base version in non-snapshot should equals version, in snapshots to X-SNAPSHOT, not timestamp
+                 //base version in non-snapshot should equals version, in snapshots to X-SNAPSHOT, not timestamp
+                version = a.getBaseVersion();
                 break;
             }
         }
         if ( version == null )
         {
             throw new MojoExecutionException(
-                    "We could not find org-netbeans-bootstrap among the modules in the application. Launchers could not be found." );
+                    "We could not find org-netbeans-bootstrap among the modules in the application. "
+                    + "Launchers could not be found." );
         }
         Artifact nbmArt = artifactFactory.createArtifact(
                 groupIdPrefix + ".modules",
@@ -1126,13 +1139,19 @@ public class CreateClusterAppMojo
     }
 
     //the basic idea is that bundle's cluster can be determined by who depends on it.
-    //simplest case is when a module depends on it. If there are more, we need to pick one that is "lower in the stack, that's what cluster2depClusters is for.
+    //simplest case is when a module depends on it. If there are more, we need to pick one that is "lower in the stack,
+    //that's what cluster2depClusters is for.
     //the rest needs to be determined in more sofisticated manner.
-    //start from bundles with known cluster and see what other bundles they depend on. stamp all these with the same cluster. do it recursively.
-    //At the end process the remaining bundles in reverse order. Check if *they* depend on a bundle with known cluster and so on..
+    //start from bundles with known cluster and see what other bundles they depend on.
+    //stamp all these with the same cluster. do it recursively.
+    //At the end process the remaining bundles in reverse order.
+    //Check if *they* depend on a bundle with known cluster and so on..
     //A few unsolved cases:
-    // - we never update the cluster information once a match was found, but there is a possibility that later in the processing the cluster could be "lowered".
-    // - 2 or more modules from unrelated clusters we cannot easily decide, most likely should be in common denominator cluster but our cluster2depClusters map is not transitive, only lists direct dependencies
+    // - we never update the cluster information once a match was found,
+    //   but there is a possibility that later in the processing the cluster could be "lowered".
+    // - 2 or more modules from unrelated clusters we cannot easily decide,
+    //   most likely should be in common denominator cluster but our cluster2depClusters map is not transitive,
+    //   only lists direct dependencies
     static void assignClustersToBundles( List<BundleTuple> bundles, Set<String> wrappedBundleCNBs,
                                          Map<String, Set<String>> clusterDependencies,
                                          Map<String, Set<String>> cluster2depClusters, Log log )
@@ -1189,7 +1208,9 @@ public class CreateClusterAppMojo
                         it2.remove();
                     }
                 }
-                ent.cluster = depclusters.get( 0 ); //TODO still some free room there, what if they don't directly depend on each other but still are related
+                //TODO still some free room there,
+                //what if they don't directly depend on each other but still are related
+                ent.cluster = depclusters.get( 0 );
                 known.add( ent );
             }
         }
@@ -1369,7 +1390,7 @@ public class CreateClusterAppMojo
                 + "        <file crc=\"" + crcForFile( moduleConf ).getValue() + "\" name=\"config/Modules/" + cnb.
                 replace( ".", "-" ) + ".xml\"/>\n"
                 + "        <file crc=\"" + crcForFile( moduleArt ).getValue() + "\" name=\"modules/" + cnb.replace( ".",
-                                                                                                                    "-" )
+                                                                                                                   "-" )
                 + ".jar\"/>\n"
                 + "    </module_version>\n"
                 + "</module>";
