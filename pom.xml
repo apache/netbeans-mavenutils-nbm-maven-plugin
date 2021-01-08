@@ -110,7 +110,8 @@ under the License.
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
                                         <include name="netbeans/etc/app.conf" />
-                                        <include name="netbeans/etc/applicationIcon.icns*" />
+                                        <include name="netbeans/etc/applicationIcon.icns" />
+                                        <include name="netbeans/etc/Info.plist" />
                                         <include name="netbeans/launchers/app*" />
                                     </patternset>
                                     <mapper type="glob" from="netbeans/*" to="harness/*" />
