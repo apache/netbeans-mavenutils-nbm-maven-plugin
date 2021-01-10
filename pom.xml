@@ -280,6 +280,7 @@ under the License.
                     <instrumentation>
                         <excludes>
                             <exclude>**/HelpMojo.class</exclude>
+                            <exclude>**/BuildMacMojo.class</exclude>
                         </excludes>
                     </instrumentation>    
                 </configuration>
