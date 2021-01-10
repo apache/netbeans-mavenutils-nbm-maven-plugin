@@ -45,10 +45,8 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 /**
- * Build mac for Mavenized NetBeans application. Creates the brandingToken.app macOS Application bundle.
- * <p>
- * See a <a href="http://www.mojohaus.org/nbm-maven-plugin/buildinstexample.html">how-to</a> on customizing the
- * installer.
+ * Builds a macOS application bundle for Mavenized NetBeans application. <br>
+ * Creates the brandingToken.app macOS Application bundle.
  *
  * @author <a href="mailto:oyarzun@apache.org">Christian Oyarzun</a>
  */
@@ -72,27 +70,33 @@ public class BuildMacMojo
     @Parameter( property = "netbeans.branding.token", required = true )
     protected String brandingToken;
     /**
-     * MacOS Icon File
+     * Optional macOS icon file (in ICNS format) to use for the application bundle to replace the default icon 
+     * from the harness.
      */
     @Parameter( property = "netbeans.mac.icon", required = false )
     private File macIconFile;
     /**
-     * MacOS Info.plist File
+     * Optional macOS Info.plist file to use for the application bundle to replace the one from the harness.
+     * <p>
+     * ${app.title} is replaced by macAppTitle
+     * ${app.name} is replaced by brandingToken
+     * ${app.version} is replaced by project.version
      */
     @Parameter( property = "netbeans.mac.info.plist", required = false )
     private File macInfoplistFile;
     /**
-     * MacOS Native Launcher
+     * Optional macOS native launcher to use for the application bundle to replace the one from the harness.
      */
     @Parameter( property = "netbeans.mac.launcher", required = false )
     private File macLauncherFile;
     /**
-     * Zip macOS app bundle
+     * Zip the macOS app bundle to brandingToken-macOS.zip
      */
     @Parameter( property = "netbeans.mac.zipbundle", defaultValue = "false" )
     private boolean macZipBundle;
     /**
-     * Application Title
+     * Optional application title to use to replace ${app.title} for value of CFBundleName in the Info.plist file,
+     * otherwise brandingTokin is used.
      */
     @Parameter( property = "netbeans.mac.title", required = false )
     private String macAppTitle;
