@@ -171,7 +171,8 @@ public class BrandingMojo
                     // jars should be placed in locales/ under the same directory the jar-directories are
                     File destinationJar
                             = new File( destinationLocation + File.separator + "locale"
-                                    + File.separator + destinationFileName( jarDirectory.getName(), effectiveBranding ) );
+                                    + File.separator
+                                    + destinationFileName( jarDirectory.getName(), effectiveBranding ) );
 
                     // create nnn.jar archive of contents
                     JarArchiver archiver = new JarArchiver();
@@ -190,7 +191,7 @@ public class BrandingMojo
 
     static String destinationFileName( String brandingFilePath, String branding )
     {
-        // use first underscore in filename 
+        // use first underscore in filename
         int lastSeparator = brandingFilePath.lastIndexOf( File.separator );
         String infix = "_" + branding;
 

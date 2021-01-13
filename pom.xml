@@ -180,13 +180,13 @@ under the License.
                 <configuration>
                     <component>12336702</component>
                 </configuration>
-   
+
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>                            
+                <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
-                        
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -232,7 +232,7 @@ under the License.
                     </reportSet>
                 </reportSets>
             </plugin>
-                        
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
@@ -268,10 +268,10 @@ under the License.
                         <excludedLink>plugin-info.html</excludedLink>
                     </excludedLinks>
                     <!--<excludedPages>
-                        <excludedPage>dependencies.html</excludedPage> 
+                        <excludedPage>dependencies.html</excludedPage>
                     </excludedPages>-->
-                </configuration>	       
-            </plugin>                        
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
@@ -282,10 +282,10 @@ under the License.
                             <exclude>**/HelpMojo.class</exclude>
                             <exclude>**/BuildMacMojo.class</exclude>
                         </excludes>
-                    </instrumentation>    
+                    </instrumentation>
                 </configuration>
             </plugin>
-            <plugin> 
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
                 <version>2.4</version>
@@ -450,7 +450,7 @@ under the License.
             <scope>test</scope>
         </dependency>
         <dependency>
-            <!-- use harness from NetBeans 11.2  --> 
+            <!-- use harness from NetBeans 11.2  -->
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
             <version>11.2</version>

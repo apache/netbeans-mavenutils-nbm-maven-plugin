@@ -141,7 +141,8 @@ public class NetBeansManifestUpdateMojo
      *
      * @since 3.0
      */
-    @Parameter( required = true, readonly = true, defaultValue = "${project.build.outputDirectory}/META-INF/MANIFEST.MF" )
+    @Parameter( required = true, readonly = true,
+                defaultValue = "${project.build.outputDirectory}/META-INF/MANIFEST.MF" )
     private File targetManifestFile;
 
     /**
@@ -242,8 +243,8 @@ public class NetBeansManifestUpdateMojo
      * 3.11</p>
      *
      * For details, see
-     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans
-     * Module system docs</a>
+     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">
+     * Netbeans Module system docs</a>
      *
      * Since 3.14, for autoload and eager modules, we automatically set AutoUpdate-Show-In-Client manifest entry to
      * false, if not defined already otherwise in the manifest. See issue
@@ -287,7 +288,7 @@ public class NetBeansManifestUpdateMojo
     private DependencyGraphBuilder dependencyGraphBuilder;
 
 // end of component params custom code folding
-// </editor-fold> 
+// </editor-fold>
     /**
      * execute plugin
      *
@@ -739,7 +740,9 @@ public class NetBeansManifestUpdateMojo
                                 "Project uses classes from transitive " + module + " " + wr.artifact.getId()
                                 + " which will not be accessible at runtime." );
                         getLog().info(
-                                "    To fix the problem, add this module as direct dependency. For OSGi bundles that are supposed to be wrapped in NetBeans modules, use the useOSGiDependencies=false parameter" );
+                                "To fix the problem, add this module as direct dependency. "
+                                + "For OSGi bundles that are supposed to be wrapped in NetBeans modules, "
+                                + "use the useOSGiDependencies=false parameter" );
                         deps.removeAll( classes[0] );
                     }
                     classes[1].retainAll( deps );
@@ -770,7 +773,10 @@ public class NetBeansManifestUpdateMojo
                 if ( !deps.isEmpty() )
                 {
                     throw new MojoFailureException(
-                            "Uncategorized problems with NetBeans dependency verification (maybe MNBMODULE-102 or wrong maven dependency metadata). Supposedly external classes are used in the project's binaries but the classes are not found on classpath. Class usages: "
+                            "Uncategorized problems with NetBeans dependency verification "
+                            + "(maybe MNBMODULE-102 or wrong maven dependency metadata). "
+                            + "Supposedly external classes are used in the project's binaries "
+                            + "but the classes are not found on classpath. Class usages: "
                             + deps );
                 }
                 else

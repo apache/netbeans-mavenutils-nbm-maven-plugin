@@ -225,8 +225,8 @@ public abstract class AbstractNbmMojo
             log.warn(
                     "dependencies in module descriptor are deprecated, use the plugin's parameter moduleDependencies" );
 
-            //we need to make sure a dependency is not twice there, module deps override the config (as is the case with other
-            //configurations)
+            //we need to make sure a dependency is not twice there, module deps override the config
+            //(as is the case with other configurations)
             for ( Dependency d : module.getDependencies() )
             {
                 Dependency found = null;
@@ -403,8 +403,9 @@ public abstract class AbstractNbmMojo
             File jar = art.getFile();
             if ( !jar.isFile() )
             {
-                //MNBMODULE-210 with recent CoS changes in netbeans (7.4) jar will be file as we link open projects in the build
-                // via WorkspaceReader. That's fine here, as all we need is to know if project is osgi or nbm module.
+                //MNBMODULE-210 with recent CoS changes in netbeans (7.4) jar will be file as we link open projects in
+                // the build via WorkspaceReader.
+                // That's fine here, as all we need is to know if project is osgi or nbm module.
                 // the nbm file has to be in local repository though.
                 String path = localRepository.pathOf( art );
                 File jar2 = new File( localRepository.getBasedir(), path.replace( "/", File.separator ) );

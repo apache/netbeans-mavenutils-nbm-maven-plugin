@@ -97,7 +97,8 @@ public class RunPlatformAppMojo
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
             throw new MojoFailureException(
-                    "The nbm:run-platform goal shall be used within a NetBeans Application project only ('nbm-application' packaging)" );
+                    "The nbm:run-platform goal shall be used within a NetBeans Application project only "
+                    + "('nbm-application' packaging)" );
         }
 
         netbeansUserdir.mkdirs();
@@ -198,7 +199,8 @@ public class RunPlatformAppMojo
     {
         if ( "true".equals( debugAdditionalArguments ) )
         {
-            return "-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
+            return "-Xdebug -Xnoagent -Djava.compiler=NONE "
+                   + "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
         }
         return debugAdditionalArguments;
     }

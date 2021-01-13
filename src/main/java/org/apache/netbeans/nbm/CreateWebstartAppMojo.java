@@ -204,7 +204,8 @@ public class CreateWebstartAppMojo
         Project antProject = antProject();
 
         getLog().warn(
-                "WARNING: Unsigned and self-signed WebStart applications are deprecated from JDK7u21 onwards. To ensure future correct functionality please use trusted certificate." );
+                "WARNING: Unsigned and self-signed WebStart applications are deprecated from JDK7u21 onwards. "
+                + "To ensure future correct functionality please use trusted certificate." );
 
         if ( keystore != null && keystorealias != null && keystorepassword != null )
         {
@@ -220,8 +221,8 @@ public class CreateWebstartAppMojo
         }
         else if ( keystore != null || keystorepassword != null || keystorealias != null )
         {
-            throw new MojoFailureException(
-                    "If you want to sign the jnlp application, you need to define all three keystore related parameters." );
+            throw new MojoFailureException( "If you want to sign the jnlp application, "
+                                           + "you need to define all three keystore related parameters." );
         }
         else
         {
@@ -718,13 +719,13 @@ public class CreateWebstartAppMojo
             {
                 continue;
             }
+
+            int slash = codenamebase.indexOf( '/' );
+            if ( slash >= 0 )
             {
-                int slash = codenamebase.indexOf( '/' );
-                if ( slash >= 0 )
-                {
-                    codenamebase = codenamebase.substring( 0, slash );
-                }
+                codenamebase = codenamebase.substring( 0, slash );
             }
+
             String dashcnb = codenamebase.replace( '.', '-' );
 
             buff.append( "    <extension name='" ).append( codenamebase ).append( "' href='" ).append( masterPrefix ).

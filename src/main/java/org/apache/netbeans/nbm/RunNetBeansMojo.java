@@ -98,7 +98,8 @@ public class RunNetBeansMojo
         if ( !clusterBuildDir.exists() || clusterBuildDir.listFiles() == null )
         {
             throw new MojoExecutionException(
-                    "No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one." );
+                    "No clusters to include in execution found. "
+                    + "Please run the nbm:cluster or nbm:cluster-app goals before this one." );
         }
         File[] fls = clusterBuildDir.listFiles();
         for ( int i = 0; i < fls.length; i++ )
@@ -206,8 +207,8 @@ public class RunNetBeansMojo
                 String jdkHome = System.getenv( "JAVA_HOME" );
                 if ( jdkHome != null )
                 {
-                    if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists() ||
-                            new File( jdkHome, "bin\\windowsaccessbridge-64.dll" ).exists() )
+                    if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists()
+                         || new File( jdkHome, "bin\\windowsaccessbridge-64.dll" ).exists() )
                     {
                         File exec64 = new File( netbeansInstallation, "bin\\" + appName + "64.exe" );
                         if ( exec64.isFile() )
@@ -268,7 +269,8 @@ public class RunNetBeansMojo
     {
         if ( "true".equals( debugAdditionalArguments ) )
         {
-            return "-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
+            return "-Xdebug -Xnoagent -Djava.compiler=NONE "
+                   + "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
         }
         return debugAdditionalArguments;
     }
