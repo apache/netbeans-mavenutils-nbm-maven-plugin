@@ -43,6 +43,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Builds a macOS application bundle for Mavenized NetBeans application. <br>
@@ -178,13 +179,15 @@ public class BuildMacMojo
 
         if ( macInfoplistFile != null )
         {
-            String infoPListString = Files.lines( macInfoplistFile.toPath(  ) )
-                                           .map( s -> s.replace( "${app.title}", macAppTitle ) )
-                                           .map( s -> s.replace( "${app.name}", brandingToken ) )
-                                           .map( s -> s.replace( "${app.version}", project.getVersion(  ) ) )
-                                           .collect( Collectors.joining( "\n" ) );
+            try ( Stream<String> lines = Files.lines( macInfoplistFile.toPath(  ) ) ) 
+            {
+                String infoPListString = lines.map( s -> s.replace( "${app.title}", macAppTitle ) )
+                                              .map( s -> s.replace( "${app.name}", brandingToken ) )
+                                              .map( s -> s.replace( "${app.version}", project.getVersion(  ) ) )
+                                              .collect( Collectors.joining( "\n" ) );
 
-            Files.write( infoplist, infoPListString.getBytes(  ) );
+                Files.write( infoplist, infoPListString.getBytes(  ) );
+            }
         }
         else
         {
@@ -200,15 +203,17 @@ public class BuildMacMojo
                                                   + " or via macInfoplistFile parameter" );
             }
 
-            BufferedReader reader = new BufferedReader( new InputStreamReader( jarFile.getInputStream( entry ) ) );
+            try (BufferedReader reader =
+                    new BufferedReader( new InputStreamReader( jarFile.getInputStream( entry ) ) ) )
+            {
+                String infoPListString = reader.lines(  )
+                                               .map( s -> s.replace( "${app.title}", macAppTitle ) )
+                                               .map( s -> s.replace( "${app.name}", brandingToken ) )
+                                               .map( s -> s.replace( "${app.version}", project.getVersion(  ) ) )
+                                               .collect( Collectors.joining( "\n" ) );
 
-            String infoPListString = reader.lines(  )
-                                           .map( s -> s.replace( "${app.title}", macAppTitle ) )
-                                           .map( s -> s.replace( "${app.name}", brandingToken ) )
-                                           .map( s -> s.replace( "${app.version}", project.getVersion(  ) ) )
-                                           .collect( Collectors.joining( "\n" ) );
-
-            Files.write( infoplist, infoPListString.getBytes(  ) );
+                Files.write( infoplist, infoPListString.getBytes(  ) );
+            }
 
         }
 
