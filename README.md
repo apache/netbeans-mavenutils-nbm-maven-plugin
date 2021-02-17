@@ -21,7 +21,7 @@
 
 # Apache NetBeans Maven Utilities Shared lib
 
-[![Build Status](https://builds.apache.org/buildStatus/icon?job=netbeans-maven-TLP%2Fnetbeans-mavenutils-nbm-shared%2Fmaster)](https://builds.apache.org/job/netbeans-maven-TLP/job/netbeans-mavenutils-nbm-shared/job/master/)
+[![Build Status](https://ci-builds.apache.org/buildStatus/icon?job=Netbeans%2Fnetbeans-maven-TLP%2Fnetbeans-mavenutils-nbm-shared%2Fmaster)](https://ci-builds.apache.org/job/Netbeans/job/netbeans-maven-TLP/job/netbeans-mavenutils-nbm-shared/job/master/)
 
 [Documentation Site](https://bits.netbeans.org/mavenutilities/nbm-shared)
 
