@@ -333,7 +333,7 @@ under the License.
                                 <goal>install</goal>
                             </goals>
                             <filterProperties>
-                                <netbeans.version>RELEASE110</netbeans.version>
+                                <netbeans.version>RELEASE113</netbeans.version>
                             </filterProperties>
                         </configuration>
                         <executions>

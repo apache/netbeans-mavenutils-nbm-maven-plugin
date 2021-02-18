@@ -47,12 +47,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Pack200;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.maven.artifact.Artifact;
@@ -277,14 +274,11 @@ public class CreateClusterAppMojo
                                     boolean ispack200 = path.endsWith( ".jar.pack.gz" );
                                     if ( ispack200 )
                                     {
-                                        path = path.replace( ".jar.pack.gz", ".jar" );
+                                        throw new BuildException( "nbm-maven-plugin version 4.6 and later cannot "
+                                                + "use Pack200 use nbm-maven-plugin 4.5 on jdk 8" );
                                     }
                                     File fl = new File( nbmBuildDirFile, path.replace( "/", File.separator ) );
                                     String part = name.substring( "netbeans/".length() );
-                                    if ( ispack200 )
-                                    {
-                                        part = part.replace( ".jar.pack.gz", ".jar" );
-                                    }
                                     if ( cluster.newer )
                                     {
                                         if ( ent.isDirectory() )
@@ -325,24 +319,7 @@ public class CreateClusterAppMojo
                                             {
                                                 outstream = new BufferedOutputStream( new FileOutputStream( fl ) );
                                                 InputStream instream = jf.getInputStream( ent );
-                                                if ( ispack200 )
-                                                {
-                                                    Pack200.Unpacker unp = Pack200.newUnpacker();
-                                                    JarOutputStream jos = new JarOutputStream( outstream );
-                                                    GZIPInputStream gzip = new GZIPInputStream( instream );
-                                                    try
-                                                    {
-                                                        unp.unpack( gzip, jos );
-                                                    }
-                                                    finally
-                                                    {
-                                                        jos.close();
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    IOUtil.copy( instream, outstream );
-                                                }
+                                                IOUtil.copy( instream, outstream );
                                             }
                                             finally
                                             {
