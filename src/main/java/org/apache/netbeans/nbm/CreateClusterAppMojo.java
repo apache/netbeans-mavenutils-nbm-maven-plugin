@@ -327,17 +327,17 @@ public class CreateClusterAppMojo
                                                 InputStream instream = jf.getInputStream( ent );
                                                 if ( ispack200 )
                                                 {
+                                                    try ( JarOutputStream jos = new JarOutputStream( outstream ) )
+                                                    {
                                                     Pack200.Unpacker unp = Pack200.newUnpacker();
-                                                    JarOutputStream jos = new JarOutputStream( outstream );
                                                     GZIPInputStream gzip = new GZIPInputStream( instream );
-                                                    try
-                                                    {
-                                                        unp.unpack( gzip, jos );
+                                                    unp.unpack( gzip, jos );
                                                     }
-                                                    finally
+                                                    catch ( LinkageError cnfe )
                                                     {
-                                                        jos.close();
-                                                    }
+                                                        throw new BuildException( "Using jdk 14 and later prevents "
+                                                                + "reading of NBM created with pack200" );
+                                                    }                                                  
                                                 }
                                                 else
                                                 {
