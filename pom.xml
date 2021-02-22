@@ -57,6 +57,18 @@ under the License.
         <tag>HEAD</tag>
     </scm>
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
@@ -203,10 +215,10 @@ under the License.
                         <link>http://junit.sourceforge.net/javadoc/</link>
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                         <!-- unreachable site <link>http://jakarta.apache.org/regexp/apidocs/</link> -->
-                        <link>http://velocity.apache.org/engine/releases/velocity-1.5/apidocs/</link>
-                        <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-artifact/apidocs/</link>
-                        <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-model/apidocs/</link>
-                        <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-plugin-api/apidocs/</link>
+                        <link>https://velocity.apache.org/engine/1.5/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-model/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
                         <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-project/apidocs/</link>-->
                         <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-reporting/maven-reporting-api/apidocs/</link>-->
                         <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-settings/apidocs/</link>
@@ -293,6 +305,27 @@ under the License.
     </reporting>
     <profiles>
         <profile>
+            <activation>
+               <jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <release>8</release>                    
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <release>8</release>                                
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>tools.jar</id>
             <activation>
                 <file>
@@ -333,7 +366,7 @@ under the License.
                                 <goal>install</goal>
                             </goals>
                             <filterProperties>
-                                <netbeans.version>RELEASE110</netbeans.version>
+                                <netbeans.version>RELEASE113</netbeans.version>
                             </filterProperties>
                         </configuration>
                         <executions>
