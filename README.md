@@ -21,7 +21,7 @@
 
 # Apache NetBeans Maven Utilities parent pom
 
-[![Build Status](https://builds.apache.org/buildStatus/icon?job=netbeans-maven-TLP%2Fnetbeans-mavenutils-parent%2Fmaster)](https://builds.apache.org/view/M-R/view/NetBeans/job/netbeans-maven-TLP/job/netbeans-mavenutils-parent/job/master/)
+[![Build Status](https://ci-builds.apache.org/buildStatus/icon?job=Netbeans%2Fnetbeans-maven-TLP%2Fnetbeans-mavenutils-parent%2Fmaster)](https://ci-builds.apache.org/job/Netbeans/job/netbeans-maven-TLP/job/netbeans-mavenutils-parent/job/master/)
 
 [Documentation Site](https://bits.netbeans.org/mavenutilities/parent)
 
