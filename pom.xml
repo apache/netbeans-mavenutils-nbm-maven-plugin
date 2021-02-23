@@ -306,7 +306,7 @@ under the License.
     <profiles>
         <profile>
             <activation>
-               <jdk>[9,)</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <build>
                 <plugins>
@@ -315,15 +315,20 @@ under the License.
                         <configuration>
                             <release>8</release>                    
                         </configuration>
-                    </plugin>
+                    </plugin>                   
+                </plugins>
+            </build>
+            <reporting>
+                <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>                
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
                             <release>8</release>                                
                         </configuration>
                     </plugin>
                 </plugins>
-            </build>
+            </reporting>
         </profile>
         <profile>
             <id>tools.jar</id>
