@@ -31,7 +31,7 @@ an autoupdate site content or build and assemble an application on top of NetBea
 
  Note: The <<<nbm:populate-repository>>> goal has been moved to it's own plugin {{{../nb-repository-plugin/index.html}nb-repository-plugin}}.
 
- Also see: {{{http://wiki.netbeans.org/NetBeansDeveloperFAQ#Mavenized_Builds}Maven NBM development FAQs}}
+ Also see: {{{https://netbeans.apache.org/wiki/DevFaqIndex.asciidoc#_mavenized_builds}Maven NBM development FAQs}}
 
  Sample <<<pom.xml>>> excerpts for creation of a NetBeans module:
 
