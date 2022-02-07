@@ -61,11 +61,11 @@ under the License.
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.9.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -496,6 +496,12 @@ under the License.
             <artifactId>guava</artifactId>
             <version>18.0</version>
             <type>jar</type>
+        </dependency>
+        <!-- ASM 9.2 supports JDKs up to 18 -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>9.2</version>
         </dependency>
     </dependencies>
     <properties>
