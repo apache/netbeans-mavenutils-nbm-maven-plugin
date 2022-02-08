@@ -446,7 +446,7 @@ under the License.
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-analyzer</artifactId>
-            <version>1.11.3</version>
+            <version>1.12.0</version>
         </dependency>
         <!-- maven dependecy analyser version 1.8 will have the correct dependency -->
         <dependency>
@@ -496,12 +496,6 @@ under the License.
             <artifactId>guava</artifactId>
             <version>18.0</version>
             <type>jar</type>
-        </dependency>
-        <!-- ASM 9.2 supports JDKs up to 18 -->
-        <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>9.2</version>
         </dependency>
     </dependencies>
     <properties>
