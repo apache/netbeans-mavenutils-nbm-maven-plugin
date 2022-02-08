@@ -61,11 +61,11 @@ under the License.
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.9.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -446,7 +446,7 @@ under the License.
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-analyzer</artifactId>
-            <version>1.11.3</version>
+            <version>1.12.0</version>
         </dependency>
         <!-- maven dependecy analyser version 1.8 will have the correct dependency -->
         <dependency>
