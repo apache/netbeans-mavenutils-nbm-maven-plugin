@@ -82,6 +82,16 @@ public class CreateNbmMojo
      */
     @Parameter( property = "keystorealias" )
     private String keystorealias;
+    /**
+     * Timestamp Authority (TSA) URL
+     */
+    @Parameter( property = "tsaurl" )
+    private String tsaurl;
+    /**
+     * Timestamp Authority (TSA) Certificate
+     */
+    @Parameter( property = "tsacert" )
+    private String tsacert;
 
     /**
      * Boolean parameter denoting if creation of NBM file shall be skipped or not. If skipped, just the expanded
@@ -231,6 +241,12 @@ public class CreateNbmMojo
                 sig.setKeystore( ks );
                 sig.setAlias( keystorealias );
                 sig.setStorepass( keystorepassword );
+                if( tsaurl != null ) {
+                    sig.setTsaurl( tsaurl );
+                }
+                if( tsacert != null ) {
+                    sig.setTsacert( tsacert );
+                }
                 getLog().debug( "Setup the Ant task to sign the NBM file." );
             }
         }
