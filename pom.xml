@@ -502,6 +502,6 @@ under the License.
     </dependencies>
     <properties>
         <mojo.java.target>1.8</mojo.java.target>
-        <maven.version>3.0.5</maven.version>
+        <maven.version>3.8.5</maven.version>
     </properties>
 </project>
