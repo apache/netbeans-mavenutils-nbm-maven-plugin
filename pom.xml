@@ -227,7 +227,7 @@ under the License.
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.9.2</version>
+            <version>1.10.12</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
