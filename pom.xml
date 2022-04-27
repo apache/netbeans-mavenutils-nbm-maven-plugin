@@ -58,39 +58,33 @@ under the License.
                         <phase>generate-resources</phase>
                         <id>unpack-harness</id>
                         <goals>
-                            <goal>get</goal>
+                            <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <artifact>org.netbeans.modules:org-netbeans-modules-apisupport-harness:${netbeans.version}:nbm</artifact>
-                            <transitive>false</transitive>
-                            <remoteRepositories>${netbeans.repo}</remoteRepositories>
-                            <destination>${project.build.directory}/harness.nbm</destination>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <id>unpack-installer</id>
-                        <goals>
-                            <goal>get</goal>
-                        </goals>
-                        <configuration>
-                            <artifact>org.netbeans.modules:org-netbeans-libs-nbi-ant:${netbeans.version}:nbm</artifact>
-                            <transitive>false</transitive>
-                            <remoteRepositories>${netbeans.repo}</remoteRepositories>
-                            <destination>${project.build.directory}/nbi-ant.nbm</destination>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <id>unpack-installer-engine</id>
-                        <goals>
-                            <goal>get</goal>
-                        </goals>
-                        <configuration>
-                            <artifact>org.netbeans.modules:org-netbeans-libs-nbi-engine:${netbeans.version}:nbm</artifact>
-                            <transitive>false</transitive>
-                            <remoteRepositories>${netbeans.repo}</remoteRepositories>
-                            <destination>${project.build.directory}/nbi-engine.nbm</destination>
+                            <!-- copy to ${project.build.directory}/dependency folder by default -->
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.netbeans.modules</groupId>
+                                    <artifactId>org-netbeans-modules-apisupport-harness</artifactId>
+                                    <version>${netbeans.version}</version>
+                                    <type>nbm</type>
+                                    <destFileName>harness.nbm</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.netbeans.modules</groupId>
+                                    <artifactId>org-netbeans-libs-nbi-ant</artifactId>
+                                    <version>${netbeans.version}</version>
+                                    <type>nbm</type>
+                                    <destFileName>nbi-ant.nbm</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.netbeans.modules</groupId>
+                                    <artifactId>org-netbeans-libs-nbi-engine</artifactId>
+                                    <version>${netbeans.version}</version>
+                                    <type>nbm</type>
+                                    <destFileName>nbi-engine.nbm</destFileName>
+                                </artifactItem>
+                            </artifactItems>                            
                         </configuration>
                     </execution>
                 </executions>
@@ -107,7 +101,8 @@ under the License.
                         </goals>
                         <configuration>
                             <target>
-                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
+                                <property name="dependency.directory" value="${project.build.directory}/dependency/" />
+                                <unzip src="${dependency.directory}harness.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
                                         <include name="netbeans/etc/app.conf" />
                                         <include name="netbeans/etc/applicationIcon.icns" />
@@ -116,7 +111,7 @@ under the License.
                                     </patternset>
                                     <mapper type="glob" from="netbeans/*" to="harness/*" />
                                 </unzip>
-                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
+                                <unzip src="${dependency.directory}harness.nbm" dest="${project.build.directory}">
                                     <patternset>
                                         <include name="netbeans/tasks.jar" />
                                         <include name="netbeans/jnlp/jnlp-launcher.jar" />
@@ -125,14 +120,14 @@ under the License.
                                 </unzip>
                                 <mkdir dir="${project.build.directory}/classes/harness/jnlp" />
                                 <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes" />
-                                <unzip src="${project.build.directory}/nbi-ant.nbm" dest="${project.build.directory}/classes">
+                                <unzip src="${dependency.directory}nbi-ant.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
                                         <include name="netbeans/modules/" />
                                         <include name="netbeans/nbi/" />
                                     </patternset>
                                     <mapper type="glob" from="netbeans/*" to="harness/*" />
                                 </unzip>
-                                <unzip src="${project.build.directory}/nbi-engine.nbm" dest="${project.build.directory}/classes">
+                                <unzip src="${dependency.directory}nbi-engine.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
                                         <include name="netbeans/modules/" />
                                     </patternset>
@@ -240,7 +235,6 @@ under the License.
     </reporting>
     <properties>
         <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
-        <netbeans.repo>netbeans::default::https://repo1.maven.org/maven2/</netbeans.repo>
-        <netbeans.version>RELEASE122</netbeans.version>
+        <netbeans.version>RELEASE130</netbeans.version>
     </properties>
 </project>
