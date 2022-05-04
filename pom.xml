@@ -23,7 +23,7 @@ under the License.
     <parent>
         <groupId>org.apache.netbeans</groupId>
         <artifactId>netbeans-parent</artifactId>
-        <version>2</version>
+        <version>3</version>
     </parent>
     <groupId>org.apache.netbeans.utilities</groupId>
     <artifactId>utilities-parent</artifactId>
