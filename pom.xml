@@ -27,7 +27,7 @@ under the License.
     </parent>
     <groupId>org.apache.netbeans.utilities</groupId>
     <artifactId>utilities-parent</artifactId>
-    <version>2-SNAPSHOT</version>
+    <version>2</version>
     <packaging>pom</packaging>
     <name>Apache Netbeans Maven Utilities</name>
     <description>Apache Netbeans Maven Utilities is a set of artefacts to build and populate Apache NetBeans artefacts using Apache Maven</description>
@@ -43,7 +43,7 @@ under the License.
         <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-parent.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-parent.git</developerConnection>
         <url>https://github.com/apache/netbeans-mavenutils-parent</url>
-      <tag>HEAD</tag>
+      <tag>utilities-parent-2</tag>
   </scm>
     <dependencyManagement>
         <dependencies>
