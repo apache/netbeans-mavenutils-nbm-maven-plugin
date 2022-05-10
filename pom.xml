@@ -52,8 +52,25 @@ under the License.
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-shared.git</developerConnection>
         <url>https://github.com/apache/netbeans-mavenutils-nbm-shared</url>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <!-- last jdk 8 compatible version -->
+                            <version>9.3</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -101,7 +118,7 @@ under the License.
                             <report>project-team</report>
                             <report>scm</report>
                             <report>summary</report>
-                           
+
                         </reports>
                     </reportSet>
                 </reportSets>
@@ -177,10 +194,10 @@ under the License.
                         <excludedLink>plugin-info.html</excludedLink>
                     </excludedLinks>
                     <!--<excludedPages>
-                        <excludedPage>dependencies.html</excludedPage> 
+                        <excludedPage>dependencies.html</excludedPage>
                     </excludedPages>-->
                 </configuration>
-            </plugin>            
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
@@ -234,6 +251,6 @@ under the License.
     </dependencies>
     <properties>
         <mojo.java.target>1.6</mojo.java.target>
-        <maven.version>3.0.4</maven.version>
+        <maven.version>3.8.5</maven.version>
     </properties>
 </project>
