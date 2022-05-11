@@ -59,6 +59,23 @@ under the License.
     <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->    
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <!-- last jdk 8 compatible version -->
+                            <version>9.3</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
@@ -173,7 +190,7 @@ under the License.
                     <source>8</source>
                     <links>
                         <!--<link>http://download-llnw.oracle.com/javaee/1.4/api/</link>-->
-                        <!-- unreachable site <link>http://commons.apache.org/collections/apidocs-COLLECTIONS_3_0/</link>-->
+                        <link>https://commons.apache.org/proper/commons-collections/javadocs/api-3.2.2/</link>
                         <link>http://commons.apache.org/dbcp/apidocs/</link>
                         <link>http://commons.apache.org/fileupload/apidocs/</link>
                         <link>http://commons.apache.org/logging/apidocs/</link>
@@ -181,19 +198,17 @@ under the License.
                         <link>http://junit.sourceforge.net/javadoc/</link>
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                         <!-- unreachable site <link>http://jakarta.apache.org/regexp/apidocs/</link> -->
-                        <link>http://velocity.apache.org/engine/releases/velocity-1.5/apidocs/</link>
-                        <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-artifact/apidocs/</link>
-                        <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-model/apidocs/</link>
-                        <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-plugin-api/apidocs/</link>
-                        <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-project/apidocs/</link>-->
-                        <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-reporting/maven-reporting-api/apidocs/</link>-->
-                        <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-settings/apidocs/</link>
+                        <link>https://velocity.apache.org/engine/1.5/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-model/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
+                        <link>https://maven.apache.org/shared/maven-reporting-api/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-settings/apidocs/</link>
                     </links>
                     <tagletArtifacts>
                         <tagletArtifact>
                             <groupId>org.apache.maven.plugin-tools</groupId>
                             <artifactId>maven-plugin-tools-javadoc</artifactId>
-                            <version>3.4</version>
                         </tagletArtifact>
                         <tagletArtifact>
                             <groupId>org.codehaus.plexus</groupId>
@@ -306,6 +321,7 @@ under the License.
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${maven.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
@@ -327,11 +343,13 @@ under the License.
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
             <version>${maven.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
             <version>${maven.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-testing</groupId>
@@ -344,6 +362,7 @@ under the License.
             <artifactId>maven-compat</artifactId>
             <version>${maven.version}</version>
             <type>jar</type>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -359,8 +378,7 @@ under the License.
         </dependency>
     </dependencies>
     <properties>
-        <mojo.java.target>1.6</mojo.java.target>
-        <wagon.version>3.0.0</wagon.version>
+        <mojo.java.target>1.8</mojo.java.target>
         <maven.version>3.8.5</maven.version>
     </properties>
 </project>
