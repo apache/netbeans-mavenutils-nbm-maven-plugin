@@ -79,7 +79,7 @@ under the License.
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
                             <!-- last jdk 8 compatible version -->
-                            <version>9.3</version>
+                            <version>10.2</version>
                         </dependency>
                     </dependencies>
                 </plugin>
