@@ -38,6 +38,7 @@ import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
@@ -347,7 +348,7 @@ public abstract class AbstractNbmMojo
     }
 
     //copied from dependency:tree mojo
-    protected DependencyNode createDependencyTree( MavenProject project, DependencyGraphBuilder dependencyGraphBuilder,
+    protected DependencyNode createDependencyTree( ProjectBuildingRequest project, DependencyGraphBuilder dependencyGraphBuilder,
                                                    String scope )
             throws MojoExecutionException
     {
