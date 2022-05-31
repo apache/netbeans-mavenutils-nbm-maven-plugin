@@ -445,7 +445,7 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>3.5</version>
+            <version>4.2.7</version>
             <exclusions>
                 <exclusion>
                     <artifactId>plexus-component-api</artifactId>
@@ -491,10 +491,10 @@ under the License.
             <scope>test</scope>
         </dependency>
         <dependency>
-            <!-- use harness from NetBeans 12.2  -->
+            <!-- use harness from NetBeans 13.0  -->
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
-            <version>12.2</version>
+            <version>13.0</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
