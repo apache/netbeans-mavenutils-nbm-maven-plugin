@@ -146,6 +146,14 @@ public class NetBeansManifestUpdateMojo
     private File targetManifestFile;
 
     /**
+     * Default behaviour is to add module libraries of scope <code>compile</code> to the classpath and bundle them with
+     * the nbm file. If set to true, module libraries of scope <code>runtime</code> will also be added to the classpath
+     * and bundled with the nbm file.
+     */
+    @Parameter( property = "maven.nbm.includeRuntimeModuleLibraries", defaultValue = "false" )
+    private boolean includeRuntimeModuleLibraries;
+
+    /**
      * Verify the runtime NetBeans module dependencies and Class-Path items generated from Maven dependencies. The check
      * is done by matching classes used in current project. Allowed values for the parameter are <code>fail</code>,
      * <code>warn</code> and <code>skip</code>. The default is <code>fail</code> in which case the validation failure
@@ -465,7 +473,8 @@ public class NetBeansManifestUpdateMojo
         }
         getLog().debug( "module =" + module );
 
-        DependencyNode treeroot = createDependencyTree( project, dependencyGraphBuilder, "compile" );
+        final String scope = includeRuntimeModuleLibraries ? Artifact.SCOPE_COMPILE_PLUS_RUNTIME : Artifact.SCOPE_COMPILE;
+        DependencyNode treeroot = createDependencyTree( project, dependencyGraphBuilder, scope );
         Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
         @SuppressWarnings( "unchecked" )
         List<Artifact> libArtifacts = getLibraryArtifacts( treeroot, module, project.getRuntimeArtifacts(),
