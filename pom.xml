@@ -445,7 +445,7 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>3.5</version>
+            <version>4.2.7</version>
             <exclusions>
                 <exclusion>
                     <artifactId>plexus-component-api</artifactId>
