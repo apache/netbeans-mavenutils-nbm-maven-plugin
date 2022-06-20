@@ -24,10 +24,10 @@ under the License.
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>nb-repository-plugin-it-single-module</artifactId>
-    <build>
+     <!--<build>
         <plugins>
             <plugin>
-                <groupId>org.apache.netbeans.utilities</groupId>
+               <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nb-repository-plugin</artifactId>
                 <executions>
                     <execution>
@@ -43,5 +43,5 @@ under the License.
                 </executions>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
 </project>

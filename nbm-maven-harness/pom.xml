@@ -21,32 +21,16 @@ under the License.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
+     <parent>
         <groupId>org.apache.netbeans.utilities</groupId>
         <artifactId>utilities-parent</artifactId>
-        <version>2</version>
+        <version>14.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
-    <version>13.1-SNAPSHOT</version>
     <name>Apache NetBeans Maven Utilities - NBM Harness for Maven</name>
     <url>https://bits.netbeans.org/mavenutilities/nbm-maven-harness</url>
-    <issueManagement>
-        <system>jira</system>
-        <url>https://issues.apache.org/jira/browse/NETBEANS</url>
-    </issueManagement>
-    <licenses>
-        <license>
-            <name>Apache License 2</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-maven-harness.git</connection>
-        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-maven-harness.git</developerConnection>
-        <url>https://github.com/apache/netbeans-mavenutils-nbm-maven-harness</url>
-      <tag>HEAD</tag>
-  </scm>
+    
     <build>
         <plugins>
             <plugin>
@@ -223,7 +207,6 @@ under the License.
             <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
-                <version>0.13</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*.mf</exclude>
@@ -235,6 +218,6 @@ under the License.
     </reporting>
     <properties>
         <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
-        <netbeans.version>RELEASE130</netbeans.version>
+        <netbeans.version>RELEASE140</netbeans.version>
     </properties>
 </project>
