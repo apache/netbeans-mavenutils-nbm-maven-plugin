@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.apache.netbeans.utilities</groupId>
+        <artifactId>utilities-parent</artifactId>
+        <version>2</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>nb-shared</artifactId>
+    <version>1.5-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Apache NetBeans Maven Utilities - NBM Shared lib Plugins Utilities</name>
+    <description>Library used by nb-repository-plugin and nbm-maven-plugin to help building Apache NetBeans installation (and other sources).
+    </description>
+    <inceptionYear>2005</inceptionYear>
+    <url>https://bits.netbeans.org/mavenutilities/nbm-shared</url>
+    <issueManagement>
+        <system>jira</system>
+        <url>https://issues.apache.org/jira/browse/NETBEANS</url>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>Apache License 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-shared.git</connection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nbm-shared.git</developerConnection>
+        <url>https://github.com/apache/netbeans-mavenutils-nbm-shared</url>
+      <tag>HEAD</tag>
+    </scm>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <!-- last jdk 8 compatible version -->
+                            <version>9.3</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <signature>
+                                <groupId>org.codehaus.mojo.signature</groupId>
+                                <artifactId>java16</artifactId>
+                                <version>1.0</version>
+                            </signature>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>plugin-management</report>
+                            <report>plugins</report>
+                            <report>project-team</report>
+                            <report>scm</report>
+                            <report>summary</report>
+
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-changes-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <!-- <onlyCurrentVersion>true</onlyCurrentVersion>-->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <quiet>true</quiet>
+                    <source>8</source>
+                    <links>
+                        <!--<link>http://download-llnw.oracle.com/javaee/1.4/api/</link>-->
+                        <link>https://commons.apache.org/proper/commons-collections/javadocs/api-3.2.2/</link>
+                        <link>http://commons.apache.org/dbcp/apidocs/</link>
+                        <link>http://commons.apache.org/fileupload/apidocs/</link>
+                        <link>http://commons.apache.org/logging/apidocs/</link>
+                        <link>http://commons.apache.org/pool/apidocs/</link>
+                        <link>http://junit.sourceforge.net/javadoc/</link>
+                        <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                        <link>https://velocity.apache.org/engine/1.5/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-model/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
+                        <link>https://maven.apache.org/shared/maven-reporting-api/apidocs/</link>
+                        <link>http://maven.apache.org/ref/${maven.version}/maven-settings/apidocs/</link>
+                    </links>
+                    <tagletArtifacts>
+                        <tagletArtifact>
+                            <groupId>org.apache.maven.plugin-tools</groupId>
+                            <artifactId>maven-plugin-tools-javadoc</artifactId>
+                        </tagletArtifact>
+                        <tagletArtifact>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-component-javadoc</artifactId>
+                            <version>1.5.5</version>
+                        </tagletArtifact>
+                    </tagletArtifacts>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <targetJdk>1.6</targetJdk>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-linkcheck-plugin</artifactId>
+                <configuration>
+                    <excludedLinks>
+                        <excludedLink>../../images/codehaus-small.png</excludedLink>
+                        <excludedLink>../../images/mojo_logo.png</excludedLink>
+                        <excludedLink>plugin-info.html</excludedLink>
+                    </excludedLinks>
+                    <!--<excludedPages>
+                        <excludedPage>dependencies.html</excludedPage>
+                    </excludedPages>-->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <version>0.13</version>
+            </plugin>
+        </plugins>
+    </reporting>
+    <!--profiles>
+        <profile>
+            <id>tools.jar</id>
+            <activation>
+                <file>
+                    <exists>${java.home}/../lib/tools.jar</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>1.5.0</version>
+                    <scope>system</scope>
+                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles-->
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>3.8.5</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.10.12</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+    <properties>
+        <mojo.java.target>1.6</mojo.java.target>
+        <maven.version>3.8.5</maven.version>
+    </properties>
+</project>
