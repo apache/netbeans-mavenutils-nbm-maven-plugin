@@ -21,16 +21,24 @@ under the License.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-     <parent>
+
+    <parent>
         <groupId>org.apache.netbeans.utilities</groupId>
         <artifactId>utilities-parent</artifactId>
         <version>14.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
+
     <artifactId>nbm-maven-harness</artifactId>
+
     <name>Apache NetBeans Maven Utilities - NBM Harness for Maven</name>
     <url>https://bits.netbeans.org/mavenutilities/nbm-maven-harness</url>
-    
+
+    <properties>
+        <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
+        <netbeans.version>RELEASE140</netbeans.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -190,6 +198,7 @@ under the License.
             </plugin>
         </plugins>
     </build>
+
     <reporting>
         <plugins>
             <plugin>
@@ -216,8 +225,4 @@ under the License.
             </plugin>
         </plugins>
     </reporting>
-    <properties>
-        <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
-        <netbeans.version>RELEASE140</netbeans.version>
-    </properties>
 </project>

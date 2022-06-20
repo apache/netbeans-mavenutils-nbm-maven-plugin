@@ -20,13 +20,14 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.apache.netbeans.utilities</groupId>
         <artifactId>utilities-parent</artifactId>
         <version>14.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nb-repository-plugin</artifactId>
     <packaging>maven-plugin</packaging>
@@ -34,15 +35,8 @@ under the License.
     <name>Apache NetBeans Maven Utilities - NB Repository Plugin</name>
     <description>Maven plugin for creating Maven Repository out of a NetBeans installation (and other sources) for consumption by the projects using nbm-maven-plugin.
     </description>
-    <inceptionYear>2005</inceptionYear>
     <url>https://bits.netbeans.org/mavenutilities/nb-repository-plugin</url>
-    <issueManagement>
-        <system>jira</system>
-        <url>https://issues.apache.org/jira/browse/NETBEANSINFRA</url>
-    </issueManagement>
-    <prerequisites>
-        <maven>3.1.1</maven>
-    </prerequisites>
+    <inceptionYear>2005</inceptionYear>
     <licenses>
         <license>
             <name>Apache License 2</name>
@@ -50,18 +44,112 @@ under the License.
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <prerequisites>
+        <maven>3.1.1</maven>
+    </prerequisites>
+
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nb-repository-plugin.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/netbeans-mavenutils-nb-repository-plugin.git</developerConnection>
         <url>https://github.com/apache/netbeans-mavenutils-nb-repository-plugin</url>
       <tag>HEAD</tag>
     </scm>
-    <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->    
+    <issueManagement>
+        <system>jira</system>
+        <url>https://issues.apache.org/jira/browse/NETBEANSINFRA</url>
+    </issueManagement>
 
+    <properties>
+        <mojo.java.target>1.8</mojo.java.target>
+        <maven.version>3.8.5</maven.version>
+    </properties>
+
+    <!--profiles>
+        <profile>
+            <id>tools.jar</id>
+            <activation>
+                <file>
+                    <exists>${java.home}/../lib/tools.jar</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>1.5.0</version>
+                    <scope>system</scope>
+                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles-->
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>${maven.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <version>3.6.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${maven.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>${maven.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugin-testing</groupId>
+            <artifactId>maven-plugin-testing-harness</artifactId>
+            <version>3.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${maven.version}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.10.12</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nb-shared</artifactId>
+            <version>1.4</version>
+        </dependency>
+    </dependencies>
+
+    <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
     <build>
         <plugins>
-            <plugin>
-                <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
+            <plugin><!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.6.4</version>
@@ -117,6 +205,7 @@ under the License.
             </plugin>
         </plugins>
     </build>
+
     <reporting>
         <plugins>
             <plugin>
@@ -141,11 +230,10 @@ under the License.
                     <!--<skip>true</skip>-->
                     <component>12336704</component>
                 </configuration>
-               
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>                           
+                <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -200,7 +288,6 @@ under the License.
                         </tagletArtifact>
                     </tagletArtifacts>
                 </configuration>
-               
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -218,7 +305,7 @@ under the License.
                     <!--<excludedPages>
                         <excludedPage>dependencies.html</excludedPage> 
                     </excludedPages>-->
-                </configuration>	       
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -231,6 +318,7 @@ under the License.
             </plugin>
         </plugins>
     </reporting>
+
     <profiles>
         <profile>
             <id>run-its</id>
@@ -275,89 +363,4 @@ under the License.
             </build>
         </profile>
     </profiles>
-    <!--profiles>
-        <profile>
-            <id>tools.jar</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
-                </file>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                    <version>1.5.0</version>
-                    <scope>system</scope>
-                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles-->
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>${maven.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugin-tools</groupId>
-            <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.6.4</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>3.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <version>${maven.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-core</artifactId>
-            <version>${maven.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugin-testing</groupId>
-            <artifactId>maven-plugin-testing-harness</artifactId>
-            <version>3.3.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-compat</artifactId>
-            <version>${maven.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.10.12</version>
-            <scope>compile</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nb-shared</artifactId>
-            <version>1.4</version>
-        </dependency>
-    </dependencies>
-    <properties>
-        <mojo.java.target>1.8</mojo.java.target>
-        <maven.version>3.8.5</maven.version>
-    </properties>
 </project>
