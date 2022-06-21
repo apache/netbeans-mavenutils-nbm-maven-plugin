@@ -47,11 +47,6 @@ under the License.
         <url>https://issues.apache.org/jira/browse/NETBEANSINFRA</url>
     </issueManagement>
 
-    <properties>
-        <mojo.java.target>1.8</mojo.java.target>
-        <maven.version>3.8.5</maven.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -78,7 +73,6 @@ under the License.
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.10.12</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -143,7 +137,7 @@ under the License.
         <dependency><!-- use harness from NetBeans 13.0  -->
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
-            <version>13.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -153,7 +147,7 @@ under the License.
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nb-shared</artifactId>
-            <version>1.4</version>
+            <version>${project.version}</version>
         </dependency>
         <!--<dependency>
             <groupId>com.google.guava</groupId>
@@ -195,14 +189,13 @@ under the License.
                     <configuration>
                         <source>1.8</source>
                     </configuration>
-                </plugin>
+                </plugin>                
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin><!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.6.4</version>
                 <configuration>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
@@ -380,7 +373,6 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.6.4</version>
                 <configuration>
                     <requirements>
                         <!--
@@ -454,7 +446,7 @@ under the License.
                 </plugins>
             </reporting>
         </profile>
-        <profile>
+       <!-- <profile>
             <id>tools.jar</id>
             <activation>
                 <file>
@@ -470,7 +462,7 @@ under the License.
                     <systemPath>${java.home}/../lib/tools.jar</systemPath>
                 </dependency>
             </dependencies>
-        </profile>
+        </profile>-->
         <profile>
             <id>run-its</id>
             <build>

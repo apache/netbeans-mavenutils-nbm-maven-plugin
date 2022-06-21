@@ -42,11 +42,6 @@ under the License.
         <url>https://issues.apache.org/jira/browse/NETBEANS</url>
     </issueManagement>
 
-    <properties>
-        <mojo.java.target>1.6</mojo.java.target>
-        <maven.version>3.8.5</maven.version>
-    </properties>
-
     <!--profiles>
         <profile>
             <id>tools.jar</id>
@@ -70,7 +65,7 @@ under the License.
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>3.8.5</version>
+            <version>${maven.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -80,7 +75,6 @@ under the License.
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.10.12</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -108,7 +102,7 @@ under the License.
                         <configuration>
                             <signature>
                                 <groupId>org.codehaus.mojo.signature</groupId>
-                                <artifactId>java16</artifactId>
+                                <artifactId>java18</artifactId>
                                 <version>1.0</version>
                             </signature>
                         </configuration>

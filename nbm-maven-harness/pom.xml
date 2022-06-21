@@ -32,7 +32,6 @@ under the License.
     <artifactId>nbm-maven-harness</artifactId>
 
     <name>Apache NetBeans Maven Utilities - NBM Harness for Maven</name>
-    <url>https://bits.netbeans.org/mavenutilities/nbm-maven-harness</url>
 
     <properties>
         <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
