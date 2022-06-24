@@ -61,7 +61,8 @@
 
     <properties>
         <!--  <mojo.java.target>1.6</mojo.java.target> -->
-        <maven.version>3.8.5</maven.version>
+        <maven.version>3.8.6</maven.version>
+        <maven.minimum.version>3.6.3</maven.minimum.version>
     </properties>
 
     <dependencyManagement>
@@ -83,6 +84,10 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>animal-sniffer-maven-plugin</artifactId>
