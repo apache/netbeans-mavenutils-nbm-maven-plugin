@@ -36,8 +36,6 @@ See this page {{{http://netbeans.apache.org/download/dev/index.html}Building fro
  For the complete upload, you will need to checkout the sources of the IDE/Platform you
 want to upload. See this page {{{http://netbeans.apache.org/download/dev/index.html}Building from source}}
 
- To have external dependencies correctly identified by their real GAV, you will need to download the index from central (or other) repository. 
-See {{{./download-mojo.html}<<<download>>> goal}}
 
  The goal has multiple input parameters that link the goal to binaries prepared beforehand.
 

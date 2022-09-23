@@ -84,7 +84,7 @@ import org.codehaus.plexus.util.IOUtil;
  * repository with them. Optionally you can also deploy to a remote repository.
  * <p>
  * If you are looking for an existing remote repository for NetBeans artifacts, check out <a href="https://search.maven.org/">Maven Central</a>.
- * <a href="http://bits.netbeans.org/nexus/content/groups/netbeans/">http://bits.netbeans.org/nexus/content/groups/netbeans/</a>,
+ * <a href="https://netbeans.apidesign.org/maven2/">https://netbeans.apidesign.org/maven2/</a>,
  * contains contains API artifacts for older NetBeans releases.
  * <a href="https://repository.apache.org/content/groups/snapshots">https://repository.apache.org/content/groups/snapshots</a>
  * may also be used for <code>dev-SNAPSHOT</code> artifacts if you wish to test development builds.

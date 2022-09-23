@@ -32,7 +32,7 @@
 
     <name>Apache Netbeans Maven Utilities</name>
     <description>Apache Netbeans Maven Utilities is a set of artefacts to build and populate Apache NetBeans artefacts using Apache Maven</description>
-    <url>https://bits.netbeans.org/mavenutilities/parent</url>
+    <url>https://bits.netbeans.org/mavenutilities/nbm-maven-plugin</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -42,7 +42,7 @@
     </licenses>
 
     <modules>
-        <module>nbm-shared</module>
+        <module>nb-shared</module>
         <module>nbm-maven-harness</module>
         <module>nb-repository-plugin</module>
         <module>nbm-maven-plugin</module>
@@ -58,7 +58,12 @@
         <system>jira</system>
         <url>https://issues.apache.org/jira/browse/NETBEANSINFRA</url>
     </issueManagement>
-
+    <distributionManagement>
+        <site>
+            <id>netbeans.bits</id>
+            <url>https://bits.netbeans.org/mavenutilities/nbm-maven-plugin</url>
+        </site>
+    </distributionManagement>
     <properties>
         <!--  <mojo.java.target>1.6</mojo.java.target> -->
         <maven.version>3.8.6</maven.version>
@@ -91,7 +96,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>animal-sniffer-maven-plugin</artifactId>
-                    <version>1.21</version>
+                    <version>1.22</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-changes-plugin</artifactId>
@@ -99,7 +104,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <configLocation>config/maven_checks.xml</configLocation>
                         <headerLocation>config/maven-header.txt</headerLocation>
@@ -120,11 +125,11 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-jxr-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.17.0</version>
+                    <version>3.19.0</version>
                     <configuration>
                         <targetJdk>1.8</targetJdk>
                     </configuration>
@@ -136,7 +141,7 @@
                 <plugin>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>
-                    <version>0.14</version>
+                    <version>0.15</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -144,11 +149,11 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.4.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.4.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-plugin-plugin</artifactId>
@@ -157,4 +162,18 @@
             </plugins>
         </pluginManagement>
     </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

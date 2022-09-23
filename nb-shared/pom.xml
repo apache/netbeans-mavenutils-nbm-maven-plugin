@@ -116,22 +116,17 @@ under the License.
 
     <reporting>
         <plugins>
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <reportSets>
                     <reportSet>
                         <reports>
-                            <report>plugin-management</report>
-                            <report>plugins</report>
-                            <report>project-team</report>
-                            <report>scm</report>
-                            <report>summary</report>
-
+                            <report>index</report>
                         </reports>
                     </reportSet>
                 </reportSets>
-            </plugin>-->
+            </plugin>
             <plugin>
                 <artifactId>maven-changes-plugin</artifactId>
                 <configuration>

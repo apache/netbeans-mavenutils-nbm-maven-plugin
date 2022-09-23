@@ -35,14 +35,7 @@ under the License.
     <name>Apache NetBeans Maven Utilities - NB Repository Plugin</name>
     <description>Maven plugin for creating Maven Repository out of a NetBeans installation (and other sources) for consumption by the projects using nbm-maven-plugin.
     </description>
-    <inceptionYear>2005</inceptionYear>
-    <licenses>
-        <license>
-            <name>Apache License 2</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+    <inceptionYear>2005</inceptionYear>    
 
     <!--profiles>
         <profile>

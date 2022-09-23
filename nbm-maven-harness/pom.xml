@@ -203,6 +203,7 @@ under the License.
                     <reportSet>
                         <reports>
                             <report>plugins</report>
+                            <report>index</report>
                             <!-- <report>cim</report> -->
                         </reports>
                     </reportSet>
