@@ -15,13 +15,27 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd" combine.self="override">
     <skin>
         <groupId>org.apache.netbeans.utilities</groupId>
         <artifactId>maven-netbeans-skin</artifactId>
         <version>1.0-SNAPSHOT</version>
     </skin>
-    <body>  
+    <body>
+        <links>
+            <item name="NB Repository Plugin" href="../nb-repository-plugin/index.html"/>
+            <item name="NBM Plugin" href="../nbm-maven-plugin/index.html"/>
+            <item name="Shared" href="../nb-shared/index.html"/>
+            <item name="Harness"/>
+            <item name="Parent" href="../index.html"/>          
+        </links>
     </body>
+    <custom>
+        <NetBeanSkin>
+            <gitHub>
+                <projectId>apache/netbeans-mavenutils-nbm-maven-plugin</projectId>
+            </gitHub>
+        </NetBeanSkin>
+    </custom>
 </project>
 

@@ -201,7 +201,7 @@ public abstract class CreateNetBeansFileStructure
     /**
      * list of groupId:artifactId pairs describing libraries that go into the nbm file and will only include the
      * .external reference in the nbm instead of the actual binary. See
-     * <a href="http://netbeans.org/bugzilla/show_bug.cgi?id=195041">NetBeans issue #195041</a> for details. Please note
+     * <a href="https://bz.apache.org/netbeans/show_bug.cgi?id=195041">NetBeans issue #195041</a> for details. Please note
      * that the scheme will only work for artifacts present in central repository but no effort is made at build time to
      * enforce that. Additionally at runtime when installing the module, the user has to be online and be capable of
      * reaching central using maven. You have been warned.

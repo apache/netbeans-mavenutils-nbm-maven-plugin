@@ -302,7 +302,7 @@ important nodes in projects view, running module(s) in the IDE or Platform.
 
 Old NetBeans Version
 
- To get access to a repository with NetBeans.org module artifacts and metadata, add {{{http://bits.netbeans.org/maven2/}http://bits.netbeans.org/maven2/}} repository to your project POM
+ To get access to a repository with NetBeans.org module artifacts and metadata, add {{{https://netbeans.apidesign.org/maven2/}https://netbeans.apidesign.org/maven2/}} repository to your project POM
 or the repository manager you are using. The repository hosts binaries from NetBeans 6.5 up to NetBeans 8.2.
 
 +-----+
@@ -311,7 +311,7 @@ or the repository manager you are using. The repository hosts binaries from NetB
         <repository>
             <id>netbeans</id>
             <name>repository hosting netbeans.org api artifacts</name>
-            <url>http://bits.netbeans.org/maven2/</url>
+            <url>https://netbeans.apidesign.org/maven2/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>

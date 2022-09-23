@@ -31,10 +31,10 @@ See the {{{./populate-mojo.html}<<<populate>>>}} goal and the {{{./repository.ht
 
  {{{https://search.maven.org/}Maven Central}} contains artefacts of Apache NetBeans 9.0 and later.
 
- Also see: {{{http://wiki.netbeans.org/NetBeansDeveloperFAQ#Mavenized_Builds}Maven NBM development FAQs}}
+ Also see: {{{https://netbeans.apache.org/wiki/DevFaqIndex.asciidoc#_mavenized_builds}Maven NBM development FAQs}}
 
 Older NetBeans Version
 
- To get access to a repository with NetBeans.org module artifacts and metadata, add {{{http://bits.netbeans.org/maven2/}http://bits.netbeans.org/maven2/}} repository to your project POM
+ To get access to a repository with NetBeans.org module artifacts and metadata, add {{{https://netbeans.apidesign.org/maven2/}https://netbeans.apidesign.org/maven2/}} repository to your project POM
 or the repository manager you are using. The repository hosts binaries from NetBeans 6.5 to NetBeans 8.2.
 
