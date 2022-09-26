@@ -183,7 +183,7 @@ under the License.
             <!-- No real effect on the build, but prevents NB IDE from thinking src/main/java should be considered in preference to the JAR: -->
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <goals>
