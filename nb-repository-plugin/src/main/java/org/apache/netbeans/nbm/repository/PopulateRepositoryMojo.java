@@ -532,7 +532,7 @@ public class PopulateRepositoryMojo
                 {
                     try
                     {
-                        moduleJarMinusCP = File.createTempFile( man.getArtifact(), ".jar" );
+                        moduleJarMinusCP = Files.createTempFile( man.getArtifact(), ".jar" ).toFile();
                         moduleJarMinusCP.deleteOnExit();
                         InputStream is = new FileInputStream( moduleJar );
                         try
@@ -936,7 +936,7 @@ public class PopulateRepositoryMojo
         try
         {
             MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = File.createTempFile( "maven", ".pom" );
+            fil = Files.createTempFile( "maven", ".pom" ).toFile();
             fil.deleteOnExit();
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
@@ -1049,7 +1049,7 @@ public class PopulateRepositoryMojo
         try
         {
             MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = File.createTempFile( "maven", ".pom" );
+            fil = Files.createTempFile( "maven", ".pom" ).toFile();
             fil.deleteOnExit();
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
@@ -1135,7 +1135,7 @@ public class PopulateRepositoryMojo
         try
         {
             MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = File.createTempFile( "maven", ".pom" );
+            fil = Files.createTempFile( "maven", ".pom" ).toFile();
             fil.deleteOnExit();
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );

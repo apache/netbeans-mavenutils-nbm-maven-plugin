@@ -22,6 +22,8 @@ package org.apache.netbeans.nbm.utils;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+
 import junit.framework.TestCase;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 
@@ -37,7 +39,7 @@ public class ExamineManifestTest extends TestCase
             throws Exception
     {
         ExamineManifest em = new ExamineManifest( new SystemStreamLog() );
-        File mf = File.createTempFile( "ExamineManifestTes", ".mf" );
+        File mf = Files.createTempFile( "ExamineManifestTes", ".mf" ).toFile();
         mf.deleteOnExit();
         PrintWriter w = new PrintWriter( mf );
         w.println( "OpenIDE-Module: org.netbeans.modules.nbjunit/1" );
@@ -67,7 +69,7 @@ public class ExamineManifestTest extends TestCase
             throws Exception
     {
         ExamineManifest em = new ExamineManifest( new SystemStreamLog() );
-        File mf = File.createTempFile( "ExamineManifestTest", ".mf" );
+        File mf = Files.createTempFile( "ExamineManifestTest", ".mf" ).toFile();
         mf.deleteOnExit();
         PrintWriter w = new PrintWriter( mf );
         w.println( "Bundle-SymbolicName: org.eclipse.jdt.core; singleton:=true" );
