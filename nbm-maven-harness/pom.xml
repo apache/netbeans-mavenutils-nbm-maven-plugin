@@ -35,7 +35,7 @@ under the License.
 
     <properties>
         <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
-        <netbeans.version>RELEASE140</netbeans.version>
+        <netbeans.version>RELEASE160</netbeans.version>
     </properties>
 
     <build>

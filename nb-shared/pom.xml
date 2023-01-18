@@ -149,7 +149,7 @@ under the License.
                         <link>http://commons.apache.org/fileupload/apidocs/</link>
                         <link>http://commons.apache.org/logging/apidocs/</link>
                         <link>http://commons.apache.org/pool/apidocs/</link>
-                        <link>http://junit.sourceforge.net/javadoc/</link>
+                        <link>https://junit.org/junit4/javadoc/latest/</link>
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                         <link>https://velocity.apache.org/engine/1.5/apidocs/</link>
                         <link>http://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>

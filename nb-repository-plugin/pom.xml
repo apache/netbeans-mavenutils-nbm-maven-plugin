@@ -71,7 +71,7 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.4.2</version>
+            <version>3.5.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -243,7 +243,7 @@ under the License.
                         <link>http://commons.apache.org/fileupload/apidocs/</link>
                         <link>http://commons.apache.org/logging/apidocs/</link>
                         <link>http://commons.apache.org/pool/apidocs/</link>
-                        <link>http://junit.sourceforge.net/javadoc/</link>
+                        <link>https://junit.org/junit4/javadoc/latest/</link>
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                         <!-- unreachable site <link>http://jakarta.apache.org/regexp/apidocs/</link> -->
                         <link>https://velocity.apache.org/engine/1.5/apidocs/</link>
@@ -302,7 +302,7 @@ under the License.
                 <plugins>
                     <plugin>
                         <artifactId>maven-invoker-plugin</artifactId>
-                        <version>3.3.0</version>
+                        <version>3.4.0</version>
                         <configuration>
                             <debug>false</debug>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
