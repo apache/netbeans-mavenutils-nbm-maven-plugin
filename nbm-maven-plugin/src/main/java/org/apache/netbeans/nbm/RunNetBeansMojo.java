@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -84,6 +86,8 @@ public class RunNetBeansMojo
     @Parameter( property = "netbeans.run.params.debug" )
     protected String debugAdditionalArguments;
 
+    private static final Pattern EXE_FILE = Pattern.compile("(64)?([.]exe)?$");
+
     /**
      *
      * @throws MojoExecutionException if an unexpected problem occurs
@@ -135,7 +139,7 @@ public class RunNetBeansMojo
                 {
                     continue;
                 }
-                name = name.replaceFirst( "(64)?([.]exe)?$", "" );
+                name = EXE_FILE.matcher(name).replaceFirst( "" );
                 if ( !name.contains( "." ) )
                 {
                     if ( appName == null )

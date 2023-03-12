@@ -878,6 +878,8 @@ public class NetBeansManifestUpdateMojo
         return projectClasses;
     }
 
+    private static final Pattern FILTER = Pattern.compile( "(.+)" );
+
     private Set<String>[] visibleModuleClasses( List<Artifact> moduleLibraries,
             ExamineManifest manifest, Dependency dep, String projectCodeNameBase,
             boolean transitive )
@@ -925,7 +927,7 @@ public class NetBeansManifestUpdateMojo
             if ( useOSGiDependencies && manifest.isOsgiBundle() )
             {
                 // TODO how to extract the public packages in osgi bundles easily..
-                compiled = Collections.singletonList( Pattern.compile( "(.+)" ) );
+                compiled = Collections.singletonList(FILTER);
             }
             for ( String clazz : moduleClasses )
             {
