@@ -404,12 +404,7 @@ public class PopulateRepositoryMojo
                 }
                 wr.setCluster( clust );
                 moduleDefinitions.put( wr, art );
-                Collection<ModuleWrapper> col = clusters.get( clust );
-                if ( col == null )
-                {
-                    col = new ArrayList<>();
-                    clusters.put( clust, col );
-                }
+                Collection<ModuleWrapper> col = clusters.computeIfAbsent(clust, k -> new ArrayList<>());
                 col.add( wr );
             }
         }

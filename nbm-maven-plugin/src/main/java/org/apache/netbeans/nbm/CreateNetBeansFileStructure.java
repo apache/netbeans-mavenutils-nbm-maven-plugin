@@ -502,12 +502,7 @@ public abstract class CreateNetBeansFileStructure
                     if ( res.getRelativeClusterPath() != null )
                     {
                         File path = new File( clusterDir, res.getRelativeClusterPath() );
-                        Collection<FileSet> col = customPaths.get( path );
-                        if ( col == null )
-                        {
-                            col = new ArrayList<>();
-                            customPaths.put( path, col );
-                        }
+                        Collection<FileSet> col = customPaths.computeIfAbsent(path, k -> new ArrayList<>());
                         col.add( set );
                     }
                     else
