@@ -732,7 +732,7 @@ public class CreateClusterAppMojo
     private static final int SET_INITIAL_SIZE = 200;
     private static final int MAP_INITIALSIZE = 50;
     private static final Pattern PATT = Pattern.compile(
-            ".*targetcluster=\"([a-zA-Z0-9_\\.\\-]+)\".*", Pattern.DOTALL );
+            ".*targetcluster=\"([\\w\\.\\-]+)\".*", Pattern.DOTALL );
 
     private String findCluster( JarFile jf )
             throws MojoFailureException, IOException
