@@ -103,6 +103,7 @@ public abstract class CreateNetBeansFileStructure
      * 4.0 entirely
      */
     @Parameter( defaultValue = "${basedir}/src/main/nbm/module.xml" )
+    @Deprecated
     protected File descriptor;
     /**
      * NetBeans module's cluster. Replaces the cluster element in module descriptor.
