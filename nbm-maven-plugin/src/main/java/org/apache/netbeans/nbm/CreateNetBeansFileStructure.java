@@ -258,7 +258,7 @@ public abstract class CreateNetBeansFileStructure
             moduleName = module.getCodeNameBase();
             getLog().warn( "codeNameBase in module descriptor is deprecated, use the plugin's parameter codeNameBase" );
         }
-        moduleName = NetBeansManifestUpdateMojo.stripVersionFromCodebaseName( moduleName.replaceAll( "-", "." ) );
+        moduleName = NetBeansManifestUpdateMojo.stripVersionFromCodebaseName( moduleName.replace( "-", "." ) );
         moduleJarName = moduleName.replace( '.', '-' );
         if ( "extra".equals( cluster ) && module.getCluster() != null )
         {

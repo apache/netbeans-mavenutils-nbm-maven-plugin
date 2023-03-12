@@ -210,10 +210,10 @@ public class BuildInstallersMojo
                 replaceAll( "[0-9]+", "" );
         props.put( "suite.nbi.product.uid", appName.toLowerCase( Locale.ENGLISH ) );
 
-        props.put( "suite.props.app.title", ( project.getName() + " " + project.getVersion() ).replaceAll( "-SNAPSHOT",
+        props.put( "suite.props.app.title", ( project.getName() + " " + project.getVersion() ).replace( "-SNAPSHOT",
                 "" ) );
 
-        String appVersion = project.getVersion().replaceAll( "-SNAPSHOT", "" );
+        String appVersion = project.getVersion().replace( "-SNAPSHOT", "" );
         props.put( "suite.nbi.product.version.short", appVersion );
         while ( appVersion.split( "\\." ).length < 5 )
         {
