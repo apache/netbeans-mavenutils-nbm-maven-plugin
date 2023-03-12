@@ -1121,12 +1121,7 @@ public class CreateClusterAppMojo
 
     private static void addToMap( Map<String, Set<String>> map, String clusterName, List<String> newValues )
     {
-        Set<String> lst = map.get( clusterName );
-        if ( lst == null )
-        {
-            lst = new HashSet<>();
-            map.put( clusterName, lst );
-        }
+        Set<String> lst = map.computeIfAbsent( clusterName, k -> new HashSet<>() );
         if ( newValues != null )
         {
             lst.addAll( newValues );
