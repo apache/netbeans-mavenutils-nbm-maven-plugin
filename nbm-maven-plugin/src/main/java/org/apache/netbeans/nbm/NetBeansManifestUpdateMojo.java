@@ -347,7 +347,7 @@ public class NetBeansManifestUpdateMojo
             moduleName = module.getCodeNameBase();
             getLog().warn( "codeNameBase in module descriptor is deprecated, use the plugin's parameter codeNameBase" );
         }
-        moduleName = moduleName.replaceAll( "-", "." );
+        moduleName = moduleName.replace( "-", "." );
 //<!-- if a NetBeans specific manifest is defined, examine this one, otherwise the already included one.
 // ignoring the case when some of the NetBeans attributes are already defined in the jar and more is included.
         File specialManifest = sourceManifestFile;
