@@ -35,14 +35,14 @@ under the License.
 
     <properties>
         <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
-        <netbeans.version>RELEASE160</netbeans.version>
+        <netbeans.version>RELEASE170</netbeans.version>
     </properties>
 
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
@@ -183,7 +183,7 @@ under the License.
             <!-- No real effect on the build, but prevents NB IDE from thinking src/main/java should be considered in preference to the JAR: -->
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
                         <goals>
