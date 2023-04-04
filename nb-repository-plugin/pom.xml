@@ -71,7 +71,7 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.5.0</version>
+            <version>3.5.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -163,6 +163,7 @@ under the License.
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
             <plugin>
@@ -302,7 +303,7 @@ under the License.
                 <plugins>
                     <plugin>
                         <artifactId>maven-invoker-plugin</artifactId>
-                        <version>3.4.0</version>
+                        <version>3.5.1</version>
                         <configuration>
                             <debug>false</debug>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
@@ -318,7 +319,7 @@ under the License.
                                 <goal>install</goal>
                             </goals>
                             <filterProperties>
-                                <netbeans.version>RELEASE110</netbeans.version> 
+                                <netbeans.version>RELEASE170</netbeans.version> 
                             </filterProperties>
                         </configuration>
                         <executions>
