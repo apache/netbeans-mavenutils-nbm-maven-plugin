@@ -94,7 +94,7 @@ under the License.
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-analyzer</artifactId>
-            <version>1.13.0</version>
+            <version>1.13.1</version>
         </dependency>
         <!-- maven dependecy analyser version 1.8 will have the correct dependency -->
         <dependency>
@@ -252,7 +252,6 @@ under the License.
                         <model>src/main/mdo/descriptor.mdo</model>
                     </models>
                     <version>1.0.0</version>
-                    <useJava5>true</useJava5>
                 </configuration>
             </plugin>
             <plugin>
@@ -373,7 +372,7 @@ under the License.
                 <artifactId>maven-jxr-plugin</artifactId>
             </plugin>
             <plugin>
-                <artifactId>maven-plugin-plugin</artifactId>
+                <artifactId>maven-plugin-report-plugin</artifactId>
                 <configuration>
                     <requirements>
                         <!--

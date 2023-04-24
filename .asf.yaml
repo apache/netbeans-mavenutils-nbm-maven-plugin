@@ -21,7 +21,7 @@ github:
     - netbeans
   features:
     wiki: false
-    issues: false
+    issues: true
     projects: false
   enabled_merge_buttons:
     squash:  true
