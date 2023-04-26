@@ -74,9 +74,9 @@ import org.codehaus.plexus.util.IOUtil;
  *
  * <pre>
  * &lt;plugin&gt;
- *   &lt;groupId>org.apache.maven.plugins&lt;/groupId&gt;
- *   &lt;artifactId>maven-jar-plugin&lt;/artifactId&gt;
- *   &lt;version>3.3.0&lt;/version&gt;
+ *   &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+ *   &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
+ *   &lt;version&gt;3.3.0&lt;/version&gt;
  *   &lt;configuration&gt;
  *     &lt;archive&gt;
  *       &lt;manifestFile&gt;${project.build.outputDirectory}/META-INF/MANIFEST.MF&lt;/manifestFile&gt;
