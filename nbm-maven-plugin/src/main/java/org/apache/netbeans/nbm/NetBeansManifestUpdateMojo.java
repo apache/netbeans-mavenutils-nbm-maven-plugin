@@ -73,16 +73,16 @@ import org.codehaus.plexus.util.IOUtil;
  * snippet to maven-jar-plugin.
  *
  * <pre>
- * &lt;plugin>
- *   &lt;groupId>org.apache.maven.plugins&lt;/groupId>
- *   &lt;artifactId>maven-jar-plugin&lt;/artifactId>
- *   &lt;version>3.3.0&lt;/version>
- *   &lt;configuration>
- *     &lt;archive>
- *       &lt;manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF&lt;/manifestFile>
- *     &lt;/archive>
- *   &lt;/configuration>
- * &lt;/plugin>
+ * &lt;plugin&gt;
+ *   &lt;groupId>org.apache.maven.plugins&lt;/groupId&gt;
+ *   &lt;artifactId>maven-jar-plugin&lt;/artifactId&gt;
+ *   &lt;version>3.3.0&lt;/version&gt;
+ *   &lt;configuration&gt;
+ *     &lt;archive&gt;
+ *       &lt;manifestFile&gt;${project.build.outputDirectory}/META-INF/MANIFEST.MF&lt;/manifestFile&gt;
+ *     &lt;/archive&gt;
+ *   &lt;/configuration&gt;
+ * &lt;/plugin&gt;
  * </pre>
  *
  * @author Milos Kleint
