@@ -221,7 +221,7 @@ under the License.
                 <artifactId>maven-jxr-plugin</artifactId>
             </plugin>
             <plugin>
-                <artifactId>maven-plugin-plugin</artifactId>
+                <artifactId>maven-plugin-report-plugin</artifactId>
                 <configuration>
                     <requirements>
                         <!--

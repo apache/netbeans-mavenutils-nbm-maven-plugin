@@ -31,10 +31,10 @@ and is capable of uploading the module jar file, javadoc, sources and nbm files 
 and remote repositories. See {{{./populate-mojo.html}<<<populate>>> goal}} description.
 
  For a binary-only upload (jar files and nbm files only), it's possible to download the bits from official sites. 
-See this page {{{http://netbeans.apache.org/download/dev/index.html}Building from source}}
+See this page {{{https://netbeans.apache.org/download/dev/index.html}Building from source}}
 
  For the complete upload, you will need to checkout the sources of the IDE/Platform you
-want to upload. See this page {{{http://netbeans.apache.org/download/dev/index.html}Building from source}}
+want to upload. See this page {{{https://netbeans.apache.org/download/dev/index.html}Building from source}}
 
 
  The goal has multiple input parameters that link the goal to binaries prepared beforehand.

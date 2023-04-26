@@ -31,7 +31,7 @@ See the {{{./populate-mojo.html}<<<populate>>>}} goal and the {{{./repository.ht
 
  {{{https://search.maven.org/}Maven Central}} contains artefacts of Apache NetBeans 9.0 and later.
 
- Also see: {{{https://netbeans.apache.org/wiki/DevFaqIndex.asciidoc#_mavenized_builds}Maven NBM development FAQs}}
+ Also see: {{{https://netbeans.apache.org/wiki/DevFaqIndex#_mavenized_builds}Maven NBM development FAQs}}
 
 Older NetBeans Version
 

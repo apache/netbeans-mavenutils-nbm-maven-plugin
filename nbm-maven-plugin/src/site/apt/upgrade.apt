@@ -96,7 +96,7 @@ in the same build.
 
    * The <<<nbm:manifest>>> goal besides generating the manifest, will also check if the runtime dependencies
 match the actual classes being used in the project and it's libraries on <<Class-Path>>. That's analogous to
-the {{{http://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html}<<<dependency:analyze>>>}}
+the {{{https://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html}<<<dependency:analyze>>>}}
 goal but takes the NetBeans module system constraints into account (non-transitivity of module dependencies,
 public vs. private packages constraint etc)
 
@@ -136,9 +136,9 @@ in maven POM file.
 
     * The <<2.5>> plugin can pick up and declare more module dependencies than the previous version. Module dependencies are safe. 
 You either declared them in your <<<module.xml>>> file. Some additional ones can appear if you have them as direct dependencies in your pom.
-Use the {{{http://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html}<<<dependency:analyze>>>}} goal to check for used/unused direct dependencies.
+Use the {{{https://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html}<<<dependency:analyze>>>}} goal to check for used/unused direct dependencies.
 
     * The <<2.5>> plugin can also pick up and declare more module libraries. That's something to watch out for! That happens again only when you declared the jars as direct dependencies.
 You could end up with a single jar being added to multiple modules and get runtime classpath issues and of course your download size 
-will get higher than necessary. Again the {{{http://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html}<<<dependency:analyze>>>}} goal shall help. If you know the jar is required but is provided by a module you depend on, use the <<<provided>>> scope to prevent inclusion.
+will get higher than necessary. Again the {{{https://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html}<<<dependency:analyze>>>}} goal shall help. If you know the jar is required but is provided by a module you depend on, use the <<<provided>>> scope to prevent inclusion.
 

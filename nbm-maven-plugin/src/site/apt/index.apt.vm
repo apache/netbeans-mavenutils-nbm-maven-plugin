@@ -31,7 +31,7 @@ an autoupdate site content or build and assemble an application on top of NetBea
 
  Note: The <<<nbm:populate-repository>>> goal has been moved to it's own plugin {{{../nb-repository-plugin/index.html}nb-repository-plugin}}.
 
- Also see: {{{https://netbeans.apache.org/wiki/DevFaqIndex.asciidoc#_mavenized_builds}Maven NBM development FAQs}}
+ Also see: {{{https://netbeans.apache.org/wiki/DevFaqIndex#_mavenized_builds}Maven NBM development FAQs}}
 
  Sample <<<pom.xml>>> excerpts for creation of a NetBeans module:
 
@@ -188,7 +188,7 @@ webstartable binaries of the applications (typically in a deployment profile):
 
 +-----+
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <executions>
                     <execution>
@@ -253,7 +253,7 @@ and are to be exposed for reuse by other modules.
 
 +-----+
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <extensions>true</extensions>
@@ -277,14 +277,14 @@ Archetypes anyone?
 one if you are developing a Apache NetBeans IDE module, or a module for a Apache NetBeans Platform-based application.
 
 +-------------------------------------------------------------------------------+
-mvn -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=nbm-archetype -DarchetypeVersion=... \
+mvn -DarchetypeGroupId=org.apache.netbeans.archetypes -DarchetypeArtifactId=nbm-archetype -DarchetypeVersion=... \
   -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 archetype:generate
 +-------------------------------------------------------------------------------+
 
  The second one creates a parent POM project containing configuration and application branding for your Apache NetBeans Platform-based application.
 
 +-------------------------------------------------------------------------------+
-mvn -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=netbeans-platform-app-archetype \
+mvn -DarchetypeGroupId=org.apache.netbeans.archetypes -DarchetypeArtifactId=netbeans-platform-app-archetype \
   -DarchetypeVersion=... -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 archetype:generate
 +-------------------------------------------------------------------------------+
 

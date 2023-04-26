@@ -17,25 +17,33 @@ under the License.
 -->
 <project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd" combine.self="override">
     <skin>
-        <groupId>org.apache.netbeans.utilities</groupId>
-        <artifactId>maven-netbeans-skin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </skin> 
+        <groupId>${skin.groupId}</groupId>
+        <artifactId>${skin.artifactId}</artifactId>
+        <version>${skin.version}</version>
+    </skin>
+    <publishDate position="none"/>
+    <version position="none"/>
     <body>
-        <links>
+        <menu>
+            <item name="Apache NetBeans home" href="https://netbeans.apache.org "/>
+        </menu>
+        <menu name="Apache Netbeans Maven Utilities">
             <item name="NB Repository Plugin" href="../nb-repository-plugin/index.html"/>
             <item name="NBM Plugin" href="../nbm-maven-plugin/index.html"/>
             <item name="Shared" />
             <item name="Harness" href="../nbm-maven-harness/index.html"/>
-            <item name="Parent" href="../index.html" />          
-        </links>
+            <item name="Parent" href="../index.html" />
+        </menu>
     </body>
     <custom>
-        <NetBeanSkin>
+        <fluidoSkin>
+            <skipGenerationDate>true</skipGenerationDate>
             <gitHub>
                 <projectId>apache/netbeans-mavenutils-nbm-maven-plugin</projectId>
+                <ribbonOrientation>right</ribbonOrientation>
+                <ribbonColor>black</ribbonColor>
             </gitHub>
-        </NetBeanSkin>
+        </fluidoSkin>
     </custom>
 </project>
 

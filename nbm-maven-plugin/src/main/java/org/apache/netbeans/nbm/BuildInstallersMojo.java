@@ -54,7 +54,7 @@ import org.apache.tools.ant.util.StringUtils;
  * Build installers for Mavenized NetBeans application. Creates installers for supported operating systems and packages
  * each installer as a deployable artifact.
  * <p>
- * See a <a href="http://www.mojohaus.org/nbm-maven-plugin/buildinstexample.html">how-to</a> on customizing the
+ * See a <a href="https://bits.netbeans.org/mavenutilities/nbm-maven-plugin/nbm-maven-plugin/buildinstexample.html">how-to</a> on customizing the
  * installer.
  *
  * @author <a href="mailto:frantisek@mantlik.cz">Frantisek Mantlik</a>

@@ -23,7 +23,15 @@
 
 [![Build Status](https://ci-builds.apache.org/buildStatus/icon?job=Netbeans%2Fnetbeans-maven-TLP%2Fnetbeans-mavenutils-nbm-maven-plugin%2Fmaster)](https://ci-builds.apache.org/job/Netbeans/job/netbeans-maven-TLP/job/netbeans-mavenutils-nbm-maven-plugin/job/master/)
 
-[Documentation Site](https://bits.netbeans.org/mavenutilities/parent)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/utilities-parent.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/utilities-parent)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nbm-maven-harness.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nbm-maven-harness)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nb-shared.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nb-shared)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nb-repository-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nb-repository-plugin)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nbm-maven-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nbm-maven-plugin)
+
+
+
+[Documentation Site](https://bits.netbeans.org/mavenutilities/nbm-maven-plugin/)
 
 ### Get In Touch
 
@@ -33,5 +41,5 @@
 
 ### Reporting Bugs
 
-Bugs should be reported to https://issues.apache.org/jira/projects/NETBEANS/issues/ using the component **mavenutilities**
+Report issue at [repository issue section](https://github.com/apache/netbeans-mavenutils-nbm-maven-plugin/issues)
 
