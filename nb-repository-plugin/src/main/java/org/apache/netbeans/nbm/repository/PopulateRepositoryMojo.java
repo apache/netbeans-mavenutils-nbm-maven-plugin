@@ -1109,7 +1109,7 @@ public class PopulateRepositoryMojo
                 dep.setGroupId( mwr.getDep().getGroupId() );
                 dep.setVersion( mwr.getDep().getVersion() );
                 dep.setClassifier( mwr.getDep().getClassifier() );
-                dep.setScope( mwr.getDep().getScope());
+                dep.setScope( mwr.getDep().getScope() );
             }
             else
             {

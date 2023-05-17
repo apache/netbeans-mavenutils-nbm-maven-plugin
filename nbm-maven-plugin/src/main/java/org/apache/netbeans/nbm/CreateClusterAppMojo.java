@@ -375,10 +375,11 @@ public class CreateClusterAppMojo
                                             { //MNBMODULE-220
                                                 try 
                                                 {
-                                                    classPath = URLDecoder.decode(ex.getClasspath(), "UTF-8");
-                                                } catch (UnsupportedEncodingException exception) 
+                                                    classPath = URLDecoder.decode( ex.getClasspath(), "UTF-8" );
+                                                } 
+                                                catch ( UnsupportedEncodingException exception ) 
                                                 {
-                                                    throw new IllegalStateException(exception);
+                                                    throw new IllegalStateException( exception );
                                                 }
                                                 classpathRoot = fl.getParentFile();
                                             }

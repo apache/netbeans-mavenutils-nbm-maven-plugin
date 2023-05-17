@@ -203,7 +203,7 @@ public class BuildMacMojo
                                                   + " or via macInfoplistFile parameter" );
             }
 
-            try (BufferedReader reader =
+            try ( BufferedReader reader =
                     new BufferedReader( new InputStreamReader( jarFile.getInputStream( entry ) ) ) )
             {
                 String infoPListString = reader.lines(  )

@@ -241,10 +241,12 @@ public class CreateNbmMojo
                 sig.setKeystore( ks );
                 sig.setAlias( keystorealias );
                 sig.setStorepass( keystorepassword );
-                if( tsaurl != null ) {
+                if ( tsaurl != null ) 
+                {
                     sig.setTsaurl( tsaurl );
                 }
-                if( tsacert != null ) {
+                if ( tsacert != null ) 
+                {
                     sig.setTsacert( tsacert );
                 }
                 getLog().debug( "Setup the Ant task to sign the NBM file." );
