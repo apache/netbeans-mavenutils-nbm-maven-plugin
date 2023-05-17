@@ -42,7 +42,6 @@ import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -265,12 +264,6 @@ public class NetBeansManifestUpdateMojo
     protected String moduleType;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-    /**
-     * The artifact repository to use.
-     *
-     */
-    @Parameter( required = true, readonly = true, defaultValue = "${localRepository}" )
-    private ArtifactRepository localRepository;
 
     /**
      * The artifact factory to use.

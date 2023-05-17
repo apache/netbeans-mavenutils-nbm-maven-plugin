@@ -59,11 +59,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -186,8 +186,8 @@ public class CreateClusterAppMojo
      * Local maven repository.
      *
      */
-    @Parameter( required = true, readonly = true, property = "localRepository" )
-    protected ArtifactRepository localRepository;
+    @Parameter( required = true, readonly = true, defaultValue = "${session}" )
+    protected MavenSession session;
 
 // end of component params custom code folding
 // </editor-fold>
@@ -231,7 +231,7 @@ public class CreateClusterAppMojo
             {
                 ArtifactResult res
                                        = turnJarToNbmFile( art, artifactFactory, artifactResolver, project,
-                                                           localRepository );
+                                                           session.getLocalRepository() );
                 if ( res.hasConvertedArtifact() )
                 {
                     art = res.getConvertedArtifact();
@@ -375,10 +375,11 @@ public class CreateClusterAppMojo
                                             { //MNBMODULE-220
                                                 try 
                                                 {
-                                                    classPath = URLDecoder.decode(ex.getClasspath(), "UTF-8");
-                                                } catch (UnsupportedEncodingException exception) 
+                                                    classPath = URLDecoder.decode( ex.getClasspath(), "UTF-8" );
+                                                } 
+                                                catch ( UnsupportedEncodingException exception ) 
                                                 {
-                                                    throw new IllegalStateException(exception);
+                                                    throw new IllegalStateException( exception );
                                                 }
                                                 classpathRoot = fl.getParentFile();
                                             }
@@ -1008,7 +1009,7 @@ public class CreateClusterAppMojo
                         try
                         {
                             artifactResolver.
-                                    resolve( artifact, project.getRemoteArtifactRepositories(), localRepository );
+                                    resolve( artifact, project.getRemoteArtifactRepositories(), session.getLocalRepository() );
                             FileUtils.copyFile( artifact.getFile(), f );
                             found = true;
                         }
@@ -1085,7 +1086,7 @@ public class CreateClusterAppMojo
                 "nbm-file" );
         try
         {
-            artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
+            artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), session.getLocalRepository() );
         }
 
         catch ( ArtifactResolutionException | ArtifactNotFoundException ex )

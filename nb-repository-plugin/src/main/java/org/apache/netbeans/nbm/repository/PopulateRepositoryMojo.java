@@ -60,6 +60,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -229,8 +230,8 @@ public class PopulateRepositoryMojo
     /**
      * Local maven repository.
      */
-    @Parameter( required = true, readonly = true, defaultValue = "${localRepository}" )
-    protected ArtifactRepository localRepository;
+    @Parameter( required = true, readonly = true, defaultValue = "${session}" )
+    protected MavenSession session;
 
     /**
      * Maven ArtifactFactory.
@@ -623,18 +624,18 @@ public class PopulateRepositoryMojo
                         if ( deploymentRepository != null )
                         {
                             artifactDeployer.deploy( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art,
-                                                     deploymentRepository, localRepository );
+                                                     deploymentRepository, session.getLocalRepository() );
                             if ( javadoc != null )
                             {
-                                artifactDeployer.deploy( javadoc, javadocArt, deploymentRepository, localRepository );
+                                artifactDeployer.deploy( javadoc, javadocArt, deploymentRepository, session.getLocalRepository() );
                             }
                             if ( source != null )
                             {
-                                artifactDeployer.deploy( source, sourceArt, deploymentRepository, localRepository );
+                                artifactDeployer.deploy( source, sourceArt, deploymentRepository, session.getLocalRepository() );
                             }
                             if ( nbm != null )
                             {
-                                artifactDeployer.deploy( nbm, nbmArt, deploymentRepository, localRepository );
+                                artifactDeployer.deploy( nbm, nbmArt, deploymentRepository, session.getLocalRepository() );
                             }
                         }
                     }
@@ -689,7 +690,7 @@ public class PopulateRepositoryMojo
                     if ( deploymentRepository != null )
                     {
                         artifactDeployer.deploy( ex.getFile(), art,
-                            deploymentRepository, localRepository );
+                            deploymentRepository, session.getLocalRepository() );
                     }
                 }
                 catch ( ArtifactDeploymentException exc )
@@ -726,7 +727,7 @@ public class PopulateRepositoryMojo
                 {
                     if ( deploymentRepository != null )
                     {
-                        artifactDeployer.deploy( pom, art, deploymentRepository, localRepository );
+                        artifactDeployer.deploy( pom, art, deploymentRepository, session.getLocalRepository() );
                     }
                 }
                 catch ( ArtifactDeploymentException ex )
@@ -741,10 +742,10 @@ public class PopulateRepositoryMojo
     void install( File file, Artifact art )
         throws MojoExecutionException
     {
-        assert localRepository != null;
+        assert session.getLocalRepository() != null;
         try
         {
-            artifactInstaller.install( file, art, localRepository );
+            artifactInstaller.install( file, art, session.getLocalRepository() );
         }
         catch ( ArtifactInstallationException e )
         {
@@ -844,14 +845,14 @@ public class PopulateRepositoryMojo
                         artifactResolver.resolve(
                                 artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_API, artifactId, forcedVersion, "pom" ),
                                 repos,
-                                localRepository );
+                                session.getLocalRepository() );
                         dep.setGroupId( groupIdPrefix + GROUP_API );
                     }
                     catch ( AbstractArtifactResolutionException x )
                     {
                         try
                         {
-                            artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_IMPL, artifactId, forcedVersion, "pom" ), repos, localRepository );
+                            artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_IMPL, artifactId, forcedVersion, "pom" ), repos, session.getLocalRepository() );
                             dep.setGroupId( groupIdPrefix + GROUP_IMPL );
                             if ( wrapper.getModuleManifest().hasPublicPackages() )
                             {
@@ -862,7 +863,7 @@ public class PopulateRepositoryMojo
                         {
                             try
                             {
-                                artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_EXTERNAL, artifactId, forcedVersion, "pom" ), repos, localRepository );
+                                artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_EXTERNAL, artifactId, forcedVersion, "pom" ), repos, session.getLocalRepository() );
                                 dep.setGroupId( groupIdPrefix + GROUP_EXTERNAL );
                                 if ( wrapper.getModuleManifest().hasPublicPackages() )
                                 {
@@ -1108,7 +1109,7 @@ public class PopulateRepositoryMojo
                 dep.setGroupId( mwr.getDep().getGroupId() );
                 dep.setVersion( mwr.getDep().getVersion() );
                 dep.setClassifier( mwr.getDep().getClassifier() );
-                dep.setScope( mwr.getDep().getScope());
+                dep.setScope( mwr.getDep().getScope() );
             }
             else
             {
