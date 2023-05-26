@@ -23,11 +23,11 @@
 
 [![Build Status](https://ci-builds.apache.org/buildStatus/icon?job=Netbeans%2Fnetbeans-maven-TLP%2Fnetbeans-mavenutils-nbm-maven-plugin%2Fmaster)](https://ci-builds.apache.org/job/Netbeans/job/netbeans-maven-TLP/job/netbeans-mavenutils-nbm-maven-plugin/job/master/)
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/utilities-parent.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/utilities-parent)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nbm-maven-harness.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nbm-maven-harness)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nb-shared.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nb-shared)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nb-repository-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nb-repository-plugin)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nbm-maven-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nbm-maven-plugin)
+[![utilities-parent](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/utilities-parent.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/utilities-parent)
+[![nbm-maven-harness](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nbm-maven-harness.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nbm-maven-harness)
+[![nb-shared](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nb-shared.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nb-shared)
+[![nb-repository-plugin](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nb-repository-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nb-repository-plugin)
+[![nbm-maven-plugin](https://img.shields.io/maven-central/v/org.apache.netbeans.utilities/nbm-maven-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.netbeans.utilities/nbm-maven-plugin)
 
 
 
