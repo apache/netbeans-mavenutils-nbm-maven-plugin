@@ -161,8 +161,6 @@ under the License.
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
                     <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
@@ -269,19 +267,6 @@ under the License.
             </plugin>
             <plugin>
                 <artifactId>maven-pmd-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-linkcheck-plugin</artifactId>
-                <configuration>
-                    <excludedLinks>
-                        <excludedLink>../../images/codehaus-small.png</excludedLink>
-                        <excludedLink>../../images/mojo_logo.png</excludedLink>
-                        <excludedLink>plugin-info.html</excludedLink>
-                    </excludedLinks>
-                    <!--<excludedPages>
-                        <excludedPage>dependencies.html</excludedPage> 
-                    </excludedPages>-->
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
