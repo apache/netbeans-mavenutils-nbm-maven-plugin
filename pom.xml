@@ -71,7 +71,7 @@
         <maven.plugin.version>3.8.2</maven.plugin.version>
         <skin.groupId>org.apache.maven.skins</skin.groupId>
         <skin.artifactId>maven-fluido-skin</skin.artifactId>
-        <skin.version>2.0.0-M5</skin.version>
+        <skin.version>2.0.0-M6</skin.version>
     </properties>
 
     <dependencyManagement>
@@ -99,6 +99,26 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.6.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>3.3.0</version>
                 </plugin>
@@ -121,7 +141,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <configLocation>config/maven_checks.xml</configLocation>
                         <headerLocation>config/maven-header.txt</headerLocation>
@@ -146,14 +166,10 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.20.0</version>
+                    <version>3.21.0</version>
                     <configuration>
                         <targetJdk>1.8</targetJdk>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-linkcheck-plugin</artifactId>
-                    <version>1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.rat</groupId>
@@ -163,6 +179,10 @@
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.11.0</version>
+                    <configuration>
+                        <source>8</source>
+                        <target>8</target>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
@@ -170,7 +190,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.4.3</version>
+                    <version>3.4.4</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-plugin-plugin</artifactId>
