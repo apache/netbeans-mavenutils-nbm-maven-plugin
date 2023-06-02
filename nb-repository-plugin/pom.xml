@@ -251,18 +251,7 @@ under the License.
                         <link>http://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
                         <link>https://maven.apache.org/shared/maven-reporting-api/apidocs/</link>
                         <link>http://maven.apache.org/ref/${maven.version}/maven-settings/apidocs/</link>
-                    </links>
-                    <tagletArtifacts>
-                        <tagletArtifact>
-                            <groupId>org.apache.maven.plugin-tools</groupId>
-                            <artifactId>maven-plugin-tools-javadoc</artifactId>
-                        </tagletArtifact>
-                        <tagletArtifact>
-                            <groupId>org.codehaus.plexus</groupId>
-                            <artifactId>plexus-component-javadoc</artifactId>
-                            <version>1.6</version>
-                        </tagletArtifact>
-                    </tagletArtifacts>
+                    </links>                    
                 </configuration>
             </plugin>
             <plugin>
