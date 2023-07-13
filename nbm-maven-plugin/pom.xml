@@ -294,6 +294,17 @@ under the License.
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- manifest for testing purpose -->
+                        <exclude>**/*.mf</exclude>
+                        <exclude>**/*.MF</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -342,19 +353,7 @@ under the License.
                         <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-project/apidocs/</link>-->
                         <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-reporting/maven-reporting-api/apidocs/</link>-->
                         <link>https://maven.apache.org/ref/${maven.version}/maven-settings/apidocs/</link>
-                    </links>
-                    <tagletArtifacts>
-                        <tagletArtifact>
-                            <groupId>org.apache.maven.plugin-tools</groupId>
-                            <artifactId>maven-plugin-tools-javadoc</artifactId>
-                            <version>3.4</version>
-                        </tagletArtifact>
-                        <tagletArtifact>
-                            <groupId>org.codehaus.plexus</groupId>
-                            <artifactId>plexus-component-javadoc</artifactId>
-                            <version>1.6</version>
-                        </tagletArtifact>
-                    </tagletArtifacts>
+                    </links>                    
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -388,17 +387,7 @@ under the License.
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
                 <version>3.0.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*.mf</exclude>
-                        <exclude>**/*.MF</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
+            </plugin>  
         </plugins>
     </reporting>
 
@@ -448,7 +437,6 @@ under the License.
         <profile>
             <id>run-its</id>
             <build>
-
                 <plugins>
                     <plugin>
                         <artifactId>maven-invoker-plugin</artifactId>
@@ -483,7 +471,6 @@ under the License.
                         </executions>
                     </plugin>
                 </plugins>
-
             </build>
         </profile>
     </profiles>
