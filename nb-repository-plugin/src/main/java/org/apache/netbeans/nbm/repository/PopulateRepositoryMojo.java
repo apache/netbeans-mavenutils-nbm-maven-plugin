@@ -584,7 +584,7 @@ public class PopulateRepositoryMojo
                         {
                             DeployRequest deployRequest = new DeployRequest();
                             deployRequest.setRepository(deploymentRepository);
-                            deployRequest.setTrace( RequestTrace.newChild( null, "np-repository-plugin" ) );
+                            deployRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
                             deployRequest.addArtifact( art.setFile( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar ) );
                             if ( javadoc != null )
                             {
@@ -653,7 +653,7 @@ public class PopulateRepositoryMojo
                     {
                         DeployRequest deployRequest = new DeployRequest();
                         deployRequest.setRepository(deploymentRepository);
-                        deployRequest.setTrace( RequestTrace.newChild( null, "np-repository-plugin" ) );
+                        deployRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
                         deployRequest.addArtifact( pomArt.setFile( pom ) );
                         deployRequest.addArtifact( art.setFile( ex.getFile() ) );
 
@@ -694,7 +694,7 @@ public class PopulateRepositoryMojo
                     {
                         DeployRequest deployRequest = new DeployRequest();
                         deployRequest.setRepository(deploymentRepository);
-                        deployRequest.setTrace( RequestTrace.newChild( null, "np-repository-plugin" ) );
+                        deployRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
                         deployRequest.addArtifact( art.setFile( pom ) );
 
                         repositorySystem.deploy( session.getRepositorySession(), deployRequest );
@@ -806,9 +806,9 @@ public class PopulateRepositoryMojo
                     dep.setVersion( forcedVersion );
                     List<RemoteRepository> repos = repositorySystem.newResolutionRepositories(session.getRepositorySession(), Collections.singletonList( new RemoteRepository.Builder( dependencyRepositoryId, "default", dependencyRepositoryUrl ).build()) );
                     ArtifactRequest artifactRequest = new ArtifactRequest();
-                    artifactRequest.setRequestContext( "np-repository-plugin" );
+                    artifactRequest.setRequestContext( "nb-repository-plugin" );
                     artifactRequest.setRepositories( repos );
-                    artifactRequest.setTrace( RequestTrace.newChild( null, "np-repository-plugin" ) );
+                    artifactRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
                     ArtifactResult artifactResult;
                     try
                     {
