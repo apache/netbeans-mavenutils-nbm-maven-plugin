@@ -66,8 +66,6 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
     {
         PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo( "populate", new File( getBasedir(), "src/test/resources/PopulateMojoTest.xml" ) );
         setVariableValueToObject( mojo, "session", createMavenSession() );
-        File repo = new File( System.getProperty( "java.io.tmpdir" ), "PopulateRepositoryMojoTest" );
-        FileUtils.deleteDirectory( repo );
         File f1 = File.createTempFile( "PopulateRepositoryMojoTest", ".jar" );
         f1.deleteOnExit();
         Artifact art1 = mojo.createArtifact( "testarg", "1.0", "testgrp" );
@@ -77,6 +75,9 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         Artifact art2 = new SubArtifact( art1, "", "nbm", f2 );
         mojo.install( art1 );
         mojo.install( art2 );
+        File localRepo = mojo.session.getRepositorySession().getLocalRepository().getBasedir();
+        assertTrue( new File( localRepo, "testgrp/testarg/1.0/testarg-1.0.nbm" ).isFile() );
+        assertTrue( new File( localRepo, "testgrp/testarg/1.0/testarg-1.0.jar" ).isFile() );
     }
     
     public void testSplit() throws Exception
