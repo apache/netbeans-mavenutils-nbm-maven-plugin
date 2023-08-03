@@ -44,7 +44,7 @@ public class AdaptNbVersion
         {
             return "0.0.0." + generateSnapshotValue( date );
         }
-        StringBuffer toReturn = new StringBuffer();
+        StringBuilder toReturn = new StringBuilder();
         while ( tok.hasMoreTokens() )
         {
             String token = tok.nextToken();
@@ -75,8 +75,8 @@ public class AdaptNbVersion
                 }
                 try
                 {
-                    Integer intValue = Integer.valueOf( token );
-                    token = intValue.toString();
+                    int intValue = Integer.parseInt( token );
+                    token = Integer.toString( intValue );
                 }
                 catch ( NumberFormatException exc )
                 {
@@ -84,7 +84,7 @@ public class AdaptNbVersion
                     token = "";
                 }
             }
-            if ( token.length() > 0 )
+            if ( !token.isEmpty() )
             {
                 if ( toReturn.length() != 0 )
                 {

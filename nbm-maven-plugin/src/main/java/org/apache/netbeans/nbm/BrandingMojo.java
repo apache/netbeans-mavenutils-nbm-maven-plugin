@@ -61,7 +61,7 @@ public class BrandingMojo
 {
 
     /**
-     * directory where the the binary content is created.
+     * directory where the binary content is created.
      */
     @Parameter( required = true, defaultValue = "${project.build.directory}/nbm" )
     protected File nbmBuildDir;
@@ -88,11 +88,7 @@ public class BrandingMojo
      */
     @Parameter( required = true, defaultValue = "extra" )
     protected String cluster;
-    /**
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
+
     @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 

@@ -39,10 +39,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -64,6 +60,8 @@ import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
 import org.codehaus.plexus.util.IOUtil;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Goal for generating NetBeans module system specific manifest entries, part of <code>nbm</code> lifecycle/packaging.
@@ -263,25 +261,11 @@ public class NetBeansManifestUpdateMojo
     @Parameter( defaultValue = "normal" )
     protected String moduleType;
 
-    // <editor-fold defaultstate="collapsed" desc="Component parameters">
-
     /**
-     * The artifact factory to use.
+     * The repository system.
      */
     @Component
-    private ArtifactFactory artifactFactory;
-
-    /**
-     * The artifact metadata source to use.
-     */
-    @Component
-    private ArtifactMetadataSource artifactMetadataSource;
-
-    /**
-     * The artifact collector to use.
-     */
-    @Component
-    private ArtifactCollector artifactCollector;
+    private RepositorySystem repositorySystem;
 
     /**
      * The dependency tree builder to use.
@@ -292,8 +276,6 @@ public class NetBeansManifestUpdateMojo
     @Parameter( defaultValue = "${session}", readonly = true )
     private MavenSession session;
 
-// end of component params custom code folding
-// </editor-fold>
     /**
      * execute plugin
      *

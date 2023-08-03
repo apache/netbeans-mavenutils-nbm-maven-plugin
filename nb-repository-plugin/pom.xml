@@ -26,7 +26,6 @@ under the License.
         <groupId>org.apache.netbeans.utilities</groupId>
         <artifactId>utilities-parent</artifactId>
         <version>14.0-SNAPSHOT</version>
-        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>nb-repository-plugin</artifactId>
@@ -91,17 +90,28 @@ under the License.
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${maven.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.maven.plugin-testing</groupId>
             <artifactId>maven-plugin-testing-harness</artifactId>
             <version>3.3.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-compat</artifactId>
-            <version>${maven.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.36</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -220,15 +230,6 @@ under the License.
             </plugin>
             <plugin>
                 <artifactId>maven-plugin-report-plugin</artifactId>
-                <configuration>
-                    <requirements>
-                        <!--
-                        NOTE: Maven 2.x does not interpolate properties of the form project.*|pom.* so the Maven Plugin Plugin
-                        gets garbage when manually examining the config of the Maven Compiler Plugin.
-                        -->
-                        <jdk>${mojo.java.target}</jdk>
-                    </requirements>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>

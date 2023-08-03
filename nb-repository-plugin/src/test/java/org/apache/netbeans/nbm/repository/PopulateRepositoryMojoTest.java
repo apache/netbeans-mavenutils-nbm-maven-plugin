@@ -19,15 +19,41 @@ package org.apache.netbeans.nbm.repository;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import java.io.File;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
+import org.eclipse.aether.util.artifact.SubArtifact;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * 
  * @author Milos Kleint
  */
-public class PopulateRepositoryMojoTest extends TestCase /** AbstractMojoTestCase  the only way out of dependency hell.**/{
-    
+public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
+    private final String LOCAL_REPO = "target/local-repo/";
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        FileUtils.deleteDirectory(new File(getBasedir() + "/" + LOCAL_REPO));
+    }
+
     public void testStripClusterName()
     {
         assertEquals( "platform", PopulateRepositoryMojo.stripClusterName( "platform9" ) );
@@ -38,20 +64,19 @@ public class PopulateRepositoryMojoTest extends TestCase /** AbstractMojoTestCas
 
     public void testInstall() throws Exception
     {
-//TODO how is this done on maven3?
-//        PopulateRepositoryMojo mojo = ( PopulateRepositoryMojo ) lookupMojo( "populate", new File( getBasedir(), "src/test/resources/PopulateMojoTest.xml" ) );
-//        File repo = new File( System.getProperty( "java.io.tmpdir" ), "PopulateRepositoryMojoTest" );
-//        FileUtils.deleteDirectory( repo );
-//        mojo.localRepository = new DefaultArtifactRepository( "test", repo.toURI().toString(), new DefaultRepositoryLayout() );
-//        Artifact art1 = mojo.createArtifact( "testarg", "1.0", "testgrp" );
-//        File f = File.createTempFile( "PopulateRepositoryMojoTest", ".nbm" );
-//        f.deleteOnExit();
-//        Artifact art2 = mojo.createAttachedArtifact( art1, f, "nbm-file", null );
-//        assertEquals( "nbm", art2.getArtifactHandler().getExtension() );
-//        //TODO does not work because of missing session
-////        mojo.install( f, art2 );
-////        assertTrue( new File( repo, "testgrp/testarg/1.0/testarg-1.0.nbm" ).isFile() );
-////        assertFalse( new File( repo, "testgrp/testarg/1.0/testarg-1.0.jar" ).isFile() );
+        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo( "populate", new File( getBasedir(), "src/test/resources/PopulateMojoTest.xml" ) );
+        setVariableValueToObject( mojo, "session", createMavenSession() );
+        File repo = new File( System.getProperty( "java.io.tmpdir" ), "PopulateRepositoryMojoTest" );
+        FileUtils.deleteDirectory( repo );
+        File f1 = File.createTempFile( "PopulateRepositoryMojoTest", ".jar" );
+        f1.deleteOnExit();
+        Artifact art1 = mojo.createArtifact( "testarg", "1.0", "testgrp" );
+        art1 = art1.setFile( f1 );
+        File f2 = File.createTempFile( "PopulateRepositoryMojoTest", ".nbm" );
+        f2.deleteOnExit();
+        Artifact art2 = new SubArtifact( art1, "", "nbm", f2 );
+        mojo.install( art1 );
+        mojo.install( art2 );
     }
     
     public void testSplit() throws Exception
@@ -90,4 +115,18 @@ public class PopulateRepositoryMojoTest extends TestCase /** AbstractMojoTestCas
         } ) );
     }
 
+    private MavenSession createMavenSession() throws NoLocalRepositoryManagerException
+    {
+        MavenSession session = mock(MavenSession.class);
+        DefaultRepositorySystemSession repositorySession = new DefaultRepositorySystemSession();
+        repositorySession.setLocalRepositoryManager(new EnhancedLocalRepositoryManagerFactory()
+                .newInstance(repositorySession, new LocalRepository(LOCAL_REPO)));
+        ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest();
+        buildingRequest.setRepositorySession(repositorySession);
+        when(session.getProjectBuildingRequest()).thenReturn(buildingRequest);
+        when(session.getRepositorySession()).thenReturn(repositorySession);
+        when(session.getPluginContext(any( PluginDescriptor.class), any( MavenProject.class)))
+                .thenReturn(new ConcurrentHashMap<String, Object>());
+        return session;
+    }
 }
