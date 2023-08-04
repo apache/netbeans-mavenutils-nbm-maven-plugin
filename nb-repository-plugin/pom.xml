@@ -36,6 +36,10 @@ under the License.
     </description>
     <inceptionYear>2005</inceptionYear>
 
+    <prerequisites>
+      <maven>3.2.5</maven>
+    </prerequisites>
+
     <!--profiles>
         <profile>
             <id>tools.jar</id>
