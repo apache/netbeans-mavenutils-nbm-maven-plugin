@@ -21,11 +21,11 @@ package org.apache.netbeans.nbm.repository;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.DigestOutputStream;
@@ -44,22 +44,8 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.deployer.ArtifactDeployer;
-import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.installer.ArtifactInstallationException;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -69,8 +55,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.artifact.AttachedArtifact;
-import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.netbeans.nbm.utils.AbstractNetbeansMojo;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.apache.tools.ant.BuildException;
@@ -79,6 +63,20 @@ import org.apache.tools.ant.taskdefs.Input;
 import org.apache.tools.ant.taskdefs.PathConvert;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.IOUtil;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.deployment.DeploymentException;
+import org.eclipse.aether.installation.InstallRequest;
+import org.eclipse.aether.installation.InstallationException;
+import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.util.artifact.SubArtifact;
 
 /**
  * A goal for identifying NetBeans modules from the installation and populating the local
@@ -226,31 +224,17 @@ public class PopulateRepositoryMojo
     @Parameter( property = "parentGAV", required = false )
     private String parentGAV;
 
-    // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
-     * Local maven repository.
+     * Maven session.
      */
     @Parameter( required = true, readonly = true, defaultValue = "${session}" )
     protected MavenSession session;
 
     /**
-     * Maven ArtifactFactory.
+     * Repository system.
      */
     @Component
-    private ArtifactFactory artifactFactory;
-
-    /**
-     * Maven ArtifactInstaller.
-     */
-    @Component
-    private ArtifactInstaller artifactInstaller;
-
-    /**
-     * Maven ArtifactDeployer.
-     *
-     */
-    @Component
-    private ArtifactDeployer artifactDeployer;
+    protected RepositorySystem repositorySystem;
 
     /**
      * Maven ArtifactHandlerManager
@@ -258,20 +242,6 @@ public class PopulateRepositoryMojo
      */
     @Component
     private ArtifactHandlerManager artifactHandlerManager;
-
-    /**
-     * Maven ArtifactRepositoryFactory.
-     *
-     */
-    @Component
-    private ArtifactRepositoryFactory repositoryFactory;
-
-    @Component
-    private ArtifactResolver artifactResolver;
-
-    @Component
-    private ArtifactRepositoryLayout artifactRepositoryLayout;
-// </editor-fold>
 
     // parent handler in case we have one
     private Parent artefactParent = null;
@@ -282,7 +252,7 @@ public class PopulateRepositoryMojo
     {
         getLog().info( "Populate repository with NetBeans modules" );
         Project antProject = antProject();
-        ArtifactRepository deploymentRepository = null;
+        RemoteRepository deploymentRepository = null;
 
         if ( parentGAV != null )
         {
@@ -301,9 +271,7 @@ public class PopulateRepositoryMojo
 
         if ( deployUrl != null )
         {
-            ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
-            deploymentRepository = repositoryFactory.createDeploymentArtifactRepository(
-                deployId, deployUrl, layout, true );
+            deploymentRepository = repositorySystem.newDeploymentRepository(session.getRepositorySession(), new RemoteRepository.Builder(deployId, "default", deployUrl).build());
         }
         else if ( skipLocalInstall )
         {
@@ -480,8 +448,7 @@ public class PopulateRepositoryMojo
                 index = index + 1;
                 getLog().info( "Processing " + index + "/" + count );
                 File pom = createMavenProject( man, wrapperList, externals );
-                ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
-                art.addMetadata( metadata );
+                Artifact pomArt = new SubArtifact(art, "", "pom", pom);
                 File javadoc = null;
                 Artifact javadocArt = null;
                 if ( javadocRoot != null )
@@ -519,12 +486,12 @@ public class PopulateRepositoryMojo
                     {
                         nbm = zip;
                         nbmArt = createAttachedArtifact( art, nbm, "nbm-file", null );
-                        if ( nbmArt.getArtifactHandler().getExtension().equals( "nbm-file" ) )
+                        if ( nbmArt.getExtension().equals( "nbm-file" ) )
                         {
                             // Maven 2.x compatibility.
                             nbmArt = createAttachedArtifact( art, nbm, "nbm", null );
                         }
-                        assert nbmArt.getArtifactHandler().getExtension().equals( "nbm" );
+                        assert nbmArt.getExtension().equals( "nbm" );
                     }
                 }
                 File moduleJar = man.getFile();
@@ -535,11 +502,9 @@ public class PopulateRepositoryMojo
                     {
                         moduleJarMinusCP = File.createTempFile( man.getArtifact(), ".jar" );
                         moduleJarMinusCP.deleteOnExit();
-                        InputStream is = new FileInputStream( moduleJar );
-                        try
+                        try ( InputStream is = Files.newInputStream( moduleJar.toPath() ) )
                         {
-                            OutputStream os = new FileOutputStream( moduleJarMinusCP );
-                            try
+                            try ( OutputStream os = Files.newOutputStream( moduleJarMinusCP.toPath() ) )
                             {
                                 JarInputStream jis = new JarInputStream( is );
                                 Manifest mani = new Manifest( jis.getManifest() );
@@ -553,7 +518,8 @@ public class PopulateRepositoryMojo
                                         {
                                             b.append( ' ' );
                                         }
-                                        b.append( dep.getGroupId() ).append( ':' ).append( dep.getArtifactId() ).append( ':' ).append( dep.getVersion() );
+                                        b.append( dep.getGroupId() ).append( ':' ).append( dep.getArtifactId() )
+                                                .append( ':' ).append( dep.getVersion() );
                                         if ( dep.getClassifier() != null )
                                         {
                                             b.append( ":" ).append( dep.getClassifier() );
@@ -584,14 +550,6 @@ public class PopulateRepositoryMojo
                                 }
                                 jos.close();
                             }
-                            finally
-                            {
-                                os.close();
-                            }
-                        }
-                        finally
-                        {
-                            is.close();
                         }
                     }
                     catch ( IOException x )
@@ -605,41 +563,45 @@ public class PopulateRepositoryMojo
                 {
                     if ( !skipLocalInstall )
                     {
-                        install( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art );
+                        install( pomArt.setFile( pom ) );
+                        install( art.setFile( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar ) );
                         if ( javadoc != null )
                         {
-                            install( javadoc, javadocArt );
+                            install( javadocArt.setFile( javadoc ) );
                         }
                         if ( source != null )
                         {
-                            install( source, sourceArt );
+                            install( sourceArt.setFile( source ) );
                         }
                         if ( nbm != null )
                         {
-                            install( nbm, nbmArt );
+                            install( nbmArt.setFile( nbm ) );
                         }
                     }
                     try
                     {
                         if ( deploymentRepository != null )
                         {
-                            artifactDeployer.deploy( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art,
-                                                     deploymentRepository, session.getLocalRepository() );
+                            DeployRequest deployRequest = new DeployRequest();
+                            deployRequest.setRepository(deploymentRepository);
+                            deployRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
+                            deployRequest.addArtifact( art.setFile( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar ) );
                             if ( javadoc != null )
                             {
-                                artifactDeployer.deploy( javadoc, javadocArt, deploymentRepository, session.getLocalRepository() );
+                                deployRequest.addArtifact( javadocArt.setFile( javadoc ) );
                             }
                             if ( source != null )
                             {
-                                artifactDeployer.deploy( source, sourceArt, deploymentRepository, session.getLocalRepository() );
+                                deployRequest.addArtifact( sourceArt.setFile( source ) );
                             }
                             if ( nbm != null )
                             {
-                                artifactDeployer.deploy( nbm, nbmArt, deploymentRepository, session.getLocalRepository() );
+                                deployRequest.addArtifact( nbmArt.setFile( nbm ) );
                             }
+                            repositorySystem.deploy( session.getRepositorySession(), deployRequest );
                         }
                     }
-                    catch ( ArtifactDeploymentException ex )
+                    catch ( DeploymentException ex )
                     {
                         throw new MojoExecutionException( "Error Deploying artifact", ex );
                     }
@@ -669,7 +631,7 @@ public class PopulateRepositoryMojo
         }
 
         //process collected non-recognized external jars..
-        if ( externals.size() > 0 )
+        if ( !externals.isEmpty() )
         {
             index = 0;
             count = externals.size();
@@ -679,21 +641,26 @@ public class PopulateRepositoryMojo
                 index = index + 1;
                 getLog().info( "Processing external " + index + "/" + count );
                 File pom = createExternalProject( ex );
-                ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
-                art.addMetadata( metadata );
+                Artifact pomArt = new SubArtifact( art, "", "pom", pom );
                 if ( !skipLocalInstall )
                 {
-                    install( ex.getFile(), art );
+                    install( pomArt.setFile( pom ) );
+                    install( art.setFile( ex.getFile() ) );
                 }
                 try
                 {
                     if ( deploymentRepository != null )
                     {
-                        artifactDeployer.deploy( ex.getFile(), art,
-                            deploymentRepository, session.getLocalRepository() );
+                        DeployRequest deployRequest = new DeployRequest();
+                        deployRequest.setRepository(deploymentRepository);
+                        deployRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
+                        deployRequest.addArtifact( pomArt.setFile( pom ) );
+                        deployRequest.addArtifact( art.setFile( ex.getFile() ) );
+
+                        repositorySystem.deploy( session.getRepositorySession(), deployRequest );
                     }
                 }
-                catch ( ArtifactDeploymentException exc )
+                catch ( DeploymentException exc )
                 {
                     throw new MojoExecutionException( "Error Deploying artifact", exc );
                 }
@@ -717,20 +684,23 @@ public class PopulateRepositoryMojo
                 getLog().info( "Processing cluster " + cluster );
                 Artifact art = createClusterArtifact( cluster, forcedVersion );
                 File pom = createClusterProject( art, modules );
-                ProjectArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
-                art.addMetadata( metadata );
                 if ( !skipLocalInstall )
                 {
-                    install( pom, art );
+                    install( art.setFile( pom ) );
                 }
                 try
                 {
                     if ( deploymentRepository != null )
                     {
-                        artifactDeployer.deploy( pom, art, deploymentRepository, session.getLocalRepository() );
+                        DeployRequest deployRequest = new DeployRequest();
+                        deployRequest.setRepository(deploymentRepository);
+                        deployRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
+                        deployRequest.addArtifact( art.setFile( pom ) );
+
+                        repositorySystem.deploy( session.getRepositorySession(), deployRequest );
                     }
                 }
-                catch ( ArtifactDeploymentException ex )
+                catch ( DeploymentException ex )
                 {
                     throw new MojoExecutionException( "Error Deploying artifact", ex );
                 }
@@ -739,15 +709,17 @@ public class PopulateRepositoryMojo
         }
     }
 
-    void install( File file, Artifact art )
+    void install( Artifact art )
         throws MojoExecutionException
     {
-        assert session.getLocalRepository() != null;
         try
         {
-            artifactInstaller.install( file, art, session.getLocalRepository() );
+            InstallRequest installRequest = new InstallRequest();
+            installRequest.addArtifact(art);
+            installRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
+            repositorySystem.install( session.getRepositorySession(), installRequest );
         }
-        catch ( ArtifactInstallationException e )
+        catch ( InstallationException e )
         {
             // TODO: install exception that does not give a trace
             throw new MojoExecutionException( "Error installing artifact", e );
@@ -769,11 +741,7 @@ public class PopulateRepositoryMojo
             handler = artifactHandlerManager.getArtifactHandler( "jar" );
         }
 
-        Artifact artifact = new AttachedArtifact( primary, type, classifier, handler );
-
-        artifact.setFile( file );
-        artifact.setResolved( true );
-        return artifact;
+        return new SubArtifact( primary, classifier, handler.getExtension(), null, file );
     }
 
     private File createMavenProject( ModuleWrapper wrapper, List<ModuleWrapper> wrapperList,
@@ -836,43 +804,45 @@ public class PopulateRepositoryMojo
                         throw new MojoExecutionException( "Cannot use dependencyRepositoryUrl without forcedVersion" );
                     }
                     dep.setVersion( forcedVersion );
-                    ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
-                    List<ArtifactRepository> repos = Collections.singletonList(
-                            repositoryFactory.createArtifactRepository(
-                                    dependencyRepositoryId, dependencyRepositoryUrl, artifactRepositoryLayout, policy, policy ) );
+                    List<RemoteRepository> repos = repositorySystem.newResolutionRepositories(session.getRepositorySession(), Collections.singletonList( new RemoteRepository.Builder( dependencyRepositoryId, "default", dependencyRepositoryUrl ).build()) );
+                    ArtifactRequest artifactRequest = new ArtifactRequest();
+                    artifactRequest.setRequestContext( "nb-repository-plugin" );
+                    artifactRequest.setRepositories( repos );
+                    artifactRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
+                    ArtifactResult artifactResult;
                     try
                     {
-                        artifactResolver.resolve(
-                                artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_API, artifactId, forcedVersion, "pom" ),
-                                repos,
-                                session.getLocalRepository() );
+                        artifactRequest.setArtifact( new DefaultArtifact( groupIdPrefix + GROUP_API, artifactId, "", "pom", forcedVersion ) );
+                        artifactResult = repositorySystem.resolveArtifact(session.getRepositorySession(), artifactRequest);
                         dep.setGroupId( groupIdPrefix + GROUP_API );
                     }
-                    catch ( AbstractArtifactResolutionException x )
+                    catch ( ArtifactResolutionException x )
                     {
                         try
                         {
-                            artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_IMPL, artifactId, forcedVersion, "pom" ), repos, session.getLocalRepository() );
+                            artifactRequest.setArtifact( new DefaultArtifact( groupIdPrefix + GROUP_IMPL, artifactId, "", "pom", forcedVersion ) );
+                            artifactResult = repositorySystem.resolveArtifact(session.getRepositorySession(), artifactRequest);
                             dep.setGroupId( groupIdPrefix + GROUP_IMPL );
                             if ( wrapper.getModuleManifest().hasPublicPackages() )
                             {
                                 dep.setScope( "runtime" );
                             }
                         }
-                        catch ( AbstractArtifactResolutionException x2 )
+                        catch ( ArtifactResolutionException x2 )
                         {
                             try
                             {
-                                artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_EXTERNAL, artifactId, forcedVersion, "pom" ), repos, session.getLocalRepository() );
+                                artifactRequest.setArtifact( new DefaultArtifact( groupIdPrefix + GROUP_EXTERNAL, artifactId, "", "pom", forcedVersion ) );
+                                artifactResult = repositorySystem.resolveArtifact(session.getRepositorySession(), artifactRequest);
                                 dep.setGroupId( groupIdPrefix + GROUP_EXTERNAL );
                                 if ( wrapper.getModuleManifest().hasPublicPackages() )
                                 {
                                     dep.setScope( "runtime" );
                                 }
                             }
-                            catch ( AbstractArtifactResolutionException x3 )
+                            catch ( ArtifactResolutionException x3 )
                             {
-                                getLog().warn( x3.getOriginalMessage() );
+                                getLog().warn( x3 );
                                 throw new MojoExecutionException( "No module found for dependency '" + elem + "'", x );
                             }
 
@@ -944,8 +914,7 @@ public class PopulateRepositoryMojo
         }
         catch ( IOException ex )
         {
-            ex.printStackTrace();
-
+            throw new UncheckedIOException(ex);
         }
         finally
         {
@@ -957,7 +926,7 @@ public class PopulateRepositoryMojo
                 }
                 catch ( IOException io )
                 {
-                    io.printStackTrace();
+                    throw new UncheckedIOException(io);
                 }
             }
         }
@@ -1154,12 +1123,12 @@ public class PopulateRepositoryMojo
 
     Artifact createArtifact( String artifact, String version, String group )
     {
-        return artifactFactory.createBuildArtifact( group, artifact, version, "jar" );
+        return new DefaultArtifact( group, artifact, "jar", version );
     }
 
     private Artifact createClusterArtifact( String artifact, String version )
     {
-        return artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_CLUSTER, artifact, version, "pom" );
+        return new DefaultArtifact( groupIdPrefix + GROUP_CLUSTER, artifact, "pom", version );
     }
 
     private static final Pattern PATTERN_CLUSTER = Pattern.compile( "([a-zA-Z]+)[0-9\\.]*" );
