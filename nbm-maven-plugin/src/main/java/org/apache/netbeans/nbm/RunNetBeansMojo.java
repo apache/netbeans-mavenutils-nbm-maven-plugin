@@ -94,7 +94,7 @@ public class RunNetBeansMojo
     {
         netbeansUserdir.mkdirs();
 
-        List<File> clusters = new ArrayList<File>();
+        List<File> clusters = new ArrayList<>();
         if ( !clusterBuildDir.exists() || clusterBuildDir.listFiles() == null )
         {
             throw new MojoExecutionException(
@@ -102,11 +102,11 @@ public class RunNetBeansMojo
                     + "Please run the nbm:cluster or nbm:cluster-app goals before this one." );
         }
         File[] fls = clusterBuildDir.listFiles();
-        for ( int i = 0; i < fls.length; i++ )
+        for ( File fl : fls )
         {
-            if ( fls[i].isDirectory() )
+            if ( fl.isDirectory() )
             {
-                clusters.add( fls[i] );
+                clusters.add( fl );
             }
         }
         StringBuilder buff = new StringBuilder();
@@ -120,7 +120,7 @@ public class RunNetBeansMojo
             buff.deleteCharAt( buff.lastIndexOf( ":" ) );
         }
 
-        getLog().debug( "cluster path:\n" + buff.toString() );
+        getLog().debug( "cluster path:\n" + buff );
 
         //now check what the exec names are to figure the right XXX.clusters name
         File binDir = new File( netbeansInstallation, "bin" );
@@ -159,27 +159,21 @@ public class RunNetBeansMojo
         }
 
         //http://www.netbeans.org/issues/show_bug.cgi?id=174819
-        StringReader sr = new StringReader( appName + "_extraclusters=\"" + buff.toString() + "\"\n"
+        StringReader sr = new StringReader( appName + "_extraclusters=\"" + buff + "\"\n"
                 + "extraclusters=\""
-                + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
+                + buff + "\"\n" + "extra_clusters=\"" + buff + "\"" );
 
         // write XXX.conf file with cluster information...
         File etc = new File( netbeansUserdir, "etc" );
         etc.mkdirs();
         File confFile = new File( etc, appName + ".conf" );
-        FileOutputStream conf = null;
-        try
+        try( FileOutputStream conf = new FileOutputStream( confFile ) )
         {
-            conf = new FileOutputStream( confFile );
             IOUtil.copy( sr, conf );
         }
         catch ( IOException ex )
         {
             throw new MojoExecutionException( "Error writing " + confFile, ex );
-        }
-        finally
-        {
-            IOUtil.close( conf );
         }
 
         if ( getLog().isDebugEnabled() )
@@ -247,7 +241,7 @@ public class RunNetBeansMojo
             {
                 getLog().info( "      " + cmdLine.getArguments()[i] );
             }
-            getLog().info( "Executing: " + cmdLine.toString() );
+            getLog().info( "Executing: " + cmdLine );
             StreamConsumer out = new StreamConsumer()
             {
 

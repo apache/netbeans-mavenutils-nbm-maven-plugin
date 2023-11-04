@@ -67,9 +67,9 @@
 
     <properties>
         <!--  <mojo.java.target>1.6</mojo.java.target> -->
-        <maven.version>3.8.6</maven.version>
+        <maven.version>3.9.5</maven.version>
         <maven.minimum.version>3.6.3</maven.minimum.version>
-        <maven.plugin.version>3.8.2</maven.plugin.version>
+        <maven.plugin.version>3.10.1</maven.plugin.version>
         <skin.groupId>org.apache.maven.skins</skin.groupId>
         <skin.artifactId>maven-fluido-skin</skin.artifactId>
         <skin.version>2.0.0-M6</skin.version>
@@ -188,6 +188,7 @@
                     <configuration>
                         <source>8</source>
                         <target>8</target>
+                        <proc>none</proc>
                     </configuration>
                 </plugin>
                 <plugin>

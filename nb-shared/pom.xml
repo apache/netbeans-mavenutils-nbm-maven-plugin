@@ -26,7 +26,6 @@ under the License.
         <groupId>org.apache.netbeans.utilities</groupId>
         <artifactId>utilities-parent</artifactId>
         <version>14.0-SNAPSHOT</version>
-        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>nb-shared</artifactId>
