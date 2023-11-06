@@ -1,3 +1,20 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
 name: Verify
 
 on:
@@ -14,20 +31,33 @@ concurrency:
 
 jobs:
   build:
+    name: Build and Test on JDK ${{ matrix.java }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 8, 11, 21 ]
+        java: [ 8, 11, 17, 21 ]
+      fail-fast: false
+
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
           submodules: false
           show-progress: false
+
       - name: "Set up JDK ${{ matrix.java }}"
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+
       - name: Build & Test
         run: ./mvnw -B verify -P run-its
+
+      - name: Create Test Summary
+        uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          annotate_only: true
+          detailed_summary: true
+          report_paths: 'nb*/target/surefire-reports/TEST-*.xml'
