@@ -30,22 +30,27 @@ import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 
-public class CreateNetBeansFileStructureTest
-        extends AbstractMojoTestCase
-{
+public class CreateNetBeansFileStructureTest extends AbstractMojoTestCase {
 
-    public void testWriteExternal()
-            throws Exception
-    {
+    public void testWriteExternal() throws Exception {
+
+        String version = "4.13.2";  // TODO must be in local repo downloaded by other means -> fix this test!
+
         String localRepository = System.getProperty( "localRepository" );
         ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.class.getName() );
         ArtifactResolver artifactResolver = (ArtifactResolver) lookup( ArtifactResolver.class.getName() );
-        Artifact a = artifactFactory.createBuildArtifact( "junit", "junit", "4.12", "jar" );
+        Artifact a = artifactFactory.createBuildArtifact( "junit", "junit", version, "jar" );
 //        DefaultArtifactRepository central = new DefaultArtifactRepository( "central", "http://repo.maven.apache.org/maven2", new DefaultRepositoryLayout() );
         artifactResolver.resolve( a, Collections.<ArtifactRepository>emptyList(), new DefaultArtifactRepository( "local", new File( localRepository ).toURI().toString(), new DefaultRepositoryLayout() ) );
         StringWriter w = new StringWriter();
         CreateNetBeansFileStructure.writeExternal( new PrintWriter( w ), a );
-        assertEquals( "CRC:1355517765\nSIZE:314932\nURL:m2:/junit:junit:4.12:jar\nURL:http://repo.maven.apache.org/maven2/junit/junit/4.12/junit-4.12.jar\n", w.toString() );
+        assertEquals( 
+                "CRC:1161534166\n"
+              + "SIZE:384581\n"
+              + "URL:m2:/junit:junit:"+version+":jar\n"
+              + "URL:http://repo.maven.apache.org/maven2/junit/junit/"+version+"/junit-"+version+".jar\n",
+                w.toString()
+        );
     }
 
 }
