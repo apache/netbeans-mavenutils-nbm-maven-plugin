@@ -88,11 +88,6 @@ public class BrandingMojo
      */
     @Parameter( required = true, defaultValue = "extra" )
     protected String cluster;
-    /**
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
     @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 

@@ -160,7 +160,7 @@ public class RunPlatformAppMojo
         try
         {
 
-            List<String> args = new ArrayList<String>();
+            List<String> args = new ArrayList<>();
             args.add( "--userdir" );
             args.add( netbeansUserdir.getAbsolutePath() );
             args.add( "-J-Dnetbeans.logger.console=true" );
@@ -178,7 +178,7 @@ public class RunPlatformAppMojo
             cmdLine.addArguments( args.toArray( new String[0] ) );
             cmdLine.addArguments( CommandLineUtils.translateCommandline( additionalArguments ) );
             cmdLine.addArguments( CommandLineUtils.translateCommandline( getDebugAdditionalArguments() ) );
-            getLog().info( "Executing: " + cmdLine.toString() );
+            getLog().info( "Executing: " + cmdLine );
             StreamConsumer out = new StreamConsumer()
             {
 

@@ -137,7 +137,6 @@ public class BuildInstallersMojo
     @Parameter( defaultValue = "${project.build.finalName}" )
     private String finalName;
 
-    // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
      * Used for attaching the artifact in the project
      */
@@ -152,7 +151,6 @@ public class BuildInstallersMojo
     @Parameter( required = true, readonly = true, property = "project" )
     private MavenProject project;
 
-    // </editor-fold>
     @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException
@@ -193,7 +191,7 @@ public class BuildInstallersMojo
         appIconIcnsFile = new File( harnessDir, "etc" + File.separatorChar + "applicationIcon.icns" );
         getLog().info( "Application icon:" + appIconIcnsFile.getAbsolutePath() );
 
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
 
         props.put( "suite.location", basedir.getAbsolutePath().replace( "\\", "/" ) );
         props.put( "suite.props.app.name", brandingToken );
@@ -243,7 +241,7 @@ public class BuildInstallersMojo
             props.put( "nbi.license.file", installerLicenseFile.getAbsolutePath() );
         }
 
-        List<String> platforms = new ArrayList<String>();
+        List<String> platforms = new ArrayList<>();
 
         if ( this.installerOsLinux )
         {
@@ -297,10 +295,7 @@ public class BuildInstallersMojo
 
         props.put( "pack200.enabled", "" + installerPack200Enable );
 
-        if ( appIconIcnsFile != null )
-        {
-            props.put( "nbi.dock.icon.file", appIconIcnsFile.getAbsolutePath() );
-        }
+        props.put( "nbi.dock.icon.file", appIconIcnsFile.getAbsolutePath() );
 
         try
         {
@@ -329,7 +324,7 @@ public class BuildInstallersMojo
     }
 
     //mkleint: could this be replaced by something from plexus-utils?
-    private class FileUrlUtils
+    private static class FileUrlUtils
     {
 
         boolean copyFile( final File toCopy, final File destFile )
@@ -345,7 +340,7 @@ public class BuildInstallersMojo
             }
         }
 
-        boolean copyFilesRecusively( final File toCopy, final File destDir )
+        boolean copyFilesRecursively( final File toCopy, final File destDir )
                 throws MojoExecutionException
         {
             assert destDir.isDirectory();
@@ -363,7 +358,7 @@ public class BuildInstallersMojo
                 }
                 for ( final File child : toCopy.listFiles() )
                 {
-                    if ( !copyFilesRecusively( child, newDestDir ) )
+                    if ( !copyFilesRecursively( child, newDestDir ) )
                     {
                         return false;
                     }
@@ -421,7 +416,7 @@ public class BuildInstallersMojo
                 }
                 else
                 {
-                    return copyFilesRecusively( new File( originUrl.getPath() ), destination );
+                    return copyFilesRecursively( new File( originUrl.getPath() ), destination );
                 }
             }
             catch ( final IOException e )

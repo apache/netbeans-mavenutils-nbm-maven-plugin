@@ -191,8 +191,8 @@ public class BuildMacMojo
         }
         else
         {
-            URL harnessResourse = getClass(  ).getClassLoader(  ).getResource( "harness" );
-            JarURLConnection jarConnection = ( JarURLConnection ) harnessResourse.openConnection(  );
+            URL harnessResource = getClass(  ).getClassLoader(  ).getResource( "harness" );
+            JarURLConnection jarConnection = ( JarURLConnection ) harnessResource.openConnection(  );
             JarFile jarFile = jarConnection.getJarFile(  );
 
             JarEntry entry = jarFile.getJarEntry( "harness/etc/Info.plist" );
@@ -229,8 +229,8 @@ public class BuildMacMojo
         }
         else
         {
-            URL harnessResourse = getClass(  ).getClassLoader(  ).getResource( "harness" );
-            JarURLConnection jarConnection = ( JarURLConnection ) harnessResourse.openConnection(  );
+            URL harnessResource = getClass(  ).getClassLoader(  ).getResource( "harness" );
+            JarURLConnection jarConnection = ( JarURLConnection ) harnessResource.openConnection(  );
             JarFile jarFile = jarConnection.getJarFile(  );
 
             JarEntry entry = jarFile.getJarEntry( "harness/etc/applicationIcon.icns" );
@@ -259,8 +259,8 @@ public class BuildMacMojo
         }
         else
         {
-            URL harnessResourse = getClass(  ).getClassLoader(  ).getResource( "harness" );
-            JarURLConnection jarConnection = ( JarURLConnection ) harnessResourse.openConnection(  );
+            URL harnessResource = getClass(  ).getClassLoader(  ).getResource( "harness" );
+            JarURLConnection jarConnection = ( JarURLConnection ) harnessResource.openConnection(  );
             JarFile jarFile = jarConnection.getJarFile(  );
 
             JarEntry entry = jarFile.getJarEntry( "harness/launchers/app-macOS" );
@@ -279,7 +279,7 @@ public class BuildMacMojo
 
         }
 
-        launcherPath.toFile(  ).setExecutable( true );
+        launcherPath.toFile().setExecutable( true );
     }
 
 }
