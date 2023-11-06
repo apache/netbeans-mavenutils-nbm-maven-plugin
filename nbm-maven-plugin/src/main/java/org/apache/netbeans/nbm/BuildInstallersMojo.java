@@ -96,7 +96,8 @@ public class BuildInstallersMojo
     /**
      * Create installer for Solaris
      */
-    @Parameter( defaultValue = "true" )
+    @Deprecated
+    @Parameter( defaultValue = "false" )
     private boolean installerOsSolaris;
     /**
      * Create installer for Linux
@@ -110,8 +111,10 @@ public class BuildInstallersMojo
     private boolean installerOsMacosx;
     /**
      * Enable Pack200 compression
+     * @deprecated For removal: No longer supported on modern JDKs
      */
-    @Parameter( defaultValue = "true" )
+    @Deprecated
+    @Parameter( defaultValue = "false" )
     private boolean installerPack200Enable;
     /**
      * License file

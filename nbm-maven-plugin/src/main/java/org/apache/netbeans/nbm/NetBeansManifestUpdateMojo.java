@@ -40,9 +40,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -104,9 +101,9 @@ public class NetBeansManifestUpdateMojo
     /**
      * a NetBeans module descriptor containing dependency information and more
      *
-     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in
-     * 4.0 entirely
+     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in future.
      */
+    @Deprecated
     @Parameter( defaultValue = "${basedir}/src/main/nbm/module.xml" )
     protected File descriptor;
 
