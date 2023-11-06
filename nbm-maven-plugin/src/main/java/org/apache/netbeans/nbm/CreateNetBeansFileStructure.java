@@ -214,7 +214,7 @@ public abstract class CreateNetBeansFileStructure
     @Component
     protected MavenResourcesFiltering mavenResourcesFiltering;
 
-    @Parameter( property = "session", readonly = true, required = true )
+    @Component
     protected MavenSession session;
 
     //items used by the CreateNBMMojo.

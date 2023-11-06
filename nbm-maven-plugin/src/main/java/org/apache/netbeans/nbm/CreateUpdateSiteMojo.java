@@ -22,6 +22,7 @@ package org.apache.netbeans.nbm;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,7 +35,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -46,13 +46,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.archiver.gzip.GZipArchiver;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.netbeans.nbbuild.MakeUpdateDesc;
 
 /**
@@ -67,7 +61,6 @@ import org.netbeans.nbbuild.MakeUpdateDesc;
         requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class CreateUpdateSiteMojo
         extends AbstractNbmMojo
-        implements Contextualizable
 {
 
     /**
@@ -126,13 +119,9 @@ public class CreateUpdateSiteMojo
     @Parameter
     private List<String> updateSiteIncludes;
 
-    // <editor-fold defaultstate="collapsed" desc="Component parameters">
     @Component
     private ArtifactFactory artifactFactory;
-    /**
-     * Contextualized.
-     */
-    private PlexusContainer container;
+
     /**
      * Used for attaching the artifact in the project
      *
@@ -147,10 +136,13 @@ public class CreateUpdateSiteMojo
      * Local maven repository.
      *
      */
-    @Parameter( readonly = true, required = true, defaultValue = "${session}" )
+    @Component
     protected MavenSession session;
 
-    // </editor-fold>
+    @Component
+    private Map<String, ArtifactRepositoryLayout> layouts;
+
+    @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException
     {
@@ -166,7 +158,7 @@ public class CreateUpdateSiteMojo
         {
             distBase = null;
         }
-        ArtifactRepository distRepository = getDeploymentRepository( distBase, container, getLog() );
+        ArtifactRepository distRepository = getDeploymentRepository( distBase, layouts );
         String oldDistBase = null;
         if ( distRepository != null )
         {
@@ -343,7 +335,7 @@ public class CreateUpdateSiteMojo
 
     private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile( "(.+)::(.+)::(.+)" );
 
-    static ArtifactRepository getDeploymentRepository( String distBase, PlexusContainer container, Log log )
+    static ArtifactRepository getDeploymentRepository( String distBase, Map<String, ArtifactRepositoryLayout> layouts )
             throws MojoExecutionException, MojoFailureException
     {
 
@@ -371,27 +363,15 @@ public class CreateUpdateSiteMojo
                 String layout = matcher.group( 2 ).trim();
                 String url = matcher.group( 3 ).trim();
 
-                ArtifactRepositoryLayout repoLayout;
-                try
-                {
-                    repoLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
-                }
-                catch ( ComponentLookupException e )
-                {
-                    throw new MojoExecutionException( "Cannot find repository layout: " + layout, e );
+                ArtifactRepositoryLayout repoLayout = layouts.get( layout );
+                if ( repoLayout == null ) {
+                    throw new MojoExecutionException( "Cannot find repository layout: " + layout );
                 }
 
                 repo = new DefaultArtifactRepository( id, url, repoLayout );
             }
         }
         return repo;
-    }
-
-    @Override
-    public void contextualize( Context context )
-            throws ContextException
-    {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     private boolean matchesIncludes( Artifact art )

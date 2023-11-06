@@ -89,6 +89,7 @@ public class RunNetBeansMojo
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
+    @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException
     {

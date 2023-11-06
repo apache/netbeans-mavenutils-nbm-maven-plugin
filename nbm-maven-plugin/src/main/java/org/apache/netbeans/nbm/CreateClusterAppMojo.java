@@ -108,7 +108,7 @@ public class CreateClusterAppMojo
     /**
      * The Maven Project.
      */
-    @Parameter( required = true, readonly = true, property = "project" )
+    @Component
     private MavenProject project;
 
     /**
@@ -175,22 +175,15 @@ public class CreateClusterAppMojo
         "org.openide.modules.jre.JavaFX" //MNBMODULE-234
     } );
 
-    // <editor-fold defaultstate="collapsed" desc="Component parameters">
     @Component
     private ArtifactFactory artifactFactory;
 
     @Component
     private ArtifactResolver artifactResolver;
 
-    /**
-     * Local maven repository.
-     *
-     */
-    @Parameter( required = true, readonly = true, defaultValue = "${session}" )
+    @Component
     protected MavenSession session;
 
-// end of component params custom code folding
-// </editor-fold>
     @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException

@@ -26,9 +26,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Organization;
@@ -42,11 +45,6 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.util.FileUtils;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.netbeans.nbbuild.MakeNBM;
 import org.netbeans.nbbuild.MakeNBM.Blurb;
 import org.netbeans.nbbuild.MakeNBM.Signature;
@@ -64,7 +62,6 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
         defaultPhase = LifecyclePhase.PACKAGE )
 public class CreateNbmMojo
         extends CreateNetBeansFileStructure
-        implements Contextualizable
 {
 
     /**
@@ -170,12 +167,6 @@ public class CreateNbmMojo
     @Parameter
     private File licenseFile;
 
-    // <editor-fold defaultstate="collapsed" desc="Component parameters">
-    /**
-     * Contextualized.
-     */
-    private PlexusContainer container;
-
     @Component
     private ArtifactFactory artifactFactory;
     /**
@@ -184,8 +175,9 @@ public class CreateNbmMojo
     @Component
     private MavenProjectHelper projectHelper;
 
-    // end of component params custom code folding
-    // </editor-fold>
+    @Component
+    private Map<String, ArtifactRepositoryLayout> layouts;
+
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy/MM/dd" );
 
     public void execute()
@@ -318,7 +310,7 @@ public class CreateNbmMojo
         if ( distribUrl != null )
         {
             ArtifactRepository distRepository = CreateUpdateSiteMojo.getDeploymentRepository(
-                    distribUrl, container, getLog() );
+                    distribUrl, layouts );
             String dist = null;
             if ( distRepository == null )
             {
@@ -370,13 +362,6 @@ public class CreateNbmMojo
         {
             throw new MojoExecutionException( "Cannot copy nbm to build directory", ex );
         }
-    }
-
-    @Override
-    public void contextualize( Context context )
-            throws ContextException
-    {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     private String createDefaultLicenseHeader()

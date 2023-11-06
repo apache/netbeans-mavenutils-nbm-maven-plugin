@@ -148,7 +148,7 @@ public class BuildInstallersMojo
     /**
      * The Maven Project.
      */
-    @Parameter( required = true, readonly = true, property = "project" )
+    @Component
     private MavenProject project;
 
     @Override
