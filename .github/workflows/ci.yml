@@ -1,0 +1,33 @@
+name: Verify
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+# cancel other PR workflow run in the same head-base group if it exists (e.g. during PR syncs)
+# if this is not a PR run (no github.head_ref and github.base_ref defined), use an UID as group
+concurrency: 
+  group: ${{ github.head_ref || github.run_id }}-${{ github.base_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 8, 11, 21 ]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: false
+          show-progress: false
+      - name: "Set up JDK ${{ matrix.java }}"
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+      - name: Build & Test
+        run: ./mvnw -B verify -P run-its
