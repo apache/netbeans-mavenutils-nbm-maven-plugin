@@ -425,7 +425,7 @@ under the License.
                                 <goal>install</goal>
                             </goals>
                             <filterProperties>
-                                <netbeans.version>RELEASE170</netbeans.version>
+                                <netbeans.version>RELEASE190</netbeans.version>
                             </filterProperties>
                         </configuration>
                         <executions>
