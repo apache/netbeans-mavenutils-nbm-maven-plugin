@@ -263,43 +263,22 @@ public class NetBeansManifestUpdateMojo
     @Parameter( defaultValue = "normal" )
     protected String moduleType;
 
-    // <editor-fold defaultstate="collapsed" desc="Component parameters">
-
-    /**
-     * The artifact factory to use.
-     */
-    @Component
-    private ArtifactFactory artifactFactory;
-
-    /**
-     * The artifact metadata source to use.
-     */
-    @Component
-    private ArtifactMetadataSource artifactMetadataSource;
-
-    /**
-     * The artifact collector to use.
-     */
-    @Component
-    private ArtifactCollector artifactCollector;
-
     /**
      * The dependency tree builder to use.
      */
-    @Component( hint = "default" )
+    @Component
     private DependencyGraphBuilder dependencyGraphBuilder;
 
-    @Parameter( defaultValue = "${session}", readonly = true )
+    @Component
     private MavenSession session;
 
-// end of component params custom code folding
-// </editor-fold>
     /**
      * execute plugin
      *
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
+    @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException
 

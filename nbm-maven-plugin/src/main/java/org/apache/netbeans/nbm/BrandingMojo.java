@@ -21,6 +21,7 @@ package org.apache.netbeans.nbm;
 
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -88,9 +89,10 @@ public class BrandingMojo
      */
     @Parameter( required = true, defaultValue = "extra" )
     protected String cluster;
-    @Parameter( required = true, readonly = true, property = "project" )
+    @Component
     private MavenProject project;
 
+    @Override
     public void execute()
             throws MojoExecutionException
     {

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -52,7 +53,7 @@ public class RunPlatformAppMojo
     @Parameter( required = true, property = "netbeans.branding.token" )
     protected String brandingToken;
     /**
-     * output directory where the the NetBeans application is created.
+     * output directory where the NetBeans application is created.
      */
     @Parameter( required = true, defaultValue = "${project.build.directory}" )
     private File outputDirectory;
@@ -83,7 +84,7 @@ public class RunPlatformAppMojo
      * The Maven Project.
      *
      */
-    @Parameter( required = true, readonly = true, property = "project" )
+    @Component
     private MavenProject project;
 
     /**
@@ -91,6 +92,7 @@ public class RunPlatformAppMojo
      * @throws MojoExecutionException if an unexpected problem occurs
      * @throws MojoFailureException if an expected problem occurs
      */
+    @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException
     {

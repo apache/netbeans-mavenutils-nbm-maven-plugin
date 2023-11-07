@@ -21,6 +21,7 @@ package org.apache.netbeans.nbm;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -101,13 +102,13 @@ public class BuildMacMojo
      */
     @Parameter( property = "netbeans.mac.title", required = false )
     private String macAppTitle;
+
     /**
      * The Maven Project.
      */
-    @Parameter( required = true, readonly = true, property = "project" )
+    @Component
     private MavenProject project;
 
-    // </editor-fold>
     @Override
     public void execute(  )
             throws MojoExecutionException, MojoFailureException

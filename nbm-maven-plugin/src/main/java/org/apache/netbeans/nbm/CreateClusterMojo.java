@@ -25,8 +25,10 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -72,8 +74,8 @@ public class CreateClusterMojo
     /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
      */
-    @Parameter( required = true, readonly = true, property = "reactorProjects" )
-    private List<MavenProject> reactorProjects;
+    @Component
+    private MavenSession mavenSession;
 
     public void execute()
             throws MojoExecutionException, MojoFailureException
@@ -85,6 +87,7 @@ public class CreateClusterMojo
             clusterBuildDir.mkdirs();
         }
 
+        List<MavenProject> reactorProjects = mavenSession.getProjects();
         if ( reactorProjects != null && reactorProjects.size() > 0 )
         {
             for ( MavenProject proj : reactorProjects )
