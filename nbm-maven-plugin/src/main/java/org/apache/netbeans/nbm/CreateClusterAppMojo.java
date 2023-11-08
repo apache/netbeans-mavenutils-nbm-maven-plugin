@@ -457,7 +457,7 @@ public class CreateClusterAppMojo
                                         }
                                         else
                                         {
-                                            getLog().info( ex.getModule() + " added by " + art.getId() + ""
+                                            getLog().debug( ex.getModule() + " added by " + art.getId() + " located in: "
                                                     + classpathFile );
                                             wrappedBundleCNBs.add( ex.getModule() );
                                         }
