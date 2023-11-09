@@ -219,7 +219,9 @@
                 <file>config/maven-eclipse-importorder.txt</file>
               </importOrder>
               <removeUnusedImports/>
-              <palantirJavaFormat/>
+              <palantirJavaFormat>
+                <version>2.38.0</version>
+              </palantirJavaFormat>
               <licenseHeader>
                 <file>config/maven-header-plain.txt</file>
               </licenseHeader>
