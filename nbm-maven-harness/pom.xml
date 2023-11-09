@@ -85,37 +85,37 @@ under the License.
             <phase>generate-resources</phase>
             <configuration>
               <target>
-                <property name="dependency.directory" value="${project.build.directory}/dependency/"/>
+                <property name="dependency.directory" value="${project.build.directory}/dependency/" />
                 <unzip dest="${project.build.directory}/classes" src="${dependency.directory}harness.nbm">
                   <patternset>
-                    <include name="netbeans/etc/app.conf"/>
-                    <include name="netbeans/etc/applicationIcon.icns"/>
-                    <include name="netbeans/etc/Info.plist"/>
-                    <include name="netbeans/launchers/app*"/>
+                    <include name="netbeans/etc/app.conf" />
+                    <include name="netbeans/etc/applicationIcon.icns" />
+                    <include name="netbeans/etc/Info.plist" />
+                    <include name="netbeans/launchers/app*" />
                   </patternset>
-                  <mapper from="netbeans/*" to="harness/*" type="glob"/>
+                  <mapper from="netbeans/*" to="harness/*" type="glob" />
                 </unzip>
                 <unzip dest="${project.build.directory}" src="${dependency.directory}harness.nbm">
                   <patternset>
-                    <include name="netbeans/tasks.jar"/>
-                    <include name="netbeans/jnlp/jnlp-launcher.jar"/>
+                    <include name="netbeans/tasks.jar" />
+                    <include name="netbeans/jnlp/jnlp-launcher.jar" />
                   </patternset>
-                  <flattenmapper/>
+                  <flattenmapper />
                 </unzip>
-                <mkdir dir="${project.build.directory}/classes/harness/jnlp"/>
-                <unzip dest="${project.build.directory}/classes" src="${project.build.directory}/tasks.jar"/>
+                <mkdir dir="${project.build.directory}/classes/harness/jnlp" />
+                <unzip dest="${project.build.directory}/classes" src="${project.build.directory}/tasks.jar" />
                 <unzip dest="${project.build.directory}/classes" src="${dependency.directory}nbi-ant.nbm">
                   <patternset>
-                    <include name="netbeans/modules/"/>
-                    <include name="netbeans/nbi/"/>
+                    <include name="netbeans/modules/" />
+                    <include name="netbeans/nbi/" />
                   </patternset>
-                  <mapper from="netbeans/*" to="harness/*" type="glob"/>
+                  <mapper from="netbeans/*" to="harness/*" type="glob" />
                 </unzip>
                 <unzip dest="${project.build.directory}/classes" src="${dependency.directory}nbi-engine.nbm">
                   <patternset>
-                    <include name="netbeans/modules/"/>
+                    <include name="netbeans/modules/" />
                   </patternset>
-                  <mapper from="netbeans/*" to="harness/*" type="glob"/>
+                  <mapper from="netbeans/*" to="harness/*" type="glob" />
                 </unzip>
                 <!-- patch product.xml - unable to delete temp files after build finishes -->
                 <replace file="${project.build.directory}/classes/harness/nbi/.common/product.xml">
@@ -123,7 +123,7 @@ under the License.
                   <replacevalue expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}" deleteonexit="true">]]></replacevalue>
                 </replace>
                 <!-- patch replace exec with ant task in common.xml -->
-                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" flags="s" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@"/>
+                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" flags="s" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" />
                 <replace failOnNoReplacements="true" file="${project.build.directory}/classes/harness/nbi/.common/common.xml">
                   <replacetoken expandProperties="false">@EXEC@</replacetoken>
                   <replacevalue expandProperties="false"><![CDATA[ant inheritrefs="false"
@@ -135,7 +135,7 @@ under the License.
                   <property name="custom.tasks.cls" value="${custom.tasks.cls}" />
             </ant]]></replacevalue>
                 </replace>
-                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" flags="s" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@"/>
+                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" flags="s" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" />
                 <replace failOnNoReplacements="true" file="${project.build.directory}/classes/harness/nbi/.common/common.xml">
                   <replacetoken expandProperties="false">@EXEC@</replacetoken>
                   <replacevalue expandProperties="false"><![CDATA[condition property="nb.jdk.home.value"
@@ -169,7 +169,7 @@ under the License.
                   <property name="${custom.parameter.name}" value="${custom.parameter.value}" />
         </ant]]></replacevalue>
                 </replace>
-                <replace failOnNoReplacements="true" file="${project.build.directory}/classes/harness/nbi/.common/common.xml" token="@java.home@" value="java.home"/>
+                <replace failOnNoReplacements="true" file="${project.build.directory}/classes/harness/nbi/.common/common.xml" token="@java.home@" value="java.home" />
               </target>
             </configuration>
           </execution>
