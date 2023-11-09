@@ -16,13 +16,4 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-/**
- * dummy class to keep central maven repository happy.
- *
- * @author Milos Kleint
- */
-public class Dummy
-{
-
-}
+public class Dummy {}

@@ -1,5 +1,3 @@
-package org.apache.netbeans.nbm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +26,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -55,39 +53,38 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
  *
  * @author Milos Kleint
  */
-@Mojo( name = "nbm",
+@Mojo(
+        name = "nbm",
         requiresProject = true,
         threadSafe = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME,
-        defaultPhase = LifecyclePhase.PACKAGE )
-public class CreateNbmMojo
-        extends CreateNetBeansFileStructure
-{
+        defaultPhase = LifecyclePhase.PACKAGE)
+public class CreateNbmMojo extends CreateNetBeansFileStructure {
 
     /**
      * keystore location for signing the nbm file
      */
-    @Parameter( property = "keystore" )
+    @Parameter(property = "keystore")
     private String keystore;
     /**
      * keystore password
      */
-    @Parameter( property = "keystorepass" )
+    @Parameter(property = "keystorepass")
     private String keystorepassword;
     /**
      * keystore alias
      */
-    @Parameter( property = "keystorealias" )
+    @Parameter(property = "keystorealias")
     private String keystorealias;
     /**
      * Timestamp Authority (TSA) URL
      */
-    @Parameter( property = "tsaurl" )
+    @Parameter(property = "tsaurl")
     private String tsaurl;
     /**
      * Timestamp Authority (TSA) Certificate
      */
-    @Parameter( property = "tsacert" )
+    @Parameter(property = "tsacert")
     private String tsacert;
 
     /**
@@ -96,7 +93,7 @@ public class CreateNbmMojo
      *
      * @since 3.0
      */
-    @Parameter( defaultValue = "false", property = "maven.nbm.skip" )
+    @Parameter(defaultValue = "false", property = "maven.nbm.skip")
     private boolean skipNbm;
 
     /**
@@ -104,7 +101,7 @@ public class CreateNbmMojo
      *
      * @since 3.8
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean requiresRestart;
 
     /**
@@ -113,7 +110,7 @@ public class CreateNbmMojo
      *
      * @since 3.8
      */
-    @Parameter( defaultValue = "${project.url}" )
+    @Parameter(defaultValue = "${project.url}")
     private String homePageUrl;
 
     /**
@@ -121,7 +118,7 @@ public class CreateNbmMojo
      *
      * @since 3.8
      */
-    @Parameter( defaultValue = "${project.organization.name}" )
+    @Parameter(defaultValue = "${project.organization.name}")
     private String author;
 
     /**
@@ -144,7 +141,7 @@ public class CreateNbmMojo
      * If the value doesn't contain :: characters, it's assumed to be the flat structure and the value is just the URL.
      *
      */
-    @Parameter( property = "maven.nbm.distributionURL" )
+    @Parameter(property = "maven.nbm.distributionURL")
     private String distributionUrl;
 
     /**
@@ -178,260 +175,193 @@ public class CreateNbmMojo
     @Component
     private Map<String, ArtifactRepositoryLayout> layouts;
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy/MM/dd" );
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
 
-    public void execute()
-            throws MojoExecutionException, MojoFailureException
-    {
-        if ( skipNbm )
-        {
-            getLog().info( "Skipping generation of NBM file." );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skipNbm) {
+            getLog().info("Skipping generation of NBM file.");
             return;
         }
 
-        if ( "pom".equals( project.getPackaging() ) )
-        {
-            getLog().info(
-                    "Skipping " + project.getId() + ", no nbm:nbm execution for 'pom' packaging" );
+        if ("pom".equals(project.getPackaging())) {
+            getLog().info("Skipping " + project.getId() + ", no nbm:nbm execution for 'pom' packaging");
             return;
         }
         super.execute();
 
         // 3. generate nbm
-        File nbmFile = new File( nbmBuildDir, finalName + ".nbm" );
-        MakeNBM nbmTask = (MakeNBM) antProject.createTask( "makenbm" );
-        nbmTask.setFile( nbmFile );
-        nbmTask.setProductDir( clusterDir );
+        File nbmFile = new File(nbmBuildDir, finalName + ".nbm");
+        MakeNBM nbmTask = (MakeNBM) antProject.createTask("makenbm");
+        nbmTask.setFile(nbmFile);
+        nbmTask.setProductDir(clusterDir);
 
-        nbmTask.setModule( "modules" + File.separator + moduleJarName + ".jar" );
+        nbmTask.setModule("modules" + File.separator + moduleJarName + ".jar");
         boolean reqRestart = requiresRestart;
-        if ( !reqRestart && module.isRequiresRestart() )
-        {
+        if (!reqRestart && module.isRequiresRestart()) {
             reqRestart = module.isRequiresRestart();
             getLog().warn(
-                    "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml" );
+                            "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
         }
-        nbmTask.setNeedsrestart( Boolean.toString( reqRestart ) );
+        nbmTask.setNeedsrestart(Boolean.toString(reqRestart));
         String moduleAuthor = author;
-        if ( module.getAuthor() != null )
-        {
+        if (module.getAuthor() != null) {
             moduleAuthor = module.getAuthor();
             getLog().warn(
-                    "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml" );
+                            "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
         }
-        nbmTask.setModuleauthor( moduleAuthor );
-        if ( keystore != null && keystorealias != null && keystorepassword != null )
-        {
-            File ks = new File( keystore );
-            if ( !ks.exists() )
-            {
-                getLog().warn( "Cannot find keystore file at " + ks.getAbsolutePath() );
-            }
-            else
-            {
+        nbmTask.setModuleauthor(moduleAuthor);
+        if (keystore != null && keystorealias != null && keystorepassword != null) {
+            File ks = new File(keystore);
+            if (!ks.exists()) {
+                getLog().warn("Cannot find keystore file at " + ks.getAbsolutePath());
+            } else {
                 Signature sig = nbmTask.createSignature();
-                sig.setKeystore( ks );
-                sig.setAlias( keystorealias );
-                sig.setStorepass( keystorepassword );
-                if ( tsaurl != null ) 
-                {
-                    sig.setTsaurl( tsaurl );
+                sig.setKeystore(ks);
+                sig.setAlias(keystorealias);
+                sig.setStorepass(keystorepassword);
+                if (tsaurl != null) {
+                    sig.setTsaurl(tsaurl);
                 }
-                if ( tsacert != null ) 
-                {
-                    sig.setTsacert( tsacert );
+                if (tsacert != null) {
+                    sig.setTsacert(tsacert);
                 }
-                getLog().debug( "Setup the Ant task to sign the NBM file." );
+                getLog().debug("Setup the Ant task to sign the NBM file.");
             }
-        }
-        else if ( keystore != null || keystorepassword != null || keystorealias != null )
-        {
+        } else if (keystore != null || keystorepassword != null || keystorealias != null) {
             getLog().warn(
-                    "If you want to sign the nbm file, you need to define all three keystore related parameters." );
+                            "If you want to sign the nbm file, you need to define all three keystore related parameters.");
         }
         String licName = licenseName;
         File licFile = licenseFile;
-        if ( module.getLicenseName() != null )
-        {
+        if (module.getLicenseName() != null) {
             licName = module.getLicenseName();
-            getLog().warn(
-                    "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml" );
+            getLog().warn("Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml");
         }
-        if ( module.getLicenseFile() != null )
-        {
-            File lf = new File( project.getBasedir(), module.getLicenseFile() );
+        if (module.getLicenseFile() != null) {
+            File lf = new File(project.getBasedir(), module.getLicenseFile());
             licFile = lf;
-            getLog().warn(
-                    "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml" );
-
+            getLog().warn("Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml");
         }
-        if ( licName != null && licFile != null )
-        {
-            if ( !licFile.exists() || !licFile.isFile() )
-            {
-                getLog().warn( "Cannot find license file at " + licFile.getAbsolutePath() );
-            }
-            else
-            {
+        if (licName != null && licFile != null) {
+            if (!licFile.exists() || !licFile.isFile()) {
+                getLog().warn("Cannot find license file at " + licFile.getAbsolutePath());
+            } else {
                 Blurb lb = nbmTask.createLicense();
-                lb.setFile( licFile );
-                lb.addText( licName );
+                lb.setFile(licFile);
+                lb.addText(licName);
             }
-        }
-        else if ( licName != null || licFile != null )
-        {
+        } else if (licName != null || licFile != null) {
             getLog().warn(
-                    "To set license for the nbm, you need to specify both licenseName and licenseFile parameters." );
-        }
-        else
-        {
+                            "To set license for the nbm, you need to specify both licenseName and licenseFile parameters.");
+        } else {
             Blurb lb = nbmTask.createLicense();
-            lb.addText( createDefaultLicenseHeader() );
-            lb.addText( createDefaultLicenseText() );
+            lb.addText(createDefaultLicenseHeader());
+            lb.addText(createDefaultLicenseText());
         }
         String hpUrl = homePageUrl;
-        if ( module.getHomepageUrl() != null )
-        {
-            getLog().warn(
-                    "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml" );
+        if (module.getHomepageUrl() != null) {
+            getLog().warn("Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml");
             hpUrl = module.getHomepageUrl();
         }
-        if ( hpUrl != null )
-        {
-            nbmTask.setHomepage( hpUrl );
+        if (hpUrl != null) {
+            nbmTask.setHomepage(hpUrl);
         }
         String distribUrl = distributionUrl;
-        if ( module.getDistributionUrl() != null )
-        {
+        if (module.getDistributionUrl() != null) {
             distribUrl = module.getDistributionUrl();
             getLog().warn(
-                    "Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml" );
+                            "Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml");
         }
-        if ( distribUrl != null )
-        {
-            ArtifactRepository distRepository = CreateUpdateSiteMojo.getDeploymentRepository(
-                    distribUrl, layouts );
+        if (distribUrl != null) {
+            ArtifactRepository distRepository = CreateUpdateSiteMojo.getDeploymentRepository(distribUrl, layouts);
             String dist = null;
-            if ( distRepository == null )
-            {
-                if ( !distribUrl.contains( "::" ) )
-                {
-                    dist
-                            = distribUrl + ( distribUrl.endsWith( "/" ) ? "" : "/" )
-                            + nbmFile.getName();
+            if (distRepository == null) {
+                if (!distribUrl.contains("::")) {
+                    dist = distribUrl + (distribUrl.endsWith("/") ? "" : "/") + nbmFile.getName();
                 }
-            }
-            else
-            {
+            } else {
                 Artifact art = artifactFactory.createArtifact(
-                        project.getGroupId(), project.getArtifactId(),
-                        project.getVersion(), null, "nbm-file" );
+                        project.getGroupId(), project.getArtifactId(), project.getVersion(), null, "nbm-file");
 
-                dist
-                        = distRepository.getUrl() + ( distRepository.getUrl().endsWith( "/" ) ? "" : "/" )
-                        + distRepository.pathOf( art );
-
+                dist = distRepository.getUrl()
+                        + (distRepository.getUrl().endsWith("/") ? "" : "/")
+                        + distRepository.pathOf(art);
             }
-            nbmTask.setDistribution( dist );
+            nbmTask.setDistribution(dist);
+        } else {
+            nbmTask.setDistribution(nbmFile.getName());
         }
-        else
-        {
-            nbmTask.setDistribution( nbmFile.getName() );
+        if (!"extra".equals(cluster)) {
+            nbmTask.setTargetcluster(cluster);
         }
-        if ( !"extra".equals( cluster ) )
-        {
-            nbmTask.setTargetcluster( cluster );
-        }
-        //MNBMODULE-217 avoid using the static DATE_FORMAT variable in MavenNBM.java (in ant harness)
-        nbmTask.setReleasedate( DATE_FORMAT.format( new Date( System.currentTimeMillis() ) ) );
-        try
-        {
+        // MNBMODULE-217 avoid using the static DATE_FORMAT variable in MavenNBM.java (in ant harness)
+        nbmTask.setReleasedate(DATE_FORMAT.format(new Date(System.currentTimeMillis())));
+        try {
             nbmTask.execute();
+        } catch (BuildException e) {
+            throw new MojoExecutionException("Cannot Generate nbm file:" + e.getMessage(), e);
         }
-        catch ( BuildException e )
-        {
-            throw new MojoExecutionException( "Cannot Generate nbm file:" + e.getMessage(), e );
-        }
-        try
-        {
-            File nbmfile = new File( buildDir, nbmFile.getName() );
-            FileUtils.getFileUtils().copyFile( nbmFile, nbmfile );
-            projectHelper.attachArtifact( project, "nbm-file", null, nbmfile );
-        }
-        catch ( IOException ex )
-        {
-            throw new MojoExecutionException( "Cannot copy nbm to build directory", ex );
+        try {
+            File nbmfile = new File(buildDir, nbmFile.getName());
+            FileUtils.getFileUtils().copyFile(nbmFile, nbmfile);
+            projectHelper.attachArtifact(project, "nbm-file", null, nbmfile);
+        } catch (IOException ex) {
+            throw new MojoExecutionException("Cannot copy nbm to build directory", ex);
         }
     }
 
-    private String createDefaultLicenseHeader()
-    {
+    private String createDefaultLicenseHeader() {
         String organization = "";
         Organization org = project.getOrganization();
-        if ( org != null )
-        {
+        if (org != null) {
             organization = org.getName();
         }
-        if ( organization == null )
-        {
+        if (organization == null) {
             List devs = project.getDevelopers();
-            if ( devs.size() > 0 )
-            {
+            if (devs.size() > 0) {
                 Iterator dvs = devs.iterator();
                 String devsString = "";
-                while ( dvs.hasNext() )
-                {
+                while (dvs.hasNext()) {
                     Developer d = (Developer) dvs.next();
                     devsString = devsString + "," + d.getName() != null ? d.getName() : d.getId();
                 }
-                organization = devsString.substring( 1 );
+                organization = devsString.substring(1);
             }
         }
-        if ( organization == null )
-        {
-            organization = ""; //what's a good default value?
+        if (organization == null) {
+            organization = ""; // what's a good default value?
         }
         String date = "";
-        if ( project.getInceptionYear() != null )
-        {
+        if (project.getInceptionYear() != null) {
             date = project.getInceptionYear();
         }
-        String year = Integer.toString( Calendar.getInstance().get( Calendar.YEAR ) );
-        if ( !year.equals( date ) )
-        {
+        String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+        if (!year.equals(date)) {
             date = date.length() == 0 ? year : date + "-" + year;
         }
         return "Copyright " + organization + " " + date;
     }
 
-    private String createDefaultLicenseText()
-    {
+    private String createDefaultLicenseText() {
         String toRet = "License terms:\n";
 
         List licenses = project.getLicenses();
-        if ( licenses != null && licenses.size() > 0 )
-        {
+        if (licenses != null && licenses.size() > 0) {
             Iterator lic = licenses.iterator();
-            while ( lic.hasNext() )
-            {
+            while (lic.hasNext()) {
                 License ll = (License) lic.next();
 
-                if ( ll.getName() != null )
-                {
+                if (ll.getName() != null) {
                     toRet = toRet + ll.getName() + " - ";
                 }
-                if ( ll.getUrl() != null )
-                {
+                if (ll.getUrl() != null) {
                     toRet = toRet + ll.getUrl();
                 }
-                if ( lic.hasNext() )
-                {
+                if (lic.hasNext()) {
                     toRet = toRet + ",\n";
                 }
             }
-        }
-        else
-        {
+        } else {
             toRet = toRet + "Unknown";
         }
         return toRet;

@@ -1,5 +1,3 @@
-package org.apache.netbeans.nbm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.netbeans.nbm;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,81 +29,61 @@ import java.util.TimeZone;
  * @author Milos Kleint
  *
  */
-public class AdaptNbVersion
-{
+public class AdaptNbVersion {
 
-    public static final String TYPE_SPECIFICATION = "spec"; //NOI18N
-    public static final String TYPE_IMPLEMENTATION = "impl"; //NOI18N
-    private static final String SNAPSHOT = "SNAPSHOT"; //NOI18N
+    public static final String TYPE_SPECIFICATION = "spec"; // NOI18N
+    public static final String TYPE_IMPLEMENTATION = "impl"; // NOI18N
+    private static final String SNAPSHOT = "SNAPSHOT"; // NOI18N
 
-    public static String adaptVersion( String version, Object type, Date date )
-    {
-        StringTokenizer tok = new StringTokenizer( version, "." );
-        if ( SNAPSHOT.equals( version ) && TYPE_IMPLEMENTATION.equals( type ) )
-        {
-            return "0.0.0." + generateSnapshotValue( date );
+    public static String adaptVersion(String version, Object type, Date date) {
+        StringTokenizer tok = new StringTokenizer(version, ".");
+        if (SNAPSHOT.equals(version) && TYPE_IMPLEMENTATION.equals(type)) {
+            return "0.0.0." + generateSnapshotValue(date);
         }
         StringBuffer toReturn = new StringBuffer();
-        while ( tok.hasMoreTokens() )
-        {
+        while (tok.hasMoreTokens()) {
             String token = tok.nextToken();
-            if ( TYPE_IMPLEMENTATION.equals( type ) )
-            {
-                int snapshotIndex = token.indexOf( SNAPSHOT );
-                if ( snapshotIndex > 0 )
-                {
-                    String repl = token.substring( 0, snapshotIndex ) + generateSnapshotValue( date );
-                    if ( token.length() > snapshotIndex + SNAPSHOT.length() )
-                    {
-                        repl = token.substring(
-                                snapshotIndex + SNAPSHOT.length() );
+            if (TYPE_IMPLEMENTATION.equals(type)) {
+                int snapshotIndex = token.indexOf(SNAPSHOT);
+                if (snapshotIndex > 0) {
+                    String repl = token.substring(0, snapshotIndex) + generateSnapshotValue(date);
+                    if (token.length() > snapshotIndex + SNAPSHOT.length()) {
+                        repl = token.substring(snapshotIndex + SNAPSHOT.length());
                     }
                     token = repl;
                 }
             }
-            if ( TYPE_SPECIFICATION.equals( type ) )
-            {
+            if (TYPE_SPECIFICATION.equals(type)) {
                 // strip the trailing -RC1, -BETA5, -SNAPSHOT
-                if ( token.indexOf( '-' ) > 0 )
-                {
-                    token = token.substring( 0, token.indexOf( '-' ) );
+                if (token.indexOf('-') > 0) {
+                    token = token.substring(0, token.indexOf('-'));
+                } else if (token.indexOf('_') > 0) {
+                    token = token.substring(0, token.indexOf('_'));
                 }
-                else if ( token.indexOf( '_' ) > 0 )
-                {
-                    token = token.substring( 0, token.indexOf( '_' ) );
-                }
-                try
-                {
-                    Integer intValue = Integer.valueOf( token );
+                try {
+                    Integer intValue = Integer.valueOf(token);
                     token = intValue.toString();
-                }
-                catch ( NumberFormatException exc )
-                {
+                } catch (NumberFormatException exc) {
                     // ignore, will just not be added to the
                     token = "";
                 }
             }
-            if ( token.length() > 0 )
-            {
-                if ( toReturn.length() != 0 )
-                {
-                    toReturn.append( "." );
+            if (token.length() > 0) {
+                if (toReturn.length() != 0) {
+                    toReturn.append(".");
                 }
-                toReturn.append( token );
+                toReturn.append(token);
             }
-
         }
-        if ( toReturn.length() == 0 )
-        {
-            toReturn.append( "0.0.0" );
+        if (toReturn.length() == 0) {
+            toReturn.append("0.0.0");
         }
         return toReturn.toString();
     }
 
-    private static String generateSnapshotValue( Date date )
-    {
-        SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyyMMdd" );
-        dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-        return dateFormat.format( date );
+    private static String generateSnapshotValue(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.format(date);
     }
 }

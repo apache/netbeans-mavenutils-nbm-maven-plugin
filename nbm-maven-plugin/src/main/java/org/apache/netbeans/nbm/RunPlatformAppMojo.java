@@ -1,5 +1,3 @@
-package org.apache.netbeans.nbm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,11 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.netbeans.nbm;
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -42,31 +41,29 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  * @author Milos Kleint
  *
  */
-@Mojo( name = "run-platform", requiresDependencyResolution = ResolutionScope.RUNTIME )
-public class RunPlatformAppMojo
-        extends AbstractMojo
-{
+@Mojo(name = "run-platform", requiresDependencyResolution = ResolutionScope.RUNTIME)
+public class RunPlatformAppMojo extends AbstractMojo {
 
     /**
      * The branding token for the application based on NetBeans platform.
      */
-    @Parameter( required = true, property = "netbeans.branding.token" )
+    @Parameter(required = true, property = "netbeans.branding.token")
     protected String brandingToken;
     /**
      * output directory where the NetBeans application is created.
      */
-    @Parameter( required = true, defaultValue = "${project.build.directory}" )
+    @Parameter(required = true, defaultValue = "${project.build.directory}")
     private File outputDirectory;
 
     /**
      * NetBeans user directory for the executed instance.
      */
-    @Parameter( required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir" )
+    @Parameter(required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir")
     protected File netbeansUserdir;
     /**
      * additional command line arguments passed to the application. can be used to debug the IDE.
      */
-    @Parameter( property = "netbeans.run.params" )
+    @Parameter(property = "netbeans.run.params")
     protected String additionalArguments;
 
     /**
@@ -77,7 +74,7 @@ public class RunPlatformAppMojo
      *
      * @since 3.11
      */
-    @Parameter( property = "netbeans.run.params.debug" )
+    @Parameter(property = "netbeans.run.params.debug")
     protected String debugAdditionalArguments;
 
     /**
@@ -93,40 +90,33 @@ public class RunPlatformAppMojo
      * @throws MojoFailureException if an expected problem occurs
      */
     @Override
-    public void execute()
-            throws MojoExecutionException, MojoFailureException
-    {
-        if ( !"nbm-application".equals( project.getPackaging() ) )
-        {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (!"nbm-application".equals(project.getPackaging())) {
             throw new MojoFailureException(
                     "The nbm:run-platform goal shall be used within a NetBeans Application project only "
-                    + "('nbm-application' packaging)" );
+                            + "('nbm-application' packaging)");
         }
 
         netbeansUserdir.mkdirs();
 
-        File appbasedir = new File( outputDirectory, brandingToken );
+        File appbasedir = new File(outputDirectory, brandingToken);
 
-        if ( !appbasedir.exists() )
-        {
-            throw new MojoExecutionException( "The directory that shall contain built application, doesn't exist ("
-                    + appbasedir.getAbsolutePath() + ")\n Please invoke 'mvn install' on the project first" );
+        if (!appbasedir.exists()) {
+            throw new MojoExecutionException("The directory that shall contain built application, doesn't exist ("
+                    + appbasedir.getAbsolutePath() + ")\n Please invoke 'mvn install' on the project first");
         }
 
-        boolean windows = Os.isFamily( "windows" );
+        boolean windows = Os.isFamily("windows");
 
         Commandline cmdLine = new Commandline();
         File exec;
-        if ( windows )
-        {
-            exec = new File( appbasedir, "bin" + brandingToken + "_w.exe" );
-            if ( !exec.exists() )
-            { // Was removed as of nb 6.7
-                exec = new File( appbasedir, "bin\\" + brandingToken + ".exe" );
+        if (windows) {
+            exec = new File(appbasedir, "bin" + brandingToken + "_w.exe");
+            if (!exec.exists()) { // Was removed as of nb 6.7
+                exec = new File(appbasedir, "bin\\" + brandingToken + ".exe");
                 // if jdk is 32 or 64-bit
-                String jdkHome = System.getenv( "JAVA_HOME" );
-                if ( jdkHome != null )
-                {
+                String jdkHome = System.getenv("JAVA_HOME");
+                if (jdkHome != null) {
                     /* Detect whether the JDK is 32-bit or 64-bit. Since Oracle has "no plans to ship 32-bit builds of
                     JDK 9" [1] or beyond, assume 64-bit unless we can positively identify the JDK as 32-bit. The file
                     below is confirmed to exist on 32-bit Java 8, Java 9, and Java 10 [2], and confirmed _not_ to exist
@@ -135,74 +125,60 @@ public class RunPlatformAppMojo
                     [1] Mark Reinhold on 2017-09-25
                         https://twitter.com/mreinhold/status/912311207935090689
                     [2] Downloaded from https://www.azul.com/downloads/zulu/zulu-windows on 2018-09-05. */
-                    if ( !new File( jdkHome, "jre\\bin\\JavaAccessBridge-32.dll" ).exists()
+                    if (!new File(jdkHome, "jre\\bin\\JavaAccessBridge-32.dll").exists()
                             && // 32-bit Java 8
-                            !new File( jdkHome, "\\bin\\javaaccessbridge-32.dll" ).exists() ) // 32-bit Java 9 or 10
+                            !new File(jdkHome, "\\bin\\javaaccessbridge-32.dll").exists()) // 32-bit Java 9 or 10
                     {
-                        File exec64 = new File( appbasedir, "bin\\" + brandingToken + "64.exe" );
-                        if ( exec64.isFile() )
-                        {
+                        File exec64 = new File(appbasedir, "bin\\" + brandingToken + "64.exe");
+                        if (exec64.isFile()) {
                             exec = exec64;
                         }
                     }
                 }
-                cmdLine.addArguments( new String[]
-                {
-                    "--console", "suppress"
-                } );
+                cmdLine.addArguments(new String[] {"--console", "suppress"});
             }
-        }
-        else
-        {
-            exec = new File( appbasedir, "bin/" + brandingToken );
+        } else {
+            exec = new File(appbasedir, "bin/" + brandingToken);
         }
 
-        cmdLine.setExecutable( exec.getAbsolutePath() );
+        cmdLine.setExecutable(exec.getAbsolutePath());
 
-        try
-        {
+        try {
 
             List<String> args = new ArrayList<>();
-            args.add( "--userdir" );
-            args.add( netbeansUserdir.getAbsolutePath() );
-            args.add( "-J-Dnetbeans.logger.console=true" );
-            args.add( "-J-ea" );
-            args.add( "--branding" );
-            args.add( brandingToken );
+            args.add("--userdir");
+            args.add(netbeansUserdir.getAbsolutePath());
+            args.add("-J-Dnetbeans.logger.console=true");
+            args.add("-J-ea");
+            args.add("--branding");
+            args.add(brandingToken);
 
             // use JAVA_HOME if set
-            if ( System.getenv( "JAVA_HOME" ) != null )
-            {
-                args.add( "--jdkhome" );
-                args.add( System.getenv( "JAVA_HOME" ) );
+            if (System.getenv("JAVA_HOME") != null) {
+                args.add("--jdkhome");
+                args.add(System.getenv("JAVA_HOME"));
             }
 
-            cmdLine.addArguments( args.toArray( new String[0] ) );
-            cmdLine.addArguments( CommandLineUtils.translateCommandline( additionalArguments ) );
-            cmdLine.addArguments( CommandLineUtils.translateCommandline( getDebugAdditionalArguments() ) );
-            getLog().info( "Executing: " + cmdLine );
-            StreamConsumer out = new StreamConsumer()
-            {
+            cmdLine.addArguments(args.toArray(new String[0]));
+            cmdLine.addArguments(CommandLineUtils.translateCommandline(additionalArguments));
+            cmdLine.addArguments(CommandLineUtils.translateCommandline(getDebugAdditionalArguments()));
+            getLog().info("Executing: " + cmdLine);
+            StreamConsumer out = new StreamConsumer() {
 
-                public void consumeLine( String line )
-                {
-                    getLog().info( line );
+                public void consumeLine(String line) {
+                    getLog().info(line);
                 }
             };
-            CommandLineUtils.executeCommandLine( cmdLine, out, out );
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Failed executing NetBeans", e );
+            CommandLineUtils.executeCommandLine(cmdLine, out, out);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed executing NetBeans", e);
         }
     }
 
-    private String getDebugAdditionalArguments()
-    {
-        if ( "true".equals( debugAdditionalArguments ) )
-        {
+    private String getDebugAdditionalArguments() {
+        if ("true".equals(debugAdditionalArguments)) {
             return "-Xdebug -Xnoagent -Djava.compiler=NONE "
-                   + "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
+                    + "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
         }
         return debugAdditionalArguments;
     }

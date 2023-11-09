@@ -1,5 +1,3 @@
-package org.apache.netbeans.nbm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.netbeans.nbm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,9 +36,7 @@ import org.apache.netbeans.nbm.utils.ExamineManifest;
  *
  * @author Milos Kleint
  */
-public class CollectLibrariesNodeVisitor
-        implements DependencyNodeVisitor
-{
+public class CollectLibrariesNodeVisitor implements DependencyNodeVisitor {
 
     /**
      * The collected list of nodes.
@@ -76,15 +73,17 @@ public class CollectLibrariesNodeVisitor
      * @param root dependency to start collect with
      * @param useOsgiDependencies whether to allow osgi dependencies or not
      */
-    public CollectLibrariesNodeVisitor( List<String> explicitLibraries,
-            List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
-            Log log, DependencyNode root, boolean useOsgiDependencies )
-    {
+    public CollectLibrariesNodeVisitor(
+            List<String> explicitLibraries,
+            List<Artifact> runtimeArtifacts,
+            Map<Artifact, ExamineManifest> examinerCache,
+            Log log,
+            DependencyNode root,
+            boolean useOsgiDependencies) {
         nodes = new ArrayList<Artifact>();
         artifacts = new HashMap<String, Artifact>();
-        for ( Artifact a : runtimeArtifacts )
-        {
-            artifacts.put( a.getDependencyConflictId(), a );
+        for (Artifact a : runtimeArtifacts) {
+            artifacts.put(a.getDependencyConflictId(), a);
         }
         this.examinerCache = examinerCache;
         this.explicitLibs = explicitLibraries;
@@ -99,74 +98,58 @@ public class CollectLibrariesNodeVisitor
     /**
      * {@inheritDoc}
      */
-    public boolean visit( DependencyNode node )
-    {
-        if ( throwable != null )
-        {
+    public boolean visit(DependencyNode node) {
+        if (throwable != null) {
             return false;
         }
-        if ( root == node )
-        {
+        if (root == node) {
             return true;
         }
-        try
-        {
+        try {
             Artifact artifact = node.getArtifact();
-            if ( !artifacts.containsKey( artifact.getDependencyConflictId() ) )
-            {
-                //ignore non-runtime stuff..
+            if (!artifacts.containsKey(artifact.getDependencyConflictId())) {
+                // ignore non-runtime stuff..
                 return false;
             }
             // somehow the transitive artifacts in the  tree are not always resolved?
-            artifact = artifacts.get( artifact.getDependencyConflictId() );
+            artifact = artifacts.get(artifact.getDependencyConflictId());
 
-            ExamineManifest depExaminator = examinerCache.get( artifact );
-            if ( depExaminator == null )
-            {
-                depExaminator = new ExamineManifest( log );
-                depExaminator.setArtifactFile( artifact.getFile() );
+            ExamineManifest depExaminator = examinerCache.get(artifact);
+            if (depExaminator == null) {
+                depExaminator = new ExamineManifest(log);
+                depExaminator.setArtifactFile(artifact.getFile());
                 depExaminator.checkFile();
-                examinerCache.put( artifact, depExaminator );
+                examinerCache.put(artifact, depExaminator);
             }
-            if ( AbstractNbmMojo.matchesLibrary( artifact, explicitLibs, depExaminator, log, useOsgiDependencies ) )
-            {
-                if ( depExaminator.isNetBeansModule() )
-                {
-                    log.warn(
-                            "You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId() );
+            if (AbstractNbmMojo.matchesLibrary(artifact, explicitLibs, depExaminator, log, useOsgiDependencies)) {
+                if (depExaminator.isNetBeansModule()) {
+                    log.warn("You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId());
                 }
 
-                nodes.add( artifact );
-                includes.add( artifact.getDependencyConflictId() );
+                nodes.add(artifact);
+                includes.add(artifact.getDependencyConflictId());
                 // if a library, iterate to it's child nodes.
                 return true;
             }
-        }
-        catch ( MojoExecutionException mojoExecutionException )
-        {
+        } catch (MojoExecutionException mojoExecutionException) {
             throwable = mojoExecutionException;
         }
-        //don't bother iterating to childs if the current node is not a library.
+        // don't bother iterating to childs if the current node is not a library.
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean endVisit( DependencyNode node )
-    {
-        if ( throwable != null )
-        {
+    public boolean endVisit(DependencyNode node) {
+        if (throwable != null) {
             return false;
         }
-        if ( node == root )
-        {
-            if ( nodes.size() > 0 )
-            {
-                log.info( "Adding on module's Class-Path:" );
-                for ( Artifact inc : nodes )
-                {
-                    log.info( "    " + inc.getId() );
+        if (node == root) {
+            if (nodes.size() > 0) {
+                log.info("Adding on module's Class-Path:");
+                for (Artifact inc : nodes) {
+                    log.info("    " + inc.getId());
                 }
             }
         }
@@ -179,11 +162,8 @@ public class CollectLibrariesNodeVisitor
      * @return the list of collected dependency nodes
      * @throws MojoExecutionException if a throwable is set
      */
-    public List<Artifact> getArtifacts()
-            throws MojoExecutionException
-    {
-        if ( throwable != null )
-        {
+    public List<Artifact> getArtifacts() throws MojoExecutionException {
+        if (throwable != null) {
             throw throwable;
         }
         return nodes;
