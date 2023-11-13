@@ -99,9 +99,9 @@ public abstract class CreateNetBeansFileStructure
     /**
      * a NetBeans module descriptor containing dependency information and more..
      *
-     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in
-     * 4.0 entirely
+     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in future
      */
+    @Deprecated
     @Parameter( defaultValue = "${basedir}/src/main/nbm/module.xml" )
     protected File descriptor;
     /**
