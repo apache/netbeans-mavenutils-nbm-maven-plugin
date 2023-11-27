@@ -586,6 +586,10 @@ public class PopulateRepositoryMojo
                             deployRequest.setRepository(deploymentRepository);
                             deployRequest.setTrace( RequestTrace.newChild( null, "nb-repository-plugin" ) );
                             deployRequest.addArtifact( art.setFile( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar ) );
+                            if ( pom !=null )
+                            {
+                                deployRequest.addArtifact( pomArt.setFile( pom ) );
+                            }
                             if ( javadoc != null )
                             {
                                 deployRequest.addArtifact( javadocArt.setFile( javadoc ) );
