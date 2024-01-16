@@ -32,6 +32,10 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Organization;
@@ -44,6 +48,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.util.FileUtils;
 import org.netbeans.nbbuild.MakeNBM;
 import org.netbeans.nbbuild.MakeNBM.Blurb;
@@ -177,6 +182,12 @@ public class CreateNbmMojo
 
     @Component
     private Map<String, ArtifactRepositoryLayout> layouts;
+
+    @Component
+    protected MavenSession session;
+
+    @Component
+    private ArtifactResolver artifactResolver;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy/MM/dd" );
 
@@ -344,6 +355,17 @@ public class CreateNbmMojo
         }
         //MNBMODULE-217 avoid using the static DATE_FORMAT variable in MavenNBM.java (in ant harness)
         nbmTask.setReleasedate( DATE_FORMAT.format( new Date( System.currentTimeMillis() ) ) );
+        // start add
+        Path updaterPath = nbmTask.createUpdaterJar();
+        Artifact updaterArtefect = artifactFactory.createArtifact("org.netbeans.external", "updater", "RELEASE200", null, "jar" );
+        try {
+            artifactResolver.resolve(updaterArtefect, session.getCurrentProject().getRemoteArtifactRepositories(), session.getLocalRepository());
+        } catch (ArtifactNotFoundException | ArtifactResolutionException ex){
+            getLog().warn( "Could not find updater.jar" );
+        }
+        Artifact find = session.getLocalRepository().find(updaterArtefect);
+        updaterPath.setPath(find.getFile().toPath().toString());
+        // end
         try
         {
             nbmTask.execute();
