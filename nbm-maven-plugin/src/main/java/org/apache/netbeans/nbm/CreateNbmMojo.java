@@ -21,6 +21,7 @@ package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,6 +45,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.util.FileUtils;
 import org.netbeans.nbbuild.MakeNBM;
 import org.netbeans.nbbuild.MakeNBM.Blurb;
@@ -344,6 +346,18 @@ public class CreateNbmMojo
         }
         //MNBMODULE-217 avoid using the static DATE_FORMAT variable in MavenNBM.java (in ant harness)
         nbmTask.setReleasedate( DATE_FORMAT.format( new Date( System.currentTimeMillis() ) ) );
+        Path updaterPath = nbmTask.createUpdaterJar();
+        try 
+        {
+            // locate a public class from updater to get the path
+            URL url = org.netbeans.updater.XMLUtil.class.getProtectionDomain().getCodeSource().getLocation();
+            updaterPath.setPath(url.getFile());    
+        }
+        catch ( BuildException e )
+        {   
+            // we could continue without having updater
+            getLog().warn( "Could not find updater.jar" );
+        }
         try
         {
             nbmTask.execute();
