@@ -32,11 +32,6 @@ under the License.
 
     <name>Apache NetBeans Maven Utilities - NBM Harness for Maven</name>
 
-    <properties>
-        <!--        XXX SHOULD BE RELEASE 9.0 and superior artefacts  changes to Apache Licence -->
-        <netbeans.version>RELEASE190</netbeans.version>
-    </properties>
-
     <build>
         <plugins>
             <plugin>

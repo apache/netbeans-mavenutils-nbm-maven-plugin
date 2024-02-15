@@ -103,6 +103,11 @@ under the License.
             <artifactId>nb-shared</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.external</groupId>
+            <artifactId>updater</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
 
         <!-- BAD BOYS: we want to get rid of these -->
         <dependency>
