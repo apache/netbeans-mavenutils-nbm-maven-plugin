@@ -616,66 +616,44 @@ public class CreateWebstartAppMojo
         File jnlpStarter
                 = new File( builtInstallation.getAbsolutePath() + File.separator + "harness" + File.separator + "jnlp"
                         + File.separator + "jnlp-launcher.jar" );
-        // buffer so it isn't reading a byte at a time!
-        InputStream source = null;
-        FileOutputStream outstream = null;
-        try
-        {
-            if ( !jnlpStarter.exists() )
-            {
-                source = getClass().getClassLoader().getResourceAsStream(
-                        "harness/jnlp/jnlp-launcher.jar" );
-            }
-            else
-            {
-                source = new FileInputStream( jnlpStarter );
-            }
-            File jnlpDestination = new File(
+        // buffer so it isn't reading a byte at a time!      
+        File jnlpDestination = new File(
                     standaloneBuildDir.getAbsolutePath() + File.separator + "jnlp-launcher.jar" );
-
-            outstream = new FileOutputStream( jnlpDestination );
+        try ( InputStream source = ( !jnlpStarter.exists() ? 
+                     getClass().getClassLoader().getResourceAsStream("harness/jnlp/jnlp-launcher.jar" ) : 
+                     new FileInputStream( jnlpStarter )) ;
+              FileOutputStream outstream = new FileOutputStream( jnlpDestination ); )
+        {
             IOUtil.copy( source, outstream );
             return jnlpDestination;
-        }
-        finally
-        {
-            IOUtil.close( source );
-            IOUtil.close( outstream );
-        }
+        }        
     }
 
     private void filterCopy( File sourceFile, String resourcePath, File destinationFile, Properties filterProperties )
             throws IOException
     {
         // buffer so it isn't reading a byte at a time!
-        Reader source = null;
-        Writer destination = null;
-        try
+        
+        InputStream instream;
+        if ( sourceFile != null )
         {
-            InputStream instream;
-            if ( sourceFile != null )
-            {
-                instream = new FileInputStream( sourceFile );
-            }
-            else
-            {
-                instream = getClass().getClassLoader().getResourceAsStream( resourcePath );
-            }
-            FileOutputStream outstream = new FileOutputStream( destinationFile );
-
-            source = new BufferedReader( new InputStreamReader( instream, "UTF-8" ) );
-            destination = new OutputStreamWriter( outstream, "UTF-8" );
-
+            instream = new FileInputStream( sourceFile );
+        }
+        else
+        {
+            instream = getClass().getClassLoader().getResourceAsStream( resourcePath );
+        }
+        
+        FileOutputStream outstream = new FileOutputStream( destinationFile ); 
+        
+        try ( Reader source = new BufferedReader(new InputStreamReader(instream, "UTF-8")); 
+                 Writer destination = new OutputStreamWriter(outstream, "UTF-8");) {
             // support ${token}
             Reader reader = new InterpolationFilterReader( source, filterProperties, "${", "}" );
 
             IOUtil.copy( reader, destination );
         }
-        finally
-        {
-            IOUtil.close( source );
-            IOUtil.close( destination );
-        }
+        
     }
 
     /**

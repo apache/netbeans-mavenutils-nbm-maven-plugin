@@ -60,7 +60,6 @@ import org.apache.netbeans.nbm.model.NetBeansModule;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Goal for generating NetBeans module system specific manifest entries, part of <code>nbm</code> lifecycle/packaging.
@@ -341,10 +340,8 @@ public class NetBeansManifestUpdateMojo
         Manifest manifest = null;
         if ( specialManifest != null && specialManifest.exists() )
         {
-            Reader reader = null;
-            try
+            try ( Reader reader = new InputStreamReader( new FileInputStream( specialManifest ) ))
             {
-                reader = new InputStreamReader( new FileInputStream( specialManifest ) );
                 manifest = new Manifest( reader );
             }
             catch ( IOException exc )
@@ -356,11 +353,7 @@ public class NetBeansManifestUpdateMojo
             {
                 getLog().warn( "Error reading manifest at " + specialManifest, ex );
                 manifest = new Manifest();
-            }
-            finally
-            {
-                IOUtil.close( reader );
-            }
+            }            
         }
         else
         {
@@ -578,24 +571,25 @@ public class NetBeansManifestUpdateMojo
 //                getLog().warn(
 //                        "Some libraries could not be found in the dependency chain: " + list );
 //            }
-        PrintWriter writer = null;
-        try
+        try 
         {
-            if ( !targetManifestFile.exists() )
+            if ( !targetManifestFile.exists() ) 
             {
                 targetManifestFile.getParentFile().mkdirs();
                 targetManifestFile.createNewFile();
             }
-            writer = new PrintWriter( targetManifestFile, "UTF-8" ); //TODO really UTF-8??
-            manifest.write( writer );
         }
         catch ( IOException ex )
         {
             throw new MojoExecutionException( ex.getMessage(), ex );
         }
-        finally
+        try ( PrintWriter writer = new PrintWriter( targetManifestFile, "UTF-8" );) //TODO really UTF-8?? 
         {
-            IOUtil.close( writer );
+            manifest.write( writer );
+        }
+        catch ( IOException ex )
+        {
+            throw new MojoExecutionException( ex.getMessage(), ex );
         }
     }
 
