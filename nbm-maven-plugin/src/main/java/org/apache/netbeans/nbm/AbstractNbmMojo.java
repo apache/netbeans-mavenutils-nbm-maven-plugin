@@ -25,8 +25,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -514,4 +517,10 @@ public abstract class AbstractNbmMojo
         }
     }
 
+    static Date getOutputTimestampOrNow( MavenProject project )
+    {
+        return MavenArchiver.parseBuildOutputTimestamp(project.getProperties().getProperty("project.build.outputTimestamp"))
+                .map(Date::from)
+                .orElseGet(Date::new);
+    }
 }

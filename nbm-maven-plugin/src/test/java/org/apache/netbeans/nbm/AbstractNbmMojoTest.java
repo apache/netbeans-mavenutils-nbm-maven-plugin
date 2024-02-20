@@ -19,6 +19,7 @@ package org.apache.netbeans.nbm;
  * under the License.
  */
 import java.io.File;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyNode;
 import org.apache.netbeans.nbm.model.Dependency;
@@ -247,6 +249,22 @@ public class AbstractNbmMojoTest extends TestCase
         assertEquals( 2, result.size() );
         assertEquals( result.get( 0 ).getId(), library.getArtifact().getId() );
         assertEquals( result.get( 1 ).getId(), translibrary2.getArtifact().getId() );
+    }
+
+    /**
+     * Test of getOutputTimestampOrNow method, of class AbstractNbmMojo.
+     */
+    public void testGetOutputTimestampOrNow()
+    {
+        MavenProject project = new MavenProject();
+
+        assertFalse( "missing property returns new Date()", AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)) );
+
+        project.getProperties().put( "project.build.outputTimestamp", "2019-10-05T18:37:42Z" );
+        assertTrue( "valid formatted property", AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)) );
+
+        project.getProperties().put( "project.build.outputTimestamp", "1570300662" );
+        assertTrue( "valid formatted property", AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)) );
     }
 
     private DefaultDependencyNode createNode( DependencyNode parent, String gr, String art, String ver, String pack, String scope, boolean isModule, List<Artifact> runtimes, Map<Artifact, ExamineManifest> cache )

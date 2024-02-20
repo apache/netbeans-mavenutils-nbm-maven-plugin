@@ -345,7 +345,7 @@ public class CreateNbmMojo
             nbmTask.setTargetcluster( cluster );
         }
         //MNBMODULE-217 avoid using the static DATE_FORMAT variable in MavenNBM.java (in ant harness)
-        nbmTask.setReleasedate( DATE_FORMAT.format( new Date( System.currentTimeMillis() ) ) );
+        nbmTask.setReleasedate( DATE_FORMAT.format( getOutputTimestampOrNow(project) ) );
         Path updaterPath = nbmTask.createUpdaterJar();
         try 
         {
