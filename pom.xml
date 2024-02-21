@@ -73,7 +73,7 @@
         <skin.groupId>org.apache.maven.skins</skin.groupId>
         <skin.artifactId>maven-fluido-skin</skin.artifactId>
         <skin.version>1.12.0</skin.version>
-        <netbeans.version>RELEASE200</netbeans.version>
+        <netbeans.version>RELEASE210</netbeans.version>
     </properties>
 
     <dependencyManagement>
