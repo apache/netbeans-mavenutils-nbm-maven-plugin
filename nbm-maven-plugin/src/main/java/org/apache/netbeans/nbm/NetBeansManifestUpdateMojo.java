@@ -366,7 +366,7 @@ public class NetBeansManifestUpdateMojo
         {
             manifest = new Manifest();
         }
-        Date date = new Date();
+        Date date = getOutputTimestampOrNow(project);
         String specVersion = AdaptNbVersion.adaptVersion( project.getVersion(),
                 AdaptNbVersion.TYPE_SPECIFICATION, date );
         String implVersion = AdaptNbVersion.adaptVersion( project.getVersion(),

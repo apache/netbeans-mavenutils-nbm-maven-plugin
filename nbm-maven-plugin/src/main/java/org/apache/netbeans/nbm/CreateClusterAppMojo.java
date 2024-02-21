@@ -710,7 +710,7 @@ public class CreateClusterAppMojo
                         ex.printStackTrace();
                     }
                 }
-                stamp.setLastModified( new Date().getTime() );
+                stamp.setLastModified( getOutputTimestampOrNow(project).getTime() );
             }
         }
         try

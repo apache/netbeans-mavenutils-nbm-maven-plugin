@@ -204,7 +204,7 @@ public class CreateClusterMojo
                             ex.printStackTrace();
                         }
                     }
-                    stamp.setLastModified( new Date().getTime() );
+                    stamp.setLastModified( getOutputTimestampOrNow(mavenSession.getCurrentProject()).getTime() );
                 }
             }
             getLog().info( "Created NetBeans module cluster(s) at " + clusterBuildDir );
