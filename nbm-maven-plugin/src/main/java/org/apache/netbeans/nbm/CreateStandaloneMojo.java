@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -31,30 +30,30 @@ import org.codehaus.plexus.archiver.util.DefaultFileSet;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
 /**
- * Create a standalone application out of the composed clusters of nbm-application
+ * Create a standalone application out of the composed clusters of
+ * nbm-application
  *
  * @author Johan Andrén
  * @author Milos Kleint
  */
-@Mojo( name = "standalone-zip", requiresProject = true, threadSafe = true )
+@Mojo(name = "standalone-zip", requiresProject = true, threadSafe = true)
 public class CreateStandaloneMojo
-        extends AbstractMojo
-{
+        extends AbstractMojo {
 
     /**
      * The branding token for the application based on NetBeans platform.
      */
-    @Parameter( property = "netbeans.branding.token", required = true )
+    @Parameter(property = "netbeans.branding.token", required = true)
     protected String brandingToken;
     /**
      * output directory where the the NetBeans application will be created.
      */
-    @Parameter( required = true, defaultValue = "${project.build.directory}" )
+    @Parameter(required = true, defaultValue = "${project.build.directory}")
     private File outputDirectory;
     /**
      * Name of the zip artifact produced by the goal (without .zip extension)
      */
-    @Parameter( defaultValue = "${project.build.finalName}" )
+    @Parameter(defaultValue = "${project.build.finalName}")
     private String finalName;
     /**
      * The Maven project.
@@ -69,42 +68,33 @@ public class CreateStandaloneMojo
      */
     @Override
     public void execute()
-            throws MojoExecutionException, MojoFailureException
-    {
+            throws MojoExecutionException, MojoFailureException {
 
-        try
-        {
-            File nbmBuildDirFile = new File( outputDirectory, brandingToken );
+        try {
+            File nbmBuildDirFile = new File(outputDirectory, brandingToken);
 
             ZipArchiver archiver = new ZipArchiver();
             DefaultFileSet fs = new DefaultFileSet();
-            fs.setDirectory( outputDirectory );
-            fs.setIncludes( new String[]
-            {
-                brandingToken + "/**",
-            } );
-            fs.setExcludes( new String[]
-            {
-                brandingToken + "/bin/*",
-            } );
-            archiver.addFileSet( fs );
-            File bins = new File( nbmBuildDirFile, "bin" );
-            for ( File bin : bins.listFiles() )
-            {
-                archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), EXEC_FILE_MOD );
+            fs.setDirectory(outputDirectory);
+            fs.setIncludes(new String[]{
+                brandingToken + "/**",});
+            fs.setExcludes(new String[]{
+                brandingToken + "/bin/*",});
+            archiver.addFileSet(fs);
+            File bins = new File(nbmBuildDirFile, "bin");
+            for (File bin : bins.listFiles()) {
+                archiver.addFile(bin, brandingToken + "/bin/" + bin.getName(), EXEC_FILE_MOD);
             }
-            File zipFile = new File( outputDirectory, finalName + ".zip" );
+            File zipFile = new File(outputDirectory, finalName + ".zip");
             //TODO - somehow check for last modified content to see if we shall be
             //recreating the zip file.
-            archiver.setDestFile( zipFile );
-            archiver.setForced( false );
+            archiver.setDestFile(zipFile);
+            archiver.setForced(false);
             archiver.createArchive();
-            project.getArtifact().setFile( zipFile );
+            project.getArtifact().setFile(zipFile);
 
-        }
-        catch ( Exception ex )
-        {
-            throw new MojoExecutionException( "", ex );
+        } catch (Exception ex) {
+            throw new MojoExecutionException("", ex);
         }
 
     }

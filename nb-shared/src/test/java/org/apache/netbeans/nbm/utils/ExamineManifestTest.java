@@ -18,73 +18,65 @@ package org.apache.netbeans.nbm.utils;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-
 import java.io.File;
 import java.io.PrintWriter;
 import junit.framework.TestCase;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 
-public class ExamineManifestTest extends TestCase
-{
-    
-    public ExamineManifestTest( String testName )
-    {
+public class ExamineManifestTest extends TestCase {
+
+    public ExamineManifestTest(String testName) {
         super(testName);
     }
 
-    public void testDependencyParsing()
-            throws Exception
-    {
-        ExamineManifest em = new ExamineManifest( new SystemStreamLog() );
-        File mf = File.createTempFile( "ExamineManifestTes", ".mf" );
+    public void testDependencyParsing() throws Exception {
+        ExamineManifest em = new ExamineManifest(new SystemStreamLog());
+        File mf = File.createTempFile("ExamineManifestTes", ".mf");
         mf.deleteOnExit();
-        PrintWriter w = new PrintWriter( mf );
-        w.println( "OpenIDE-Module: org.netbeans.modules.nbjunit/1" );
-        w.println( "OpenIDE-Module-Module-Dependencies: org.netbeans.insane/1, org.netbeans.libs.junit4 > 1.0" );
+        PrintWriter w = new PrintWriter(mf);
+        w.println("OpenIDE-Module: org.netbeans.modules.nbjunit/1");
+        w.println("OpenIDE-Module-Module-Dependencies: org.netbeans.insane/1, org.netbeans.libs.junit4 > 1.0");
         w.flush();
         w.close();
-        em.setManifestFile( mf );
-        em.setPopulateDependencies( true );
+        em.setManifestFile(mf);
+        em.setPopulateDependencies(true);
         em.checkFile();
-        assertEquals( "[org.netbeans.insane, org.netbeans.libs.junit4]", em.getDependencyTokens().toString() );
-        assertEquals( "org.netbeans.modules.nbjunit", em.getModule() );
-        assertEquals( "org.netbeans.modules.nbjunit/1", em.getModuleWithRelease() );
-        em = new ExamineManifest( new SystemStreamLog() );
+        assertEquals("[org.netbeans.insane, org.netbeans.libs.junit4]", em.getDependencyTokens().toString());
+        assertEquals("org.netbeans.modules.nbjunit", em.getModule());
+        assertEquals("org.netbeans.modules.nbjunit/1", em.getModuleWithRelease());
+        em = new ExamineManifest(new SystemStreamLog());
         mf.delete();
-        w = new PrintWriter( mf );
-        w.println( "Manifest-Version: 1.0" );
+        w = new PrintWriter(mf);
+        w.println("Manifest-Version: 1.0");
         w.flush();
         w.close();
-        em.setManifestFile( mf );
-        em.setPopulateDependencies( true );
+        em.setManifestFile(mf);
+        em.setPopulateDependencies(true);
         em.checkFile();
-        assertEquals( null, em.getModule() );
-        assertEquals( null, em.getModuleWithRelease() );
+        assertEquals(null, em.getModule());
+        assertEquals(null, em.getModuleWithRelease());
     }
 
-    public void testBundles()
-            throws Exception
-    {
-        ExamineManifest em = new ExamineManifest( new SystemStreamLog() );
-        File mf = File.createTempFile( "ExamineManifestTest", ".mf" );
+    public void testBundles() throws Exception {
+        ExamineManifest em = new ExamineManifest(new SystemStreamLog());
+        File mf = File.createTempFile("ExamineManifestTest", ".mf");
         mf.deleteOnExit();
-        PrintWriter w = new PrintWriter( mf );
-        w.println( "Bundle-SymbolicName: org.eclipse.jdt.core; singleton:=true" );
-        w.println( "Bundle-Version: 3.1.0" );
-        w.println( "Export-Package: org.eclipse.jdt.core," );
-        w.println( " org.eclipse.jdt.internal.formatter.old;x-internal:=true" );
-        w.println( "Require-Bundle: org.eclipse.equinox.registry;bundle-version=\"[3.4.0,4." );
-        w.println( " 0.0)\",org.eclipse.equinox.common;bundle-version=\"[3.2.0,4.0.0)\"" );
+        PrintWriter w = new PrintWriter(mf);
+        w.println("Bundle-SymbolicName: org.eclipse.jdt.core; singleton:=true");
+        w.println("Bundle-Version: 3.1.0");
+        w.println("Export-Package: org.eclipse.jdt.core,");
+        w.println(" org.eclipse.jdt.internal.formatter.old;x-internal:=true");
+        w.println("Require-Bundle: org.eclipse.equinox.registry;bundle-version=\"[3.4.0,4.");
+        w.println(" 0.0)\",org.eclipse.equinox.common;bundle-version=\"[3.2.0,4.0.0)\"");
         w.flush();
         w.close();
-        em.setManifestFile( mf );
-        em.setPopulateDependencies( true );
+        em.setManifestFile(mf);
+        em.setPopulateDependencies(true);
         em.checkFile();
-        assertEquals( "org.eclipse.jdt.core", em.getModule() );
-        assertEquals( "3.1.0", em.getSpecVersion() );
-        assertTrue( em.hasPublicPackages() );
-        assertEquals( "[org.eclipse.equinox.registry, org.eclipse.equinox.common]", em.getDependencyTokens().toString() );
+        assertEquals("org.eclipse.jdt.core", em.getModule());
+        assertEquals("3.1.0", em.getSpecVersion());
+        assertTrue(em.hasPublicPackages());
+        assertEquals("[org.eclipse.equinox.registry, org.eclipse.equinox.common]", em.getDependencyTokens().toString());
     }
 
 }

@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -52,55 +51,55 @@ import java.util.stream.Stream;
  *
  * @author <a href="mailto:oyarzun@apache.org">Christian Oyarzun</a>
  */
-@Mojo( name = "build-mac",
-      requiresProject = true,
-      requiresDependencyResolution = ResolutionScope.RUNTIME,
-      threadSafe = true,
-      defaultPhase = LifecyclePhase.PACKAGE )
+@Mojo(name = "build-mac",
+        requiresProject = true,
+        requiresDependencyResolution = ResolutionScope.RUNTIME,
+        threadSafe = true,
+        defaultPhase = LifecyclePhase.PACKAGE)
 public class BuildMacMojo
-        extends AbstractNbmMojo
-{
+        extends AbstractNbmMojo {
 
     /**
      * output directory.
      */
-    @Parameter( defaultValue = "${project.build.directory}", required = true )
+    @Parameter(defaultValue = "${project.build.directory}", required = true)
     protected File outputDirectory;
     /**
      * The branding token for the application based on NetBeans platform.
      */
-    @Parameter( property = "netbeans.branding.token", required = true )
+    @Parameter(property = "netbeans.branding.token", required = true)
     protected String brandingToken;
     /**
-     * Optional macOS icon file (in ICNS format) to use for the application bundle to replace the default icon 
-     * from the harness.
+     * Optional macOS icon file (in ICNS format) to use for the application
+     * bundle to replace the default icon from the harness.
      */
-    @Parameter( property = "netbeans.mac.icon", required = false )
+    @Parameter(property = "netbeans.mac.icon", required = false)
     private File macIconFile;
     /**
-     * Optional macOS Info.plist file to use for the application bundle to replace the one from the harness.
+     * Optional macOS Info.plist file to use for the application bundle to
+     * replace the one from the harness.
      * <p>
-     * ${app.title} is replaced by macAppTitle
-     * ${app.name} is replaced by brandingToken
-     * ${app.version} is replaced by project.version
+     * ${app.title} is replaced by macAppTitle ${app.name} is replaced by
+     * brandingToken ${app.version} is replaced by project.version
      */
-    @Parameter( property = "netbeans.mac.info.plist", required = false )
+    @Parameter(property = "netbeans.mac.info.plist", required = false)
     private File macInfoplistFile;
     /**
-     * Optional macOS native launcher to use for the application bundle to replace the one from the harness.
+     * Optional macOS native launcher to use for the application bundle to
+     * replace the one from the harness.
      */
-    @Parameter( property = "netbeans.mac.launcher", required = false )
+    @Parameter(property = "netbeans.mac.launcher", required = false)
     private File macLauncherFile;
     /**
      * Zip the macOS app bundle to brandingToken-macOS.zip
      */
-    @Parameter( property = "netbeans.mac.zipbundle", defaultValue = "false" )
+    @Parameter(property = "netbeans.mac.zipbundle", defaultValue = "false")
     private boolean macZipBundle;
     /**
-     * Optional application title to use to replace ${app.title} for value of CFBundleName in the Info.plist file,
-     * otherwise brandingTokin is used.
+     * Optional application title to use to replace ${app.title} for value of
+     * CFBundleName in the Info.plist file, otherwise brandingTokin is used.
      */
-    @Parameter( property = "netbeans.mac.title", required = false )
+    @Parameter(property = "netbeans.mac.title", required = false)
     private String macAppTitle;
 
     /**
@@ -110,177 +109,151 @@ public class BuildMacMojo
     private MavenProject project;
 
     @Override
-    public void execute(  )
-            throws MojoExecutionException, MojoFailureException
-    {
-        if ( !"nbm-application".equals( project.getPackaging(  ) ) )
-        {
+    public void execute()
+            throws MojoExecutionException, MojoFailureException {
+        if (!"nbm-application".equals(project.getPackaging())) {
             throw new MojoExecutionException(
-                    "This goal only makes sense on project with 'nbm-application' packaging." );
+                    "This goal only makes sense on project with 'nbm-application' packaging.");
         }
 
-        try
-        {
-            File bundleDir = new File( outputDirectory, brandingToken + ".app" );
-            bundleDir.mkdirs(  );
+        try {
+            File bundleDir = new File(outputDirectory, brandingToken + ".app");
+            bundleDir.mkdirs();
 
-            File contentsDir = new File( bundleDir, "Contents" );
-            contentsDir.mkdirs(  );
+            File contentsDir = new File(bundleDir, "Contents");
+            contentsDir.mkdirs();
 
-            File resourcesDir = new File( contentsDir, "Resources" );
-            resourcesDir.mkdirs(  );
+            File resourcesDir = new File(contentsDir, "Resources");
+            resourcesDir.mkdirs();
 
-            File appDir = new File( resourcesDir, brandingToken );
-            appDir.mkdirs(  );
+            File appDir = new File(resourcesDir, brandingToken);
+            appDir.mkdirs();
 
-            File macOSDir = new File( contentsDir, "MacOS" );
-            macOSDir.mkdirs(  );
+            File macOSDir = new File(contentsDir, "MacOS");
+            macOSDir.mkdirs();
 
-            File app = new File( outputDirectory, brandingToken );
-            FileUtils.copyDirectoryStructure( app, appDir );
+            File app = new File(outputDirectory, brandingToken);
+            FileUtils.copyDirectoryStructure(app, appDir);
 
             // delete windows executables
-            Files.delete( appDir.toPath(  ).resolve( "bin/" + brandingToken + ".exe" ) );
-            Files.delete( appDir.toPath(  ).resolve( "bin/" + brandingToken + "64.exe" ) );
+            Files.delete(appDir.toPath().resolve("bin/" + brandingToken + ".exe"));
+            Files.delete(appDir.toPath().resolve("bin/" + brandingToken + "64.exe"));
 
-            copyIcon( resourcesDir );
+            copyIcon(resourcesDir);
 
-            copyInfoPlist( contentsDir );
+            copyInfoPlist(contentsDir);
 
-            copyLauncher( macOSDir );
+            copyLauncher(macOSDir);
 
-            if ( macZipBundle )
-            {
-                DefaultFileSet fileset = new DefaultFileSet( outputDirectory );
-                fileset.setIncludes( new String[] {bundleDir.getName(  ), bundleDir.getName(  ) + "/**"} );
+            if (macZipBundle) {
+                DefaultFileSet fileset = new DefaultFileSet(outputDirectory);
+                fileset.setIncludes(new String[]{bundleDir.getName(), bundleDir.getName() + "/**"});
 
-                ZipArchiver archiver = new ZipArchiver(  );
-                archiver.addFileSet( fileset );
+                ZipArchiver archiver = new ZipArchiver();
+                archiver.addFileSet(fileset);
 
-                File zipFile = new File( outputDirectory, brandingToken + "-macOS.zip" );
-                archiver.setDestFile( zipFile );
+                File zipFile = new File(outputDirectory, brandingToken + "-macOS.zip");
+                archiver.setDestFile(zipFile);
 
-                archiver.createArchive(  );
+                archiver.createArchive();
             }
 
-        }
-        catch ( Exception ex )
-        {
-            throw new MojoExecutionException( "Build macOS application bundle failed: " + ex, ex );
+        } catch (Exception ex) {
+            throw new MojoExecutionException("Build macOS application bundle failed: " + ex, ex);
         }
     }
 
-    void copyInfoPlist( File contentsDir ) throws IOException, MojoExecutionException
-    {
-        Path infoplist = contentsDir.toPath(  ).resolve( "Info.plist" );
-        if ( macAppTitle == null )
-        {
+    void copyInfoPlist(File contentsDir) throws IOException, MojoExecutionException {
+        Path infoplist = contentsDir.toPath().resolve("Info.plist");
+        if (macAppTitle == null) {
             macAppTitle = brandingToken;
         }
 
-        if ( macInfoplistFile != null )
-        {
-            try ( Stream<String> lines = Files.lines( macInfoplistFile.toPath(  ) ) ) 
-            {
-                String infoPListString = lines.map( s -> s.replace( "${app.title}", macAppTitle ) )
-                                              .map( s -> s.replace( "${app.name}", brandingToken ) )
-                                              .map( s -> s.replace( "${app.version}", project.getVersion(  ) ) )
-                                              .collect( Collectors.joining( "\n" ) );
+        if (macInfoplistFile != null) {
+            try (Stream<String> lines = Files.lines(macInfoplistFile.toPath())) {
+                String infoPListString = lines.map(s -> s.replace("${app.title}", macAppTitle))
+                        .map(s -> s.replace("${app.name}", brandingToken))
+                        .map(s -> s.replace("${app.version}", project.getVersion()))
+                        .collect(Collectors.joining("\n"));
 
-                Files.write( infoplist, infoPListString.getBytes(  ) );
+                Files.write(infoplist, infoPListString.getBytes());
             }
-        }
-        else
-        {
-            URL harnessResource = getClass(  ).getClassLoader(  ).getResource( "harness" );
-            JarURLConnection jarConnection = ( JarURLConnection ) harnessResource.openConnection(  );
-            JarFile jarFile = jarConnection.getJarFile(  );
+        } else {
+            URL harnessResource = getClass().getClassLoader().getResource("harness");
+            JarURLConnection jarConnection = (JarURLConnection) harnessResource.openConnection();
+            JarFile jarFile = jarConnection.getJarFile();
 
-            JarEntry entry = jarFile.getJarEntry( "harness/etc/Info.plist" );
+            JarEntry entry = jarFile.getJarEntry("harness/etc/Info.plist");
 
-            if ( entry == null )
-            {
-                throw new MojoExecutionException( "macOS Info.plist not found in harness"
-                                                  + " or via macInfoplistFile parameter" );
+            if (entry == null) {
+                throw new MojoExecutionException("macOS Info.plist not found in harness"
+                        + " or via macInfoplistFile parameter");
             }
 
-            try ( BufferedReader reader =
-                    new BufferedReader( new InputStreamReader( jarFile.getInputStream( entry ) ) ) )
-            {
-                String infoPListString = reader.lines(  )
-                                               .map( s -> s.replace( "${app.title}", macAppTitle ) )
-                                               .map( s -> s.replace( "${app.name}", brandingToken ) )
-                                               .map( s -> s.replace( "${app.version}", project.getVersion(  ) ) )
-                                               .collect( Collectors.joining( "\n" ) );
+            try (BufferedReader reader
+                    = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry)))) {
+                String infoPListString = reader.lines()
+                        .map(s -> s.replace("${app.title}", macAppTitle))
+                        .map(s -> s.replace("${app.name}", brandingToken))
+                        .map(s -> s.replace("${app.version}", project.getVersion()))
+                        .collect(Collectors.joining("\n"));
 
-                Files.write( infoplist, infoPListString.getBytes(  ) );
+                Files.write(infoplist, infoPListString.getBytes());
             }
 
         }
 
     }
 
-    void copyIcon( File resourcesDir ) throws IOException, MojoExecutionException
-    {
-        Path icnsPath = resourcesDir.toPath(  ).resolve( brandingToken + ".icns" );
+    void copyIcon(File resourcesDir) throws IOException, MojoExecutionException {
+        Path icnsPath = resourcesDir.toPath().resolve(brandingToken + ".icns");
 
-        if ( macIconFile != null )
-        {
-            FileUtils.copyFile( macIconFile, icnsPath.toFile(  ) );
-        }
-        else
-        {
-            URL harnessResource = getClass(  ).getClassLoader(  ).getResource( "harness" );
-            JarURLConnection jarConnection = ( JarURLConnection ) harnessResource.openConnection(  );
-            JarFile jarFile = jarConnection.getJarFile(  );
+        if (macIconFile != null) {
+            FileUtils.copyFile(macIconFile, icnsPath.toFile());
+        } else {
+            URL harnessResource = getClass().getClassLoader().getResource("harness");
+            JarURLConnection jarConnection = (JarURLConnection) harnessResource.openConnection();
+            JarFile jarFile = jarConnection.getJarFile();
 
-            JarEntry entry = jarFile.getJarEntry( "harness/etc/applicationIcon.icns" );
+            JarEntry entry = jarFile.getJarEntry("harness/etc/applicationIcon.icns");
 
-            if ( entry == null )
-            {
-                throw new MojoExecutionException( "macOS icon not found in harness or via macIconFile parameter" );
+            if (entry == null) {
+                throw new MojoExecutionException("macOS icon not found in harness or via macIconFile parameter");
             }
 
-            try ( InputStream entryInputStream = jarFile.getInputStream( entry ) )
-            {
-                Files.copy( entryInputStream, icnsPath, StandardCopyOption.REPLACE_EXISTING );
+            try (InputStream entryInputStream = jarFile.getInputStream(entry)) {
+                Files.copy(entryInputStream, icnsPath, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            getLog(  ).info( "macOS icon not provided with macIconFile, using default icon." );
+            getLog().info("macOS icon not provided with macIconFile, using default icon.");
         }
     }
 
-    void copyLauncher( File macOSDir ) throws IOException, MojoExecutionException
-    {
-        Path launcherPath = macOSDir.toPath(  ).resolve( brandingToken );
+    void copyLauncher(File macOSDir) throws IOException, MojoExecutionException {
+        Path launcherPath = macOSDir.toPath().resolve(brandingToken);
 
-        if ( macLauncherFile != null )
-        {
-            FileUtils.copyFile( macLauncherFile, launcherPath.toFile(  ) );
-        }
-        else
-        {
-            URL harnessResource = getClass(  ).getClassLoader(  ).getResource( "harness" );
-            JarURLConnection jarConnection = ( JarURLConnection ) harnessResource.openConnection(  );
-            JarFile jarFile = jarConnection.getJarFile(  );
+        if (macLauncherFile != null) {
+            FileUtils.copyFile(macLauncherFile, launcherPath.toFile());
+        } else {
+            URL harnessResource = getClass().getClassLoader().getResource("harness");
+            JarURLConnection jarConnection = (JarURLConnection) harnessResource.openConnection();
+            JarFile jarFile = jarConnection.getJarFile();
 
-            JarEntry entry = jarFile.getJarEntry( "harness/launchers/app-macOS" );
+            JarEntry entry = jarFile.getJarEntry("harness/launchers/app-macOS");
 
-            if ( entry == null )
-            {
-                throw new MojoExecutionException( "macOS launcher not found in harness"
-                                                 + " or via macLauncherFile parameter" );
+            if (entry == null) {
+                throw new MojoExecutionException("macOS launcher not found in harness"
+                        + " or via macLauncherFile parameter");
 
             }
 
-            try ( InputStream entryInputStream = jarFile.getInputStream( entry ) )
-            {
-                Files.copy( entryInputStream, launcherPath, StandardCopyOption.REPLACE_EXISTING );
+            try (InputStream entryInputStream = jarFile.getInputStream(entry)) {
+                Files.copy(entryInputStream, launcherPath, StandardCopyOption.REPLACE_EXISTING);
             }
 
         }
 
-        launcherPath.toFile().setExecutable( true );
+        launcherPath.toFile().setExecutable(true);
     }
 
 }

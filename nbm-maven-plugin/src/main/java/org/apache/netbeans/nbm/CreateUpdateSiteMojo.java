@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
@@ -55,64 +54,70 @@ import org.netbeans.nbbuild.MakeUpdateDesc;
  * @author Milos Kleint
  *
  */
-@Mojo( name = "autoupdate",
+@Mojo(name = "autoupdate",
         defaultPhase = LifecyclePhase.PACKAGE,
         aggregator = true,
-        requiresDependencyResolution = ResolutionScope.RUNTIME )
+        requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class CreateUpdateSiteMojo
-        extends AbstractNbmMojo
-{
+        extends AbstractNbmMojo {
 
     /**
      * output directory.
      */
-    @Parameter( required = true, defaultValue = "${project.build.directory}" )
+    @Parameter(required = true, defaultValue = "${project.build.directory}")
     protected File outputDirectory;
     /**
      * autoupdate site xml file name.
      */
-    @Parameter( defaultValue = "updates.xml", property = "maven.nbm.updatesitexml" )
+    @Parameter(defaultValue = "updates.xml", property = "maven.nbm.updatesitexml")
     protected String fileName;
     /**
-     * A custom distribution base for the nbms in the update site. If NOT defined, the update site will use a simple
-     * relative URL, which is generally what you want. Defining it as "auto" will pick up the distribution URL from each
-     * NBM, which is generally wrong. See <code>distributionUrl</code> in nbm mojo for what url will be used in that
-     * case.
+     * A custom distribution base for the nbms in the update site. If NOT
+     * defined, the update site will use a simple relative URL, which is
+     * generally what you want. Defining it as "auto" will pick up the
+     * distribution URL from each NBM, which is generally wrong. See
+     * <code>distributionUrl</code> in nbm mojo for what url will be used in
+     * that case.
      * <p/>
-     * The value is either a direct http protocol based URL that points to the location under which all nbm files are
-     * located, or
+     * The value is either a direct http protocol based URL that points to the
+     * location under which all nbm files are located, or
      * <p/>
-     * allows to create an update site based on maven repository content. The resulting autoupdate site document can be
-     * uploaded as tar.gz to repository as well as attached artifact to the 'nbm-application' project.
+     * allows to create an update site based on maven repository content. The
+     * resulting autoupdate site document can be uploaded as tar.gz to
+     * repository as well as attached artifact to the 'nbm-application' project.
      * <br/>
      * Format: id::layout::url same as in maven-deploy-plugin
      * <br/>
      * with the 'default' and 'legacy' layouts. (maven2 vs maven1 layout)
      * <br/>
-     * If the value doesn't contain :: characters, it's assumed to be the flat structure and the value is just the URL.
+     * If the value doesn't contain :: characters, it's assumed to be the flat
+     * structure and the value is just the URL.
      *
      * @since 3.0 it's also possible to add remote repository as base
      */
-    @Parameter( defaultValue = ".", property = "maven.nbm.customDistBase" )
+    @Parameter(defaultValue = ".", property = "maven.nbm.customDistBase")
     private String distBase;
 
     /**
      * The Maven Project.
      *
      */
-    @Parameter( required = true, readonly = true, property = "project" )
+    @Parameter(required = true, readonly = true, property = "project")
     private MavenProject project;
 
     /**
-     * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
+     * If the executed project is a reactor project, this will contains the full
+     * list of projects in the reactor.
      */
-    @Parameter( required = true, readonly = true, defaultValue = "${reactorProjects}" )
+    @Parameter(required = true, readonly = true, defaultValue = "${reactorProjects}")
     private List reactorProjects;
 
     /**
-     * List of Ant style patterns on artifact GA (groupID:artifactID) that should be included in the update site. Eg.
-     * org.netbeans.* matches all artifacts with any groupID starting with 'org.netbeans.', org.*:api will match any
-     * artifact with artifactId of 'api' and groupId starting with 'org.'
+     * List of Ant style patterns on artifact GA (groupID:artifactID) that
+     * should be included in the update site. Eg. org.netbeans.* matches all
+     * artifacts with any groupID starting with 'org.netbeans.', org.*:api will
+     * match any artifact with artifactId of 'api' and groupId starting with
+     * 'org.'
      *
      * @since 3.14
      */
@@ -144,248 +149,194 @@ public class CreateUpdateSiteMojo
 
     @Override
     public void execute()
-            throws MojoExecutionException, MojoFailureException
-    {
+            throws MojoExecutionException, MojoFailureException {
         Project antProject = registerNbmAntTasks();
-        File nbmBuildDirFile = new File( outputDirectory, "netbeans_site" );
-        if ( !nbmBuildDirFile.exists() )
-        {
+        File nbmBuildDirFile = new File(outputDirectory, "netbeans_site");
+        if (!nbmBuildDirFile.exists()) {
             nbmBuildDirFile.mkdirs();
         }
 
         boolean isRepository = false;
-        if ( "auto".equals( distBase ) )
-        {
+        if ("auto".equals(distBase)) {
             distBase = null;
         }
-        ArtifactRepository distRepository = getDeploymentRepository( distBase, layouts );
+        ArtifactRepository distRepository = getDeploymentRepository(distBase, layouts);
         String oldDistBase = null;
-        if ( distRepository != null )
-        {
+        if (distRepository != null) {
             isRepository = true;
-        }
-        else
-        {
-            if ( distBase != null && !distBase.contains( "::" ) )
-            {
+        } else {
+            if (distBase != null && !distBase.contains("::")) {
                 oldDistBase = distBase;
             }
         }
 
-        if ( "nbm-application".equals( project.getPackaging() ) )
-        {
-            @SuppressWarnings( "unchecked" )
+        if ("nbm-application".equals(project.getPackaging())) {
+            @SuppressWarnings("unchecked")
             Set<Artifact> artifacts = project.getArtifacts();
-            for ( Artifact art : artifacts )
-            {
-                if ( !matchesIncludes( art ) )
-                {
+            for (Artifact art : artifacts) {
+                if (!matchesIncludes(art)) {
                     continue;
                 }
                 ArtifactResult res
-                        = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, session.getLocalRepository() );
-                if ( res.hasConvertedArtifact() )
-                {
+                        = turnJarToNbmFile(art, artifactFactory, artifactResolver, project, session.getLocalRepository());
+                if (res.hasConvertedArtifact()) {
                     art = res.getConvertedArtifact();
                 }
 
-                if ( art.getType().equals( "nbm-file" ) )
-                {
-                    Copy copyTask = (Copy) antProject.createTask( "copy" );
-                    copyTask.setOverwrite( true );
-                    copyTask.setFile( art.getFile() );
-                    if ( !isRepository )
-                    {
-                        copyTask.setFlatten( true );
-                        copyTask.setTodir( nbmBuildDirFile );
+                if (art.getType().equals("nbm-file")) {
+                    Copy copyTask = (Copy) antProject.createTask("copy");
+                    copyTask.setOverwrite(true);
+                    copyTask.setFile(art.getFile());
+                    if (!isRepository) {
+                        copyTask.setFlatten(true);
+                        copyTask.setTodir(nbmBuildDirFile);
+                    } else {
+                        String path = distRepository.pathOf(art);
+                        File f = new File(nbmBuildDirFile, path.replace('/', File.separatorChar));
+                        copyTask.setTofile(f);
                     }
-                    else
-                    {
-                        String path = distRepository.pathOf( art );
-                        File f = new File( nbmBuildDirFile, path.replace( '/', File.separatorChar ) );
-                        copyTask.setTofile( f );
-                    }
-                    try
-                    {
+                    try {
                         copyTask.execute();
-                    }
-                    catch ( BuildException ex )
-                    {
-                        throw new MojoExecutionException( "Cannot merge nbm files into autoupdate site", ex );
+                    } catch (BuildException ex) {
+                        throw new MojoExecutionException("Cannot merge nbm files into autoupdate site", ex);
                     }
 
                 }
-                if ( res.isOSGiBundle() )
-                {
+                if (res.isOSGiBundle()) {
                     // TODO check for bundles
                 }
             }
-            getLog().info( "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile() );
+            getLog().info("Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile());
 
-        }
-        else if ( reactorProjects != null && reactorProjects.size() > 0 )
-        {
+        } else if (reactorProjects != null && reactorProjects.size() > 0) {
 
             Iterator it = reactorProjects.iterator();
-            while ( it.hasNext() )
-            {
+            while (it.hasNext()) {
                 MavenProject proj = (MavenProject) it.next();
-                File projOutputDirectory = new File( proj.getBuild().getDirectory() );
-                if ( projOutputDirectory != null && projOutputDirectory.exists() )
-                {
-                    Copy copyTask = (Copy) antProject.createTask( "copy" );
-                    if ( !isRepository )
-                    {
+                File projOutputDirectory = new File(proj.getBuild().getDirectory());
+                if (projOutputDirectory != null && projOutputDirectory.exists()) {
+                    Copy copyTask = (Copy) antProject.createTask("copy");
+                    if (!isRepository) {
                         FileSet fs = new FileSet();
-                        fs.setDir( projOutputDirectory );
-                        fs.createInclude().setName( "*.nbm" );
-                        copyTask.addFileset( fs );
-                        copyTask.setOverwrite( true );
-                        copyTask.setFlatten( true );
-                        copyTask.setTodir( nbmBuildDirFile );
-                    }
-                    else
-                    {
+                        fs.setDir(projOutputDirectory);
+                        fs.createInclude().setName("*.nbm");
+                        copyTask.addFileset(fs);
+                        copyTask.setOverwrite(true);
+                        copyTask.setFlatten(true);
+                        copyTask.setTodir(nbmBuildDirFile);
+                    } else {
                         boolean has = false;
                         File[] fls = projOutputDirectory.listFiles();
-                        if ( fls != null )
-                        {
-                            for ( File fl : fls )
-                            {
-                                if ( fl.getName().endsWith( ".nbm" ) )
-                                {
-                                    copyTask.setFile( fl );
+                        if (fls != null) {
+                            for (File fl : fls) {
+                                if (fl.getName().endsWith(".nbm")) {
+                                    copyTask.setFile(fl);
                                     has = true;
                                     break;
                                 }
                             }
                         }
-                        if ( !has )
-                        {
+                        if (!has) {
                             continue;
                         }
                         Artifact art
-                                = artifactFactory.createArtifact( proj.getGroupId(), proj.getArtifactId(), proj.
+                                = artifactFactory.createArtifact(proj.getGroupId(), proj.getArtifactId(), proj.
                                         getVersion(),
-                                        null, "nbm-file" );
-                        String path = distRepository.pathOf( art );
-                        File f = new File( nbmBuildDirFile, path.replace( '/', File.separatorChar ) );
-                        copyTask.setTofile( f );
+                                        null, "nbm-file");
+                        String path = distRepository.pathOf(art);
+                        File f = new File(nbmBuildDirFile, path.replace('/', File.separatorChar));
+                        copyTask.setTofile(f);
                     }
-                    try
-                    {
+                    try {
                         copyTask.execute();
-                    }
-                    catch ( BuildException ex )
-                    {
-                        throw new MojoExecutionException( "Cannot merge nbm files into autoupdate site", ex );
+                    } catch (BuildException ex) {
+                        throw new MojoExecutionException("Cannot merge nbm files into autoupdate site", ex);
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             throw new MojoExecutionException(
-                    "This goal only makes sense on reactor projects or project with 'nbm-application' packaging." );
+                    "This goal only makes sense on reactor projects or project with 'nbm-application' packaging.");
 
         }
-        MakeUpdateDesc descTask = (MakeUpdateDesc) antProject.createTask( "updatedist" );
-        File xmlFile = new File( nbmBuildDirFile, fileName );
-        descTask.setDesc( xmlFile );
-        if ( oldDistBase != null )
-        {
-            descTask.setDistBase( oldDistBase );
+        MakeUpdateDesc descTask = (MakeUpdateDesc) antProject.createTask("updatedist");
+        File xmlFile = new File(nbmBuildDirFile, fileName);
+        descTask.setDesc(xmlFile);
+        if (oldDistBase != null) {
+            descTask.setDistBase(oldDistBase);
         }
-        if ( distRepository != null )
-        {
-            descTask.setDistBase( distRepository.getUrl() );
+        if (distRepository != null) {
+            descTask.setDistBase(distRepository.getUrl());
         }
         FileSet fs = new FileSet();
-        fs.setDir( nbmBuildDirFile );
-        fs.createInclude().setName( "**/*.nbm" );
-        descTask.addFileset( fs );
-        try
-        {
+        fs.setDir(nbmBuildDirFile);
+        fs.createInclude().setName("**/*.nbm");
+        descTask.addFileset(fs);
+        try {
             descTask.execute();
+        } catch (BuildException ex) {
+            throw new MojoExecutionException("Cannot create autoupdate site xml file", ex);
         }
-        catch ( BuildException ex )
-        {
-            throw new MojoExecutionException( "Cannot create autoupdate site xml file", ex );
-        }
-        getLog().info( "Generated autoupdate site content at " + nbmBuildDirFile.getAbsolutePath() );
+        getLog().info("Generated autoupdate site content at " + nbmBuildDirFile.getAbsolutePath());
 
-        try
-        {
+        try {
             GZipArchiver gz = new GZipArchiver();
-            gz.addFile( xmlFile, fileName );
-            File gzipped = new File( nbmBuildDirFile, fileName + ".gz" );
-            gz.setDestFile( gzipped );
+            gz.addFile(xmlFile, fileName);
+            File gzipped = new File(nbmBuildDirFile, fileName + ".gz");
+            gz.setDestFile(gzipped);
             gz.createArchive();
-            if ( "nbm-application".equals( project.getPackaging() ) )
-            {
-                projectHelper.attachArtifact( project, "xml.gz", "updatesite", gzipped );
+            if ("nbm-application".equals(project.getPackaging())) {
+                projectHelper.attachArtifact(project, "xml.gz", "updatesite", gzipped);
             }
-        }
-        catch ( Exception ex )
-        {
-            throw new MojoExecutionException( "Cannot create gzipped version of the update site xml file.", ex );
+        } catch (Exception ex) {
+            throw new MojoExecutionException("Cannot create gzipped version of the update site xml file.", ex);
         }
 
     }
 
-    private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile( "(.+)::(.+)::(.+)" );
+    private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile("(.+)::(.+)::(.+)");
 
-    static ArtifactRepository getDeploymentRepository( String distBase, Map<String, ArtifactRepositoryLayout> layouts )
-            throws MojoExecutionException, MojoFailureException
-    {
+    static ArtifactRepository getDeploymentRepository(String distBase, Map<String, ArtifactRepositoryLayout> layouts)
+            throws MojoExecutionException, MojoFailureException {
 
         ArtifactRepository repo = null;
 
-        if ( distBase != null )
-        {
+        if (distBase != null) {
 
-            Matcher matcher = ALT_REPO_SYNTAX_PATTERN.matcher( distBase );
+            Matcher matcher = ALT_REPO_SYNTAX_PATTERN.matcher(distBase);
 
-            if ( !matcher.matches() )
-            {
-                if ( !distBase.contains( "::" ) )
-                {
+            if (!matcher.matches()) {
+                if (!distBase.contains("::")) {
                     //backward compatibility gag.
                     return null;
                 }
-                throw new MojoFailureException( distBase,
+                throw new MojoFailureException(distBase,
                         "Invalid syntax for repository.",
-                        "Invalid syntax for alternative repository. Use \"id::layout::url\"." );
-            }
-            else
-            {
-                String id = matcher.group( 1 ).trim();
-                String layout = matcher.group( 2 ).trim();
-                String url = matcher.group( 3 ).trim();
+                        "Invalid syntax for alternative repository. Use \"id::layout::url\".");
+            } else {
+                String id = matcher.group(1).trim();
+                String layout = matcher.group(2).trim();
+                String url = matcher.group(3).trim();
 
-                ArtifactRepositoryLayout repoLayout = layouts.get( layout );
-                if ( repoLayout == null ) {
-                    throw new MojoExecutionException( "Cannot find repository layout: " + layout );
+                ArtifactRepositoryLayout repoLayout = layouts.get(layout);
+                if (repoLayout == null) {
+                    throw new MojoExecutionException("Cannot find repository layout: " + layout);
                 }
 
-                repo = new DefaultArtifactRepository( id, url, repoLayout );
+                repo = new DefaultArtifactRepository(id, url, repoLayout);
             }
         }
         return repo;
     }
 
-    private boolean matchesIncludes( Artifact art )
-    {
-        if ( updateSiteIncludes != null )
-        {
+    private boolean matchesIncludes(Artifact art) {
+        if (updateSiteIncludes != null) {
             String s = art.getGroupId() + ":" + art.getArtifactId();
-            for ( String p : updateSiteIncludes )
-            {
+            for (String p : updateSiteIncludes) {
                 //TODO optimize and only do once per execution.
-                p = p.replace( ".", "\\." ).replace( "*", ".*" );
-                Pattern patt = Pattern.compile( p );
-                if ( patt.matcher( s ).matches() )
-                {
+                p = p.replace(".", "\\.").replace("*", ".*");
+                Pattern patt = Pattern.compile(p);
+                if (patt.matcher(s).matches()) {
                     return true;
                 }
             }
