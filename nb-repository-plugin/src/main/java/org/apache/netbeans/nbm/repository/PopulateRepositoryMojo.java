@@ -1104,24 +1104,18 @@ public class PopulateRepositoryMojo
 //        build.addPlugin(plg);
 //        mavenModel.setBuild(build);
 
-        FileWriter writer = null;
         File fil = null;
-        try
+        try ( FileWriter writer = new FileWriter( fil ) )
         {
             MavenXpp3Writer xpp = new MavenXpp3Writer();
             fil = Files.createTempFile( "maven", ".pom" ).toFile();
             fil.deleteOnExit();
-            writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
         }
         catch ( IOException ex )
         {
             ex.printStackTrace();
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
+        }        
         return fil;
     }
 

@@ -52,8 +52,6 @@ import org.apache.netbeans.nbm.utils.AbstractNetbeansMojo;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import org.codehaus.plexus.util.IOUtil;
-
 public abstract class AbstractNbmMojo
         extends AbstractNetbeansMojo
 {
@@ -151,30 +149,18 @@ public abstract class AbstractNbmMojo
             throw new MojoExecutionException(
                     "The module descriptor is missing: '" + descriptor + "'." );
         }
-        Reader r = null;
-        try
+        try ( Reader r = new FileReader( descriptor ) )
         {
-            r = new FileReader( descriptor );
             NetBeansModuleXpp3Reader reader = new NetBeansModuleXpp3Reader();
             NetBeansModule module = reader.read( r );
             return module;
         }
-        catch ( IOException exc )
+        catch ( IOException | XmlPullParserException exc )
         {
             throw new MojoExecutionException(
                     "Error while reading module descriptor '" + descriptor + "'.",
                     exc );
-        }
-        catch ( XmlPullParserException xml )
-        {
-            throw new MojoExecutionException(
-                    "Error while reading module descriptor '" + descriptor + "'.",
-                    xml );
-        }
-        finally
-        {
-            IOUtil.close( r );
-        }
+        }        
     }
 
     protected final NetBeansModule createDefaultDescriptor( MavenProject project, boolean log )

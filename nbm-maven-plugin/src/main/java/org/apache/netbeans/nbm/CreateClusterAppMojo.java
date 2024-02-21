@@ -315,10 +315,8 @@ public class CreateClusterAppMojo
 
                                             fl.getParentFile().mkdirs();
                                             fl.createNewFile();
-                                            BufferedOutputStream outstream = null;
-                                            try
+                                            try ( BufferedOutputStream outstream = new BufferedOutputStream( new FileOutputStream( fl ) ) )
                                             {
-                                                outstream = new BufferedOutputStream( new FileOutputStream( fl ) );
                                                 InputStream instream = jf.getInputStream( ent );
                                                 if ( ispack200 )
                                                 {
@@ -338,11 +336,7 @@ public class CreateClusterAppMojo
                                                 {
                                                     IOUtil.copy( instream, outstream );
                                                 }
-                                            }
-                                            finally
-                                            {
-                                                IOUtil.close( outstream );
-                                            }
+                                            }                                            
                                         }
                                     }
 
@@ -805,16 +799,10 @@ public class CreateClusterAppMojo
             else
             {
                 getLog().debug( "Using fallback app.conf shipping with the nbm-maven-plugin." );
-                InputStream instream = null;
-                try
+                try ( InputStream instream = getClass().getClassLoader().getResourceAsStream( "harness/etc/app.conf" ) )
                 {
-                    instream = getClass().getClassLoader().getResourceAsStream( "harness/etc/app.conf" );
                     str = IOUtil.toString( instream, "UTF-8" );
-                }
-                finally
-                {
-                    IOUtil.close( instream );
-                }
+                }                
             }
         }
         else
@@ -925,24 +913,16 @@ public class CreateClusterAppMojo
     private void writeFile( String path, File destSh )
             throws IOException
     {
-        InputStream instream = null;
-        OutputStream output = null;
-        try
+        try (InputStream instream = getClass().getClassLoader().getResourceAsStream( path );
+                OutputStream output = new BufferedOutputStream( new FileOutputStream( destSh ) ))
         {
-            instream = getClass().getClassLoader().getResourceAsStream( path );
             if ( instream == null )
             {
                 throw new FileNotFoundException( path );
             }
             destSh.createNewFile();
-            output = new BufferedOutputStream( new FileOutputStream( destSh ) );
             IOUtil.copy( instream, output );
-        }
-        finally
-        {
-            IOUtil.close( instream );
-            IOUtil.close( output );
-        }
+        }        
     }
 
     private ClusterTuple processCluster( String cluster, File nbmBuildDirFile, Artifact art )
