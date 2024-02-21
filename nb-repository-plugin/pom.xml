@@ -155,6 +155,7 @@ under the License.
                 <artifactId>maven-plugin-plugin</artifactId>
                 <configuration>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+                    <goalPrefix>nb-repository</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>
