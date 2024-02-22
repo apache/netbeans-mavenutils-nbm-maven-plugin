@@ -37,105 +37,91 @@ import org.junit.Test;
  *
  * @author mkleint
  */
-public class CreateClusterAppMojoTest
-{
+public class CreateClusterAppMojoTest {
 
-    public CreateClusterAppMojoTest()
-    {
+    public CreateClusterAppMojoTest() {
     }
 
     @Test
-    public void computeClusterOrderingTest() throws Exception
-    {
+    public void computeClusterOrderingTest() throws Exception {
         HashMap<String, Set<String>> clusterDeps = new HashMap<String, Set<String>>();
         HashMap<String, Set<String>> clusterModules = new HashMap<String, Set<String>>();
-        clusterModules.put( "platform", new HashSet<String>( Arrays.asList( new String[]
-        {
+        clusterModules.put("platform", new HashSet<String>(Arrays.asList(new String[]{
             "pl-a", "pl-b", "pl-c"
-        } ) ) );
-        clusterModules.put( "ide", new HashSet<String>( Arrays.asList( new String[]
-        {
+        })));
+        clusterModules.put("ide", new HashSet<String>(Arrays.asList(new String[]{
             "i-a", "i-b", "i-c"
-        } ) ) );
-        clusterModules.put( "java", new HashSet<String>( Arrays.asList( new String[]
-        {
+        })));
+        clusterModules.put("java", new HashSet<String>(Arrays.asList(new String[]{
             "j-a", "j-b", "j-c"
-        } ) ) );
+        })));
 
-        clusterDeps.put( "java", new HashSet<String>( Arrays.asList( new String[]
-        {
+        clusterDeps.put("java", new HashSet<String>(Arrays.asList(new String[]{
             "i-a", "pl-b", "pl-c"
-        } ) ) );
-        clusterDeps.put( "ide", new HashSet<String>( Arrays.asList( new String[]
-        {
+        })));
+        clusterDeps.put("ide", new HashSet<String>(Arrays.asList(new String[]{
             "pl-b", "pl-c"
-        } ) ) );
-        Map<String, Set<String>> res = CreateClusterAppMojo.computeClusterOrdering( clusterDeps, clusterModules );
-        assertNotNull( res );
-        Set<String> resJava = res.get( "java" );
-        assertNotNull( resJava );
-        assertEquals( resJava.size(), 2 );
-        assertTrue( resJava.contains( "ide" ) );
-        assertTrue( resJava.contains( "platform" ) );
+        })));
+        Map<String, Set<String>> res = CreateClusterAppMojo.computeClusterOrdering(clusterDeps, clusterModules);
+        assertNotNull(res);
+        Set<String> resJava = res.get("java");
+        assertNotNull(resJava);
+        assertEquals(resJava.size(), 2);
+        assertTrue(resJava.contains("ide"));
+        assertTrue(resJava.contains("platform"));
 
-        Set<String> resIde = res.get( "ide" );
-        assertNotNull( resIde );
-        assertEquals( resIde.size(), 1 );
-        assertTrue( resIde.contains( "platform" ) );
+        Set<String> resIde = res.get("ide");
+        assertNotNull(resIde);
+        assertEquals(resIde.size(), 1);
+        assertTrue(resIde.contains("platform"));
 
     }
 
     @Test
-    public void assignClustersToBundles() throws Exception
-    {
+    public void assignClustersToBundles() throws Exception {
         ArrayList<BundleTuple> bundles = new ArrayList<BundleTuple>();
-        BundleTuple tup1 = createBundleTuple( "a.b.c", new File( getClass().getResource( "/osgimanifests" + File.separator + "a.b.c.MF" ).toURI() ) );
-        bundles.add( tup1 );
-        BundleTuple tup2 = createBundleTuple( "b.c.d", new File( getClass().getResource( "/osgimanifests" + File.separator + "b.c.d.MF" ).toURI() ) );
-        assertTrue( Arrays.toString( tup2.manifest.getOsgiImports().toArray() ), tup2.manifest.getOsgiImports().contains( "a.b.c" ) );
-        bundles.add( tup2 );
+        BundleTuple tup1 = createBundleTuple("a.b.c", new File(getClass().getResource("/osgimanifests" + File.separator + "a.b.c.MF").toURI()));
+        bundles.add(tup1);
+        BundleTuple tup2 = createBundleTuple("b.c.d", new File(getClass().getResource("/osgimanifests" + File.separator + "b.c.d.MF").toURI()));
+        assertTrue(Arrays.toString(tup2.manifest.getOsgiImports().toArray()), tup2.manifest.getOsgiImports().contains("a.b.c"));
+        bundles.add(tup2);
         HashMap<String, Set<String>> clusterDeps = new HashMap<String, Set<String>>();
-        clusterDeps.put( "java", new HashSet<String>( Arrays.asList( new String[]
-        {
+        clusterDeps.put("java", new HashSet<String>(Arrays.asList(new String[]{
             "i-a", "pl-b", "pl-c"
-        } ) ) );
-        clusterDeps.put( "ide", new HashSet<String>( Arrays.asList( new String[]
-        {
+        })));
+        clusterDeps.put("ide", new HashSet<String>(Arrays.asList(new String[]{
             "pl-b", "pl-c", "a.b.c"
-        } ) ) );
+        })));
 
-        CreateClusterAppMojo.assignClustersToBundles( bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null );
-        assertEquals( "ide", tup1.cluster );
-        assertEquals( "ide", tup2.cluster );
+        CreateClusterAppMojo.assignClustersToBundles(bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null);
+        assertEquals("ide", tup1.cluster);
+        assertEquals("ide", tup2.cluster);
 
         clusterDeps.clear();
-        clusterDeps.put( "ide", new HashSet<String>( Arrays.asList( new String[]
-        {
+        clusterDeps.put("ide", new HashSet<String>(Arrays.asList(new String[]{
             "i-a", "pl-b", "pl-c"
-        } ) ) );
-        clusterDeps.put( "java", new HashSet<String>( Arrays.asList( new String[]
-        {
+        })));
+        clusterDeps.put("java", new HashSet<String>(Arrays.asList(new String[]{
             "pl-b", "pl-c", "b.c.d"
-        } ) ) );
+        })));
         tup2.cluster = null;
         tup1.cluster = null;
 
-        CreateClusterAppMojo.assignClustersToBundles( bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null );
-        assertEquals( "java", tup2.cluster );
-        assertEquals( "java", tup1.cluster );
+        CreateClusterAppMojo.assignClustersToBundles(bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null);
+        assertEquals("java", tup2.cluster);
+        assertEquals("java", tup1.cluster);
 
     }
 
-    private BundleTuple createBundleTuple( String cnb, File file ) throws MojoExecutionException
-    {
-        assertTrue( file.exists() );
+    private BundleTuple createBundleTuple(String cnb, File file) throws MojoExecutionException {
+        assertTrue(file.exists());
 
-        ExamineManifest em = new ExamineManifest( null );
-        em.setManifestFile( file );
-        em.setPopulateDependencies( true );
+        ExamineManifest em = new ExamineManifest(null);
+        em.setManifestFile(file);
+        em.setPopulateDependencies(true);
         em.checkFile();
-        assertEquals( cnb, em.getModule() );
-        BundleTuple toRet = new BundleTuple( null, em );
+        assertEquals(cnb, em.getModule());
+        BundleTuple toRet = new BundleTuple(null, em);
 
         return toRet;
     }

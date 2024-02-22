@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,13 +32,13 @@ import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 
 /**
- * A dependency node visitor that collects visited nodes that are known libraries or are children of known libraries
+ * A dependency node visitor that collects visited nodes that are known
+ * libraries or are children of known libraries
  *
  * @author Milos Kleint
  */
 public class CollectModuleLibrariesNodeVisitor
-        implements DependencyNodeVisitor
-{
+        implements DependencyNodeVisitor {
 
     /**
      * The collected list of nodes.
@@ -64,7 +63,8 @@ public class CollectModuleLibrariesNodeVisitor
     private final boolean useOSGiDependencies;
 
     /**
-     * Creates a dependency node visitor that collects visited nodes for further processing.
+     * Creates a dependency node visitor that collects visited nodes for further
+     * processing.
      *
      * @param runtimeArtifacts list of runtime artifacts
      * @param examinerCache cache of netbeans manifest for artifacts
@@ -74,14 +74,12 @@ public class CollectModuleLibrariesNodeVisitor
      */
     public CollectModuleLibrariesNodeVisitor(
             List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
-            Log log, DependencyNode root, boolean useOSGiDependencies )
-    {
+            Log log, DependencyNode root, boolean useOSGiDependencies) {
         directNodes = new HashMap<String, List<Artifact>>();
         transitiveNodes = new HashMap<String, List<Artifact>>();
         artifacts = new HashMap<String, Artifact>();
-        for ( Artifact a : runtimeArtifacts )
-        {
-            artifacts.put( a.getDependencyConflictId(), a );
+        for (Artifact a : runtimeArtifacts) {
+            artifacts.put(a.getDependencyConflictId(), a);
         }
         this.examinerCache = examinerCache;
         this.log = log;
@@ -92,81 +90,62 @@ public class CollectModuleLibrariesNodeVisitor
     /**
      * {@inheritDoc}
      */
-    public boolean visit( DependencyNode node )
-    {
-        if ( throwable != null )
-        {
+    public boolean visit(DependencyNode node) {
+        if (throwable != null) {
             return false;
         }
-        if ( root == node )
-        {
+        if (root == node) {
             return true;
         }
-        try
-        {
+        try {
             Artifact artifact = node.getArtifact();
-            if ( !artifacts.containsKey( artifact.getDependencyConflictId() ) )
-            {
+            if (!artifacts.containsKey(artifact.getDependencyConflictId())) {
                 //ignore non-runtime stuff..
                 return false;
             }
             // somehow the transitive artifacts in the  tree are not always resolved?
-            artifact = artifacts.get( artifact.getDependencyConflictId() );
+            artifact = artifacts.get(artifact.getDependencyConflictId());
 
-            ExamineManifest depExaminator = examinerCache.get( artifact );
-            if ( depExaminator == null )
-            {
-                depExaminator = new ExamineManifest( log );
-                depExaminator.setArtifactFile( artifact.getFile() );
+            ExamineManifest depExaminator = examinerCache.get(artifact);
+            if (depExaminator == null) {
+                depExaminator = new ExamineManifest(log);
+                depExaminator.setArtifactFile(artifact.getFile());
                 depExaminator.checkFile();
-                examinerCache.put( artifact, depExaminator );
+                examinerCache.put(artifact, depExaminator);
             }
-            if ( depExaminator.isNetBeansModule() || ( useOSGiDependencies && depExaminator.isOsgiBundle() ) )
-            {
-                currentModule.push( artifact.getDependencyConflictId() );
+            if (depExaminator.isNetBeansModule() || (useOSGiDependencies && depExaminator.isOsgiBundle())) {
+                currentModule.push(artifact.getDependencyConflictId());
                 ArrayList<Artifact> arts = new ArrayList<Artifact>();
-                arts.add( artifact );
-                if ( currentModule.size() == 1 )
-                {
-                    directNodes.put( currentModule.peek(), arts );
-                }
-                else
-                {
-                    transitiveNodes.put( currentModule.peek(), arts );
+                arts.add(artifact);
+                if (currentModule.size() == 1) {
+                    directNodes.put(currentModule.peek(), arts);
+                } else {
+                    transitiveNodes.put(currentModule.peek(), arts);
                 }
                 return true;
             }
-            if ( currentModule.size() > 0 )
-            {
+            if (currentModule.size() > 0) {
                 ////MNBMODULE-95 we are only interested in the module owned libraries
-                if ( !currentModule.peek().startsWith( LIB_ID )
+                if (!currentModule.peek().startsWith(LIB_ID)
                         && AbstractNbmMojo.
-                                matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log,
-                                        useOSGiDependencies ) )
-                {
-                    if ( currentModule.size() == 1 )
-                    {
-                        directNodes.get( currentModule.peek() ).add( artifact );
-                    }
-                    else
-                    {
-                        transitiveNodes.get( currentModule.peek() ).add( artifact );
+                                matchesLibrary(artifact, Collections.<String>emptyList(), depExaminator, log,
+                                        useOSGiDependencies)) {
+                    if (currentModule.size() == 1) {
+                        directNodes.get(currentModule.peek()).add(artifact);
+                    } else {
+                        transitiveNodes.get(currentModule.peek()).add(artifact);
                     }
                     // if a library, iterate to it's child nodes.
                     return true;
                 }
-            }
-            else
-            {
+            } else {
                 //MNBMODULE-95 we check the non-module dependencies to see if they
                 // depend on modules/bundles. these bundles are transitive, so
                 // we add the root module as the first currentModule to keep
                 //any bundle/module underneath it as transitive
-                currentModule.push( LIB_ID + artifact.getDependencyConflictId() );
+                currentModule.push(LIB_ID + artifact.getDependencyConflictId());
             }
-        }
-        catch ( MojoExecutionException mojoExecutionException )
-        {
+        } catch (MojoExecutionException mojoExecutionException) {
             throwable = mojoExecutionException;
         }
         return true;
@@ -175,16 +154,13 @@ public class CollectModuleLibrariesNodeVisitor
     /**
      * {@inheritDoc}
      */
-    public boolean endVisit( DependencyNode node )
-    {
-        if ( throwable != null )
-        {
+    public boolean endVisit(DependencyNode node) {
+        if (throwable != null) {
             return false;
         }
-        if ( !currentModule.empty()
-                && ( currentModule.peek().equals( node.getArtifact().getDependencyConflictId() )
-                || currentModule.peek().equals( LIB_ID + node.getArtifact().getDependencyConflictId() ) ) )
-        {
+        if (!currentModule.empty()
+                && (currentModule.peek().equals(node.getArtifact().getDependencyConflictId())
+                || currentModule.peek().equals(LIB_ID + node.getArtifact().getDependencyConflictId()))) {
             currentModule.pop();
         }
         return true;
@@ -197,10 +173,8 @@ public class CollectModuleLibrariesNodeVisitor
      * @throws MojoExecutionException if an unexpected problem occurs
      */
     public Map<String, List<Artifact>> getDeclaredArtifacts()
-            throws MojoExecutionException
-    {
-        if ( throwable != null )
-        {
+            throws MojoExecutionException {
+        if (throwable != null) {
             throw throwable;
         }
         return directNodes;
@@ -213,10 +187,8 @@ public class CollectModuleLibrariesNodeVisitor
      * @throws MojoExecutionException if an unexpected problem occurs
      */
     public Map<String, List<Artifact>> getTransitiveArtifacts()
-            throws MojoExecutionException
-    {
-        if ( throwable != null )
-        {
+            throws MojoExecutionException {
+        if (throwable != null) {
             throw throwable;
         }
         return transitiveNodes;
