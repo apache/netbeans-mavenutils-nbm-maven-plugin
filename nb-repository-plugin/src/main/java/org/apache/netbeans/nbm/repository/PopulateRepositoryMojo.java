@@ -71,7 +71,6 @@ import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeploymentException;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallationException;
-import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -1104,19 +1103,22 @@ public class PopulateRepositoryMojo
 //        build.addPlugin(plg);
 //        mavenModel.setBuild(build);
 
-        File fil = null;
-        try ( FileWriter writer = new FileWriter( fil ) )
-        {
-            MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = Files.createTempFile( "maven", ".pom" ).toFile();
+        try {
+            File fil = Files.createTempFile("maven", ".pom").toFile();
             fil.deleteOnExit();
-            xpp.write( writer, mavenModel );
-        }
-        catch ( IOException ex )
+
+            try ( FileWriter writer = new FileWriter( fil ) )
+            {
+                MavenXpp3Writer xpp = new MavenXpp3Writer();
+                xpp.write( writer, mavenModel );
+            }
+            return fil;
+        } 
+        catch (IOException ex) 
         {
             ex.printStackTrace();
-        }        
-        return fil;
+        }
+        return null;
     }
 
     Artifact createArtifact( String artifact, String version, String group )
