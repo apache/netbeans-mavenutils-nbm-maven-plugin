@@ -20,5 +20,8 @@
 #
 ee3ecabf930faebc2e8c8c455c1a03dd591303d7
 
-## Reformat src and test to Apache NetBeans default ALT-SHIFT-F
+## Reformats src and test to Apache NetBeans default ALT-SHIFT-F
+# nbm plugin
 364b5432961e566c4f9b9eadbae566c0ed93db96
+# np repo
+689bc0b0eb4ec9c4cfed588b009e49439d5ffe5a
