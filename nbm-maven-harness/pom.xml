@@ -67,7 +67,7 @@ under the License.
                                     <type>nbm</type>
                                     <destFileName>nbi-engine.nbm</destFileName>
                                 </artifactItem>
-                            </artifactItems>                            
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -175,7 +175,6 @@ under the License.
             <!-- No real effect on the build, but prevents NB IDE from thinking src/main/java should be considered in preference to the JAR: -->
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.2</version>
                 <executions>
                     <execution>
                         <goals>
@@ -195,7 +194,6 @@ under the License.
                     <reportSet>
                         <reports>
                             <report>plugins</report>
-                            <report>index</report>
                             <!-- <report>cim</report> -->
                         </reports>
                     </reportSet>
