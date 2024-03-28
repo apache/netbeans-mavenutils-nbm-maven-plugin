@@ -135,8 +135,18 @@ under the License.
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-analyzer</artifactId>
             <version>1.13.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>9.7</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -158,7 +168,7 @@ under the License.
                     <configuration>
                         <source>1.8</source>
                     </configuration>
-                </plugin>                
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -175,7 +185,7 @@ under the License.
                                 <requireMavenVersion>
                                     <version>${maven.minimum.version}</version>
                                 </requireMavenVersion>
-                            </rules>    
+                            </rules>
                         </configuration>
                     </execution>
                 </executions>
@@ -301,15 +311,10 @@ under the License.
             </plugin>
             <plugin>
                 <artifactId>maven-changes-plugin</artifactId>
-                <version>2.12.1</version>
-                <configuration>
-                    <component>12336702</component>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
@@ -331,7 +336,7 @@ under the License.
                         <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-project/apidocs/</link>-->
                         <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-reporting/maven-reporting-api/apidocs/</link>-->
                         <link>https://maven.apache.org/ref/${maven.version}/maven-settings/apidocs/</link>
-                    </links>                    
+                    </links>
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -364,8 +369,7 @@ under the License.
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
-                <version>3.0.0</version>
-            </plugin>  
+            </plugin>
         </plugins>
     </reporting>
 
@@ -380,9 +384,9 @@ under the License.
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <release>8</release>                    
+                            <release>8</release>
                         </configuration>
-                    </plugin>                   
+                    </plugin>
                 </plugins>
             </build>
             <reporting>
@@ -390,7 +394,7 @@ under the License.
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
-                            <release>8</release>                                
+                            <release>8</release>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -419,7 +423,6 @@ under the License.
                 <plugins>
                     <plugin>
                         <artifactId>maven-invoker-plugin</artifactId>
-                        <version>3.6.0</version>
                         <configuration>
                             <debug>true</debug>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
@@ -435,7 +438,7 @@ under the License.
                                 <goal>install</goal>
                             </goals>
                             <filterProperties>
-                                <netbeans.version>RELEASE190</netbeans.version>
+                                <netbeans.version>${netbeans.version}</netbeans.version>
                             </filterProperties>
                         </configuration>
                         <executions>
