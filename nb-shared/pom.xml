@@ -37,8 +37,8 @@ under the License.
     <inceptionYear>2005</inceptionYear>
 
     <issueManagement>
-        <system>jira</system>
-        <url>https://issues.apache.org/jira/browse/NETBEANS</url>
+        <system>github</system>
+        <url>https://github.com/apache/netbeans-mavenutils-nbm-maven-plugin/issues</url>
     </issueManagement>
 
     <!--profiles>
@@ -114,20 +114,6 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>index</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <artifactId>maven-changes-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                    <!-- <onlyCurrentVersion>true</onlyCurrentVersion>-->
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -164,7 +150,6 @@ under the License.
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
-                <version>3.0.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.rat</groupId>
