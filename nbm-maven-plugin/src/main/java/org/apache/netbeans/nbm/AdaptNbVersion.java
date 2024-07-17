@@ -81,7 +81,11 @@ public class AdaptNbVersion {
         if (toReturn.length() == 0) {
             toReturn.append("0.0.0");
         }
-        return toReturn.toString();
+        String result = toReturn.toString();
+        if (TYPE_SPECIFICATION.equals(type)) {
+            result = computeSpecificationVersion(result);
+        }
+        return result;
     }
 
     private static String generateSnapshotValue(Date date) {
@@ -89,4 +93,16 @@ public class AdaptNbVersion {
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dateFormat.format(date);
     }
+
+    private static String computeSpecificationVersion(String v) {
+        int pos = -1;
+        for (int i = 0; i < 3; i++) {
+            pos = v.indexOf('.', pos + 1);
+            if (pos == -1) {
+                return v;
+            }
+        }
+        return v.substring(0, pos);
+    }
+
 }
