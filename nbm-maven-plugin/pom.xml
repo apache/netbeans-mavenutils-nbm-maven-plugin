@@ -85,19 +85,23 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.5.1</version>
+            <version>4.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>4.9.2</version>
+            <version>4.10.0</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-io</artifactId>
-            <version>3.4.2</version>
+            <version>3.5.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-xml</artifactId>
+            <version>3.0.1</version>
+        </dependency>
         <dependency><!-- use harness from NetBeans 13.0  -->
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
@@ -129,12 +133,12 @@ under the License.
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-tree</artifactId>
-            <version>3.2.1</version>
+            <version>3.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-analyzer</artifactId>
-            <version>1.13.2</version>
+            <version>1.14.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.ow2.asm</groupId>
@@ -157,6 +161,11 @@ under the License.
             <artifactId>maven-plugin-testing-harness</artifactId>
             <version>3.3.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>32.0.1-jre</version>
         </dependency>
     </dependencies>
 
@@ -214,7 +223,7 @@ under the License.
             <plugin>
                 <groupId>org.codehaus.modello</groupId>
                 <artifactId>modello-maven-plugin</artifactId>
-                <version>2.3.0</version>
+                <version>2.4.0</version>
                 <executions>
                     <execution>
                         <id>build</id>
@@ -273,12 +282,12 @@ under the License.
                     <dependency>
                         <groupId>org.apache.maven.shared</groupId>
                         <artifactId>maven-shared-resources</artifactId>
-                        <version>5</version>
+                        <version>6</version>
                     </dependency>
                     <dependency>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-invoker-plugin</artifactId>
-                        <version>3.6.1</version>
+                        <version>3.7.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
