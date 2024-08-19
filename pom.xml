@@ -149,7 +149,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.12.1</version> <!-- version sensitive to maven-fluido-skin version -->
+                    <version>3.20.0</version> <!-- version sensitive to maven-fluido-skin version -->
                     <configuration>
                         <!-- hard coded work here,  ${project.distributionManagement.site.url} move everything
                         to staging root removing the "parent " -->
