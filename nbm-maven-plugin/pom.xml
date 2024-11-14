@@ -76,7 +76,7 @@ under the License.
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-archiver</artifactId>
-            <version>3.6.2</version>
+            <version>3.6.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -85,7 +85,6 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>4.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -95,12 +94,11 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-io</artifactId>
-            <version>3.5.0</version>
+            <version>3.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-xml</artifactId>
-            <version>3.0.1</version>
         </dependency>
         <dependency><!-- use harness from NetBeans 13.0  -->
             <groupId>${project.groupId}</groupId>
@@ -128,7 +126,7 @@ under the License.
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-filtering</artifactId>
-            <version>3.3.2</version>
+            <version>3.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
@@ -138,7 +136,7 @@ under the License.
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-analyzer</artifactId>
-            <version>1.14.1</version>
+            <version>1.15.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.ow2.asm</groupId>
@@ -149,7 +147,7 @@ under the License.
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
-            <version>9.7</version>
+            <version>9.7.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -165,7 +163,7 @@ under the License.
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.2.1-jre</version>
+            <version>33.3.1-jre</version>
         </dependency>
     </dependencies>
 
@@ -287,7 +285,7 @@ under the License.
                     <dependency>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-invoker-plugin</artifactId>
-                        <version>3.7.0</version>
+                        <version>${invoker.plugin.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -331,12 +329,12 @@ under the License.
                     <links>
                         <!--<link>http://download-llnw.oracle.com/javaee/1.4/api/</link>-->
                         <!-- unreachable site <link>http://commons.apache.org/collections/apidocs-COLLECTIONS_3_0/</link>-->
-                        <link>http://commons.apache.org/dbcp/apidocs/</link>
-                        <link>http://commons.apache.org/fileupload/apidocs/</link>
-                        <link>http://commons.apache.org/logging/apidocs/</link>
-                        <link>http://commons.apache.org/pool/apidocs/</link>
+                        <link>https://commons.apache.org/proper/commons-dbcp/apidocs/</link>
+                        <link>https://commons.apache.org/proper/commons-fileupload/apidocs/</link>
+                        <link>https://commons.apache.org/proper/commons-logging/apidocs/</link>
+                        <link>https://commons.apache.org/proper/commons-pool/apidocs/</link>
                         <link>https://junit.org/junit4/javadoc/latest/</link>
-                        <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                        <link>https://logging.apache.org/log4j/1.x/apidocs/</link>
                         <!-- unreachable site <link>http://jakarta.apache.org/regexp/apidocs/</link> -->
                         <link>https://velocity.apache.org/engine/1.5/apidocs/</link>
                         <link>https://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>
