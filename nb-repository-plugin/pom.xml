@@ -290,7 +290,7 @@ under the License.
                                 <goal>install</goal>
                             </goals>
                             <filterProperties>
-                                <netbeans.version>${netbeans.version}</netbeans.version>
+                                <netbeans.version>${netbeans.version.it}</netbeans.version>
                             </filterProperties>
                         </configuration>
                         <executions>
