@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import junit.framework.TestCase;
+import org.apache.maven.project.DefaultProjectDependenciesResolver;
+import org.apache.maven.project.ProjectDependenciesResolver;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyGraphBuilder;
 import org.apache.tools.ant.taskdefs.Manifest;
 
 /**
@@ -89,7 +93,9 @@ public class NetBeansManifestUpdateMojoTest extends TestCase {
             throws Exception {
         Manifest m = new Manifest();
         Manifest.Section s = m.getMainSection();
-        new NetBeansManifestUpdateMojo().conditionallyAddAttribute(s, "Desc", "Something.\n   Else.\n");
+        ProjectDependenciesResolver pdr = new DefaultProjectDependenciesResolver();
+        DependencyGraphBuilder dgb = new DefaultDependencyGraphBuilder(pdr);
+        new NetBeansManifestUpdateMojo(dgb).conditionallyAddAttribute(s, "Desc", "Something.\n   Else.\n");
         assertEquals("Something. Else.", s.getAttributeValue("Desc"));
     }
 

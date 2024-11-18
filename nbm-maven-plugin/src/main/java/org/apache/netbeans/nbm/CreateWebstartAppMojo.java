@@ -34,9 +34,9 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import javax.inject.Inject;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
@@ -78,8 +78,7 @@ public class CreateWebstartAppMojo
     @org.apache.maven.plugins.annotations.Parameter(required = true, readonly = true, property = "project")
     private MavenProject project;
 
-    @Component
-    protected MavenProjectHelper projectHelper;
+    private final MavenProjectHelper projectHelper;
 
     /**
      * The branding token for the application based on NetBeans platform.
@@ -189,6 +188,11 @@ public class CreateWebstartAppMojo
      */
     @org.apache.maven.plugins.annotations.Parameter(property = "netbeans.run.params")
     private String additionalArguments;
+
+    @Inject
+    public CreateWebstartAppMojo(MavenProjectHelper projectHelper) {
+        this.projectHelper = projectHelper;
+    }
 
     /**
      *
@@ -559,7 +563,7 @@ public class CreateWebstartAppMojo
         File jnlpStarter
                 = new File(builtInstallation.getAbsolutePath() + File.separator + "harness" + File.separator + "jnlp"
                         + File.separator + "jnlp-launcher.jar");
-        // buffer so it isn't reading a byte at a time!      
+        // buffer so it isn't reading a byte at a time!
         File jnlpDestination = new File(
                 standaloneBuildDir.getAbsolutePath() + File.separator + "jnlp-launcher.jar");
         try (InputStream source = (!jnlpStarter.exists()

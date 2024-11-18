@@ -36,9 +36,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import javax.inject.Inject;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -147,16 +147,20 @@ public class BuildInstallersMojo
     /**
      * Used for attaching the artifact in the project
      */
-    @Component
-    private MavenProjectHelper projectHelper;
+    private final MavenProjectHelper projectHelper;
 
     @Parameter(readonly = true, required = true, property = "basedir")
     private File basedir;
     /**
      * The Maven Project.
      */
-    @Component
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
+
+    @Inject
+    public BuildInstallersMojo(MavenProjectHelper projectHelper) {
+        this.projectHelper = projectHelper;
+    }
 
     @Override
     public void execute()

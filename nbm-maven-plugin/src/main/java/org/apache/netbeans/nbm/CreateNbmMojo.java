@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -37,12 +37,12 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.Organization;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.filtering.MavenResourcesFiltering;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.util.FileUtils;
@@ -178,19 +178,25 @@ public class CreateNbmMojo
     @Parameter
     private File licenseFile;
 
-    @Component
-    private ArtifactFactory artifactFactory;
+    private final ArtifactFactory artifactFactory;
     /**
      * Used for attaching the artifact in the project
      */
-    @Component
-    private MavenProjectHelper projectHelper;
+    private final MavenProjectHelper projectHelper;
 
-    @Component
-    private Map<String, ArtifactRepositoryLayout> layouts;
+    private final Map<String, ArtifactRepositoryLayout> layouts;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
 
+    @Inject
+    public CreateNbmMojo(ArtifactFactory artifactFactory, MavenProjectHelper projectHelper, Map<String, ArtifactRepositoryLayout> layouts, MavenResourcesFiltering mavenResourcesFiltering) {
+        super(mavenResourcesFiltering);
+        this.artifactFactory = artifactFactory;
+        this.projectHelper = projectHelper;
+        this.layouts = layouts;
+    }
+
+    @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException {
         if (skipNbm) {
