@@ -184,7 +184,7 @@ public class CreateClusterAppMojo
     protected MavenSession session;
 
     @Inject
-    public CreateClusterAppMojo(ArtifactFactory artifactFactory,ArtifactResolver artifactResolver) {
+    public CreateClusterAppMojo(ArtifactFactory artifactFactory, ArtifactResolver artifactResolver) {
         this.artifactFactory = artifactFactory;
         this.artifactResolver = artifactResolver;
     }

@@ -259,7 +259,7 @@ public class PopulateRepositoryMojo
     private Parent artefactParent = null;
 
     @Inject
-    public PopulateRepositoryMojo(ArtifactHandlerManager artifactHandlerManager,RepositorySystem repositorySystem) {
+    public PopulateRepositoryMojo(ArtifactHandlerManager artifactHandlerManager, RepositorySystem repositorySystem) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repositorySystem = repositorySystem;
     }

@@ -189,7 +189,7 @@ public class CreateNbmMojo
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
 
     @Inject
-    public CreateNbmMojo(ArtifactFactory artifactFactory, MavenProjectHelper projectHelper, Map<String, ArtifactRepositoryLayout> layouts,MavenResourcesFiltering mavenResourcesFiltering) {
+    public CreateNbmMojo(ArtifactFactory artifactFactory, MavenProjectHelper projectHelper, Map<String, ArtifactRepositoryLayout> layouts, MavenResourcesFiltering mavenResourcesFiltering) {
         super(mavenResourcesFiltering);
         this.artifactFactory = artifactFactory;
         this.projectHelper = projectHelper;
