@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -34,7 +35,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -124,28 +124,33 @@ public class CreateUpdateSiteMojo
     @Parameter
     private List<String> updateSiteIncludes;
 
-    @Component
-    private ArtifactFactory artifactFactory;
+    private final ArtifactFactory artifactFactory;
 
     /**
      * Used for attaching the artifact in the project
      *
      */
-    @Component
-    private MavenProjectHelper projectHelper;
+    private final MavenProjectHelper projectHelper;
 
-    @Component
-    private ArtifactResolver artifactResolver;
+    private final ArtifactResolver artifactResolver;
 
     /**
      * Local maven repository.
      *
      */
-    @Component
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
     protected MavenSession session;
 
-    @Component
-    private Map<String, ArtifactRepositoryLayout> layouts;
+    private final Map<String, ArtifactRepositoryLayout> layouts;
+
+    @Inject
+    public CreateUpdateSiteMojo(ArtifactFactory artifactFactory, MavenProjectHelper projectHelper, ArtifactResolver artifactResolver, Map<String, ArtifactRepositoryLayout> layouts) {
+        this.artifactFactory = artifactFactory;
+        this.projectHelper = projectHelper;
+        this.artifactResolver = artifactResolver;
+        this.layouts = layouts;
+    }
+
 
     @Override
     public void execute()

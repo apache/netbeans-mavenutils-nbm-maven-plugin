@@ -56,6 +56,7 @@ import java.util.zip.CRC32;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
@@ -66,7 +67,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -107,7 +107,7 @@ public class CreateClusterAppMojo
     /**
      * The Maven Project.
      */
-    @Component
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
     /**
@@ -176,14 +176,18 @@ public class CreateClusterAppMojo
         "org.openide.modules.jre.JavaFX" //MNBMODULE-234
     });
 
-    @Component
-    private ArtifactFactory artifactFactory;
+    private final ArtifactFactory artifactFactory;
 
-    @Component
-    private ArtifactResolver artifactResolver;
+    private final ArtifactResolver artifactResolver;
 
-    @Component
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
     protected MavenSession session;
+
+    @Inject
+    public CreateClusterAppMojo(ArtifactFactory artifactFactory,ArtifactResolver artifactResolver) {
+        this.artifactFactory = artifactFactory;
+        this.artifactResolver = artifactResolver;
+    }
 
     @Override
     public void execute()

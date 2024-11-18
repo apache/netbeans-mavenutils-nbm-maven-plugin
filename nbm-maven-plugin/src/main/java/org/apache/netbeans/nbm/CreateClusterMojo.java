@@ -21,13 +21,11 @@ package org.apache.netbeans.nbm;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -76,7 +74,7 @@ public class CreateClusterMojo
      * If the executed project is a reactor project, this will contains the full
      * list of projects in the reactor.
      */
-    @Component
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
 
     public void execute()

@@ -43,6 +43,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.execution.MavenSession;
@@ -51,7 +52,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.netbeans.nbm.utils.AbstractNetbeansMojo;
@@ -247,18 +247,22 @@ public class PopulateRepositoryMojo
     /**
      * Repository system.
      */
-    @Component
-    protected RepositorySystem repositorySystem;
+    private RepositorySystem repositorySystem;
 
     /**
      * Maven ArtifactHandlerManager
      *
      */
-    @Component
     private ArtifactHandlerManager artifactHandlerManager;
 
     // parent handler in case we have one
     private Parent artefactParent = null;
+
+    @Inject
+    public PopulateRepositoryMojo(ArtifactHandlerManager artifactHandlerManager,RepositorySystem repositorySystem) {
+        this.artifactHandlerManager = artifactHandlerManager;
+        this.repositorySystem = repositorySystem;
+    }
 
     @Override
     public void execute()

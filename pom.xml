@@ -75,6 +75,7 @@
         <skin.artifactId>maven-fluido-skin</skin.artifactId>
         <skin.version>2.0.0</skin.version>
         <netbeans.version>RELEASE220</netbeans.version>
+        <javax.inject.version>1</javax.inject.version>
     </properties>
 
     <dependencyManagement>

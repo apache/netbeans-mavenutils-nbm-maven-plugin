@@ -38,11 +38,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -283,12 +283,15 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
     /**
      * The dependency tree builder to use.
      */
-    @Component
-    private DependencyGraphBuilder dependencyGraphBuilder;
+    private final DependencyGraphBuilder dependencyGraphBuilder;
 
-    @Component
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
 
+    @Inject
+    public NetBeansManifestUpdateMojo(DependencyGraphBuilder dependencyGraphBuilder) {
+        this.dependencyGraphBuilder = dependencyGraphBuilder;
+    }
     /**
      * execute plugin
      *
@@ -540,7 +543,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         } catch (IOException ex) {
             throw new MojoExecutionException(ex.getMessage(), ex);
         }
-        try (PrintWriter writer = new PrintWriter(targetManifestFile, "UTF-8");) //TODO really UTF-8?? 
+        try (PrintWriter writer = new PrintWriter(targetManifestFile, "UTF-8");) //TODO really UTF-8??
         {
             manifest.write(writer);
         } catch (IOException ex) {

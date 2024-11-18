@@ -40,13 +40,13 @@ import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.filtering.MavenFilteringException;
 import org.apache.maven.project.MavenProject;
@@ -221,10 +221,9 @@ public abstract class CreateNetBeansFileStructure
     @Parameter
     private List<String> externals;
 
-    @Component
-    protected MavenResourcesFiltering mavenResourcesFiltering;
+    private MavenResourcesFiltering mavenResourcesFiltering;
 
-    @Component
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
     protected MavenSession session;
 
     //items used by the CreateNBMMojo.
@@ -232,6 +231,12 @@ public abstract class CreateNetBeansFileStructure
     protected NetBeansModule module;
     protected File clusterDir;
     protected String moduleJarName;
+
+    @Inject
+    public CreateNetBeansFileStructure(MavenResourcesFiltering mavenResourcesFiltering) {
+        this.mavenResourcesFiltering = mavenResourcesFiltering;
+    }
+
 
     @Override
     public void execute()
