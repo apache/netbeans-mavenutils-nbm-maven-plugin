@@ -74,7 +74,8 @@
         <skin.groupId>org.apache.maven.skins</skin.groupId>
         <skin.artifactId>maven-fluido-skin</skin.artifactId>
         <skin.version>2.0.0</skin.version>
-        <netbeans.version>RELEASE220</netbeans.version>
+        <!-- version of Apache NetBeans for harness build -->
+        <netbeans.version>RELEASE230</netbeans.version>
         <javax.inject.version>1</javax.inject.version>
     </properties>
 
@@ -150,7 +151,7 @@
                                     <requireMavenVersion>
                                         <version>${maven.minimum.version}</version>
                                     </requireMavenVersion>
-                                </rules>    
+                                </rules>
                             </configuration>
                         </execution>
                     </executions>
@@ -303,4 +304,34 @@
             </plugin>
         </plugins>
     </reporting>
+    <profiles>
+        <!-- select the artefact version according to supported jdk --> 
+        <profile>
+            <id>downgrade-release-for-jdk8-it</id>
+            <activation>
+                <jdk>(,11]</jdk>
+            </activation>
+            <properties>
+                <netbeans.version.it>RELEASE126</netbeans.version.it>
+            </properties>
+        </profile>
+        <profile>
+            <id>downgrade-release-for-jdk11-it</id>
+            <activation>
+                <jdk>(11,17]</jdk>
+            </activation>
+            <properties>
+                <netbeans.version.it>RELEASE210</netbeans.version.it>
+            </properties>
+        </profile>
+        <profile>
+            <id>it-for-current-jdk</id>
+            <activation>
+                <jdk>(17,)</jdk>
+            </activation>
+            <properties>
+                <netbeans.version.it>${netbeans.version}</netbeans.version.it>
+            </properties>
+        </profile>
+    </profiles>
 </project>
