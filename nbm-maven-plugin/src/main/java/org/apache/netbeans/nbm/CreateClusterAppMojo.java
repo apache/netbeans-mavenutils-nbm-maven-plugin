@@ -29,7 +29,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 import java.net.URL;
@@ -38,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,7 +79,6 @@ import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.netbeans.nbbuild.MakeListOfNBM;
 
 /**
@@ -95,8 +92,7 @@ import org.netbeans.nbbuild.MakeListOfNBM;
         requiresProject = true,
         threadSafe = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class CreateClusterAppMojo
-        extends AbstractNbmMojo {
+public class CreateClusterAppMojo extends AbstractNbmMojo {
 
     /**
      * output directory where the the NetBeans application will be created.
@@ -190,8 +186,7 @@ public class CreateClusterAppMojo
     }
 
     @Override
-    public void execute()
-            throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
         File nbmBuildDirFile = new File(outputDirectory, brandingToken);
         if (!nbmBuildDirFile.exists()) {
@@ -223,9 +218,7 @@ public class CreateClusterAppMojo
             @SuppressWarnings("unchecked")
             Set<Artifact> artifacts = project.getArtifacts();
             for (Artifact art : artifacts) {
-                ArtifactResult res
-                        = turnJarToNbmFile(art, artifactFactory, artifactResolver, project,
-                                session.getLocalRepository());
+                ArtifactResult res = turnJarToNbmFile(art, artifactFactory, artifactResolver, project, session.getLocalRepository());
                 if (res.hasConvertedArtifact()) {
                     art = res.getConvertedArtifact();
                 }
@@ -278,15 +271,13 @@ public class CreateClusterAppMojo
                                             InputStream is = jf.getInputStream(ent);
                                             try {
                                                 externalDownload(new File(fl.getParentFile(),
-                                                        fl.getName().replaceFirst("[.]external$",
-                                                                "")), is);
+                                                        fl.getName().replaceFirst("[.]external$", "")), is);
                                             } finally {
                                                 is.close();
                                             }
                                             //MNBMODULE-192
                                             set.appendIncludes(new String[]{
-                                                name.substring("netbeans/".length(), name.length() - ".external".
-                                                length())
+                                                name.substring("netbeans/".length(), name.length() - ".external".length())
                                             });
                                         } else {
                                             set.appendIncludes(new String[]{
@@ -400,8 +391,7 @@ public class CreateClusterAppMojo
                                             // in this case we dont want module-maven-embedder to be considered as
                                             // wrapper for his libs guava is provided but ide have it also
                                         } else {
-                                            getLog().debug(ex.getModule() + " added by " + art.getId() + " located in: "
-                                                    + classpathFile);
+                                            getLog().debug(ex.getModule() + " added by " + art.getId() + " located in: " + classpathFile);
                                             wrappedBundleCNBs.add(ex.getModule());
                                         }
                                     }
@@ -529,8 +519,7 @@ public class CreateClusterAppMojo
             }
 
             //attempt to sort clusters based on the dependencies and cluster content.
-            Map<String, Set<String>> cluster2depClusters
-                    = computeClusterOrdering(clusterDependencies, clusterModules);
+            Map<String, Set<String>> cluster2depClusters = computeClusterOrdering(clusterDependencies, clusterModules);
             clusterModules.clear();
 
             //now assign the cluster to bundles based on dependencies..
@@ -563,32 +552,17 @@ public class CreateClusterAppMojo
                     try {
                         FileUtils.copyFile(art.getFile(), moduleArt);
                         final File moduleConf = new File(confModules, cnbDashed + ".xml");
-                        FileUtils.copyStreamToFile(new InputStreamFacade() {
-                            @Override
-                            public InputStream getInputStream() throws IOException {
-                                return new StringInputStream(createBundleConfigFile(cnb, ex.isBundleAutoload()),
-                                        "UTF-8");
-                            }
-                        }, moduleConf);
-                        FileUtils.copyStreamToFile(new InputStreamFacade() {
-                            @Override
-                            public InputStream getInputStream() throws IOException {
-                                return new StringInputStream(createBundleUpdateTracking(cnb, moduleArt, moduleConf,
-                                        specVer), "UTF-8");
-                            }
-                        }, new File(updateTracking, cnbDashed + ".xml"));
+                        FileUtils.copyStreamToFile(() -> new StringInputStream(createBundleConfigFile(cnb, ex.isBundleAutoload()), "UTF-8"), moduleConf);
+                        FileUtils.copyStreamToFile(() -> new StringInputStream(createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8"), new File(updateTracking, cnbDashed + ".xml"));
                     } catch (IOException exc) {
                         getLog().error(exc);
                     }
                 }
             }
-
-            getLog().info(
-                    "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile());
+            getLog().info("Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile());
 
         } else {
-            throw new MojoExecutionException(
-                    "This goal only makes sense on project with nbm-application packaging");
+            throw new MojoExecutionException("This goal only makes sense on project with nbm-application packaging");
         }
         //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
         File[] files = nbmBuildDirFile.listFiles();
@@ -608,8 +582,7 @@ public class CreateClusterAppMojo
         try {
             createBinEtcDir(nbmBuildDirFile, brandingToken);
         } catch (IOException ex) {
-            throw new MojoExecutionException(
-                    "Cannot process etc folder content creation.", ex);
+            throw new MojoExecutionException("Cannot process etc folder content creation.", ex);
         }
     }
     private static final int SET_INITIAL_SIZE = 200;
@@ -617,8 +590,7 @@ public class CreateClusterAppMojo
     private static final Pattern PATT = Pattern.compile(
             ".*targetcluster=\"([a-zA-Z0-9_\\.\\-]+)\".*", Pattern.DOTALL);
 
-    private String findCluster(JarFile jf)
-            throws MojoFailureException, IOException {
+    private String findCluster(JarFile jf) throws MojoFailureException, IOException {
         ZipEntry entry = jf.getEntry("Info/info.xml");
         InputStream ins = jf.getInputStream(entry);
         String str = IOUtil.toString(ins, "UTF8");
@@ -639,8 +611,7 @@ public class CreateClusterAppMojo
      *
      * @throws java.io.IOException
      */
-    private void createBinEtcDir(File buildDir, String brandingToken)
-            throws IOException, MojoExecutionException {
+    private void createBinEtcDir(File buildDir, String brandingToken) throws IOException, MojoExecutionException {
         File etcDir = new File(buildDir + File.separator + "etc");
         etcDir.mkdir();
 
@@ -703,8 +674,7 @@ public class CreateClusterAppMojo
 
         File harnessDir = new File(buildDir, "harness");
         //we have org-netbeans-modules-apisupport-harness in target area, just use it's own launchers.
-        binDir = new File(
-                harnessDir.getAbsolutePath() + File.separator + "launchers");
+        binDir = new File(harnessDir.getAbsolutePath() + File.separator + "launchers");
         if (binDir.exists()) {
             File exe = new File(binDir, "app.exe");
             FileUtils.copyFile(exe, destExe);
@@ -722,8 +692,7 @@ public class CreateClusterAppMojo
         } else {
             File nbm = getHarnessNbm();
             try (ZipFile zip = new ZipFile(nbm)) {
-                getLog().debug(
-                        "Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file.");
+                getLog().debug("Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file.");
                 writeFromZip(zip, "netbeans/launchers/app.sh", destSh, true);
                 writeFromZip(zip, "netbeans/launchers/app.exe", destExe, true);
                 writeFromZip(zip, "netbeans/launchers/app64.exe", destExe64, false);
@@ -770,8 +739,7 @@ public class CreateClusterAppMojo
         chmod.execute();
     }
 
-    private void writeFile(String path, File destSh)
-            throws IOException {
+    /* private void writeFile(String path, File destSh) throws IOException {
         try (InputStream instream = getClass().getClassLoader().getResourceAsStream(path); OutputStream output = new BufferedOutputStream(new FileOutputStream(destSh))) {
             if (instream == null) {
                 throw new FileNotFoundException(path);
@@ -780,7 +748,7 @@ public class CreateClusterAppMojo
             IOUtil.copy(instream, output);
         }
     }
-
+     */
     private ClusterTuple processCluster(String cluster, File nbmBuildDirFile, Artifact art) {
         File clusterFile = new File(nbmBuildDirFile, cluster);
         boolean newer = false;
@@ -796,8 +764,7 @@ public class CreateClusterAppMojo
         return new ClusterTuple(clusterFile, newer);
     }
 
-    private void externalDownload(File f, InputStream is)
-            throws IOException {
+    private void externalDownload(File f, InputStream is) throws IOException {
         // Cf. org.netbeans.nbbuild.AutoUpdate
         BufferedReader r = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         long crc = -1;
@@ -861,8 +828,7 @@ public class CreateClusterAppMojo
         Set<Artifact> artifacts = project.getArtifacts();
         String version = null;
         for (Artifact a : artifacts) {
-            if ((groupIdPrefix + ".modules").equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.
-                    getArtifactId())) {
+            if ((groupIdPrefix + ".modules").equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
                 //base version in non-snapshot should equals version, in snapshots to X-SNAPSHOT, not timestamp
                 version = a.getBaseVersion();
                 break;
@@ -887,8 +853,7 @@ public class CreateClusterAppMojo
         return nbmArt.getFile();
     }
 
-    private void writeFromZip(final ZipFile zip, String zipPath, File destFile, boolean mandatory) throws
-            MojoExecutionException, IOException {
+    private void writeFromZip(final ZipFile zip, String zipPath, File destFile, boolean mandatory) throws MojoExecutionException, IOException {
         final ZipEntry path = zip.getEntry(zipPath);
         if (path == null) {
             if (mandatory) {
@@ -897,13 +862,7 @@ public class CreateClusterAppMojo
             getLog().debug(zipPath + " is not present in " + zip.getName());
             return;
         }
-        FileUtils.copyStreamToFile(new InputStreamFacade() {
-
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return zip.getInputStream(path);
-            }
-        }, destFile);
+        FileUtils.copyStreamToFile(() -> zip.getInputStream(path), destFile);
     }
 
     private static void addToMap(Map<String, Set<String>> map, String clusterName, List<String> newValues) {
@@ -1004,16 +963,14 @@ public class CreateClusterAppMojo
             BundleTuple bundleTuple = it.next();
             boolean found = false;
             for (BundleTuple knownBT : known) {
-                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiExports(), knownBT.manifest.
-                        getOsgiImports());
+                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiExports(), knownBT.manifest.getOsgiImports());
                 if (!is.isEmpty()) {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
                 }
                 //dependencyTokens are requireBundle - matches the module property
-                is = Sets.intersection(Collections.singleton(bundleTuple.manifest.getModule()), new HashSet(
-                        knownBT.manifest.getDependencyTokens()));
+                is = Sets.intersection(Collections.singleton(bundleTuple.manifest.getModule()), new HashSet(knownBT.manifest.getDependencyTokens()));
                 if (!is.isEmpty()) {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
@@ -1039,16 +996,14 @@ public class CreateClusterAppMojo
             BundleTuple bundleTuple = it.next();
             boolean found = false;
             for (BundleTuple knownBT : known) {
-                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiImports(), knownBT.manifest.
-                        getOsgiExports());
+                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiImports(), knownBT.manifest.getOsgiExports());
                 if (!is.isEmpty()) {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
                 }
                 //dependencyTokens are requireBundle - matches the module property
-                is = Sets.intersection(Collections.singleton(knownBT.manifest.getModule()), new HashSet(
-                        bundleTuple.manifest.getDependencyTokens()));
+                is = Sets.intersection(Collections.singleton(knownBT.manifest.getModule()), new HashSet(bundleTuple.manifest.getDependencyTokens()));
                 if (!is.isEmpty()) {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
@@ -1128,25 +1083,21 @@ public class CreateClusterAppMojo
                 + "</module>\n";
     }
 
-    static String createBundleUpdateTracking(String cnb, File moduleArt, File moduleConf, String specVersion)
-            throws FileNotFoundException, IOException {
+    static String createBundleUpdateTracking(String cnb, File moduleArt, File moduleConf, String specVersion) throws FileNotFoundException, IOException {
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<module codename=\"" + cnb + "\">\n"
                 + "    <module_version install_time=\"" + System.currentTimeMillis()
                 + "\" last=\"true\" origin=\"installer\" specification_version=\"" + specVersion + "\">\n"
-                + "        <file crc=\"" + crcForFile(moduleConf).getValue() + "\" name=\"config/Modules/" + cnb.
-                replace(".", "-") + ".xml\"/>\n"
-                + "        <file crc=\"" + crcForFile(moduleArt).getValue() + "\" name=\"modules/" + cnb.replace(".",
-                "-")
+                + "        <file crc=\"" + crcForFile(moduleConf).getValue() + "\" name=\"config/Modules/" + cnb.replace(".", "-") + ".xml\"/>\n"
+                + "        <file crc=\"" + crcForFile(moduleArt).getValue() + "\" name=\"modules/" + cnb.replace(".", "-")
                 + ".jar\"/>\n"
                 + "    </module_version>\n"
                 + "</module>";
 
     }
 
-    static CRC32 crcForFile(File inFile)
-            throws FileNotFoundException, IOException {
+    static CRC32 crcForFile(File inFile) throws FileNotFoundException, IOException {
         CRC32 crc = new CRC32();
         try (InputStream inFileStream = new FileInputStream(inFile)) {
             byte[] array = new byte[(int) inFile.length()];

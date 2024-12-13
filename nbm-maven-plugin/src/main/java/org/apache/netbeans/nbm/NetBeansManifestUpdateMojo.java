@@ -206,7 +206,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
      * codename base of the module, uniquely identifying the module within the
      * NetBeans runtime. usually the package name equivalent. Can include the
      * major release version. See
-     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest">
+     * <a href="https://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest">
      * NetBeans Module system docs</a>
      *
      * @since 3.8
@@ -267,7 +267,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
      * by the user. It installs disabled. Since 3.11</p>
      *
      * For details, see
-     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">
+     * <a href="https://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">
      * Netbeans Module system docs</a>
      *
      * Since 3.14, for autoload and eager modules, we automatically set
@@ -411,7 +411,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         }
         conditionallyAddAttribute(mainSection, "OpenIDE-Module-Public-Packages", packagesValue);
 
-        //See http://www.netbeans.org/download/dev/javadoc/org-openide-modules/apichanges.html#split-of-openide-jar
+        //See https://bits.netbeans.org/dev/javadoc/org-openide-modules/apichanges.html#split-of-openide-jar
         conditionallyAddAttribute(mainSection, "OpenIDE-Module-Requires",
                 "org.openide.modules.ModuleFormat1");
 //        conditionallyAddAttribute(mainSection, "OpenIDE-Module-IDE-Dependencies", "IDE/1 > 3.40");

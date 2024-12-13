@@ -45,6 +45,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.util.StringUtils;
@@ -65,8 +66,7 @@ import org.apache.tools.ant.util.StringUtils;
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         threadSafe = true,
         defaultPhase = LifecyclePhase.PACKAGE)
-public class BuildInstallersMojo
-        extends AbstractNbmMojo {
+public class BuildInstallersMojo extends AbstractNbmMojo {
 
     /**
      * output directory.
@@ -163,8 +163,7 @@ public class BuildInstallersMojo
     }
 
     @Override
-    public void execute()
-            throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         Project antProject = antProject();
 
         if (!"nbm-application".equals(project.getPackaging())) {
@@ -204,19 +203,16 @@ public class BuildInstallersMojo
         props.put("suite.props.app.name", brandingToken);
         props.put("suite.dist.zip", zipFile.getAbsolutePath().replace("\\", "/"));
         props.put("suite.dist.directory", outputDirectory.getAbsolutePath().replace("\\", "/"));
-        props.put("installer.build.dir", new File(outputDirectory, "installerbuild").getAbsolutePath().replace("\\",
-                "/"));
+        props.put("installer.build.dir", new File(outputDirectory, "installerbuild").getAbsolutePath().replace("\\", "/"));
 
         props.put("installers.file.prefix", installersFilePrefix);
 
 //        props.put( "install.dir.name", installDirName );
         //mkleint: this is a flawed pattern! cannot make any assumption on multimodule layout
-        String appName = project.getParent().getArtifactId().replace(".", "").replace("-", "").replace("_", "").
-                replaceAll("[0-9]+", "");
+        String appName = project.getParent().getArtifactId().replace(".", "").replace("-", "").replace("_", "").replaceAll("[0-9]+", "");
         props.put("suite.nbi.product.uid", appName.toLowerCase(Locale.ENGLISH));
 
-        props.put("suite.props.app.title", (project.getName() + " " + project.getVersion()).replaceAll("-SNAPSHOT",
-                ""));
+        props.put("suite.props.app.title", (project.getName() + " " + project.getVersion()).replaceAll("-SNAPSHOT", ""));
 
         String appVersion = project.getVersion().replaceAll("-SNAPSHOT", "");
         props.put("suite.nbi.product.version.short", appVersion);
@@ -227,17 +223,13 @@ public class BuildInstallersMojo
 
         props.put("nbi.stub.location", new File(harnessDir, "nbi/stub").getAbsolutePath().replace("\\", "/"));
 
-        props.put("nbi.stub.common.location", new File(harnessDir, "nbi/.common").getAbsolutePath().replace("\\",
-                "/"));
+        props.put("nbi.stub.common.location", new File(harnessDir, "nbi/.common").getAbsolutePath().replace("\\", "/"));
 
-        props.put("nbi.ant.tasks.jar", new File(harnessDir, "modules/ext/nbi-ant-tasks.jar").getAbsolutePath().
-                replace("\\", "/"));
+        props.put("nbi.ant.tasks.jar", new File(harnessDir, "modules/ext/nbi-ant-tasks.jar").getAbsolutePath().replace("\\", "/"));
 
-        props.put("nbi.registries.management.jar", new File(harnessDir, "modules/ext/nbi-registries-management.jar").
-                getAbsolutePath().replace("\\", "/"));
+        props.put("nbi.registries.management.jar", new File(harnessDir, "modules/ext/nbi-registries-management.jar").getAbsolutePath().replace("\\", "/"));
 
-        props.put("nbi.engine.jar", new File(harnessDir, "modules/ext/nbi-engine.jar").getAbsolutePath().replace(
-                "\\", "/"));
+        props.put("nbi.engine.jar", new File(harnessDir, "modules/ext/nbi-engine.jar").getAbsolutePath().replace("\\", "/"));
 
         if (installerLicenseFile != null) {
             getLog().info(String.format("License file is at %1s, exist = %2$s", installerLicenseFile,
@@ -293,10 +285,9 @@ public class BuildInstallersMojo
         props.put("pack200.enabled", "" + installerPack200Enable);
 
         props.put("nbi.dock.icon.file", appIconIcnsFile.getAbsolutePath());
-
+        
         try {
-            antProject.setUserProperty("ant.file", new File(harnessDir, "nbi/stub/template.xml").getAbsolutePath().
-                    replace("\\", "/"));
+            antProject.setUserProperty("ant.file", new File(harnessDir, "nbi/stub/template.xml").getAbsolutePath().replace("\\", "/"));
             ProjectHelper helper = ProjectHelper.getProjectHelper();
             antProject.addReference("ant.projectHelper", helper);
             helper.parse(antProject, new File(harnessDir, "nbi/stub/template.xml"));
@@ -309,7 +300,7 @@ public class BuildInstallersMojo
                 }
             }
             antProject.executeTarget("build");
-        } catch (Exception ex) {
+        } catch (BuildException ex) {
             throw new MojoExecutionException("Installers creation failed: " + ex, ex);
         }
     }
@@ -317,8 +308,7 @@ public class BuildInstallersMojo
     //mkleint: could this be replaced by something from plexus-utils?
     private static class FileUrlUtils {
 
-        boolean copyFile(final File toCopy, final File destFile)
-                throws MojoExecutionException {
+        boolean copyFile(final File toCopy, final File destFile) throws MojoExecutionException {
             try {
                 return copyStream(new FileInputStream(toCopy), new FileOutputStream(destFile));
             } catch (final FileNotFoundException e) {
@@ -326,8 +316,7 @@ public class BuildInstallersMojo
             }
         }
 
-        boolean copyFilesRecursively(final File toCopy, final File destDir)
-                throws MojoExecutionException {
+        boolean copyFilesRecursively(final File toCopy, final File destDir) throws MojoExecutionException {
             assert destDir.isDirectory();
 
             if (!toCopy.isDirectory()) {
@@ -346,8 +335,7 @@ public class BuildInstallersMojo
             return true;
         }
 
-        boolean copyJarResourcesRecursively(final File destDir, final JarURLConnection jarConnection)
-                throws IOException, MojoExecutionException {
+        boolean copyJarResourcesRecursively(final File destDir, final JarURLConnection jarConnection) throws IOException, MojoExecutionException {
 
             final JarFile jarFile = jarConnection.getJarFile();
 
@@ -366,8 +354,7 @@ public class BuildInstallersMojo
                         entryInputStream.close();
                     } else {
                         if (!ensureDirectoryExists(f)) {
-                            throw new IOException("Could not create directory: "
-                                    + f.getAbsolutePath());
+                            throw new IOException("Could not create directory: " + f.getAbsolutePath());
                         }
                     }
                 }
@@ -375,8 +362,7 @@ public class BuildInstallersMojo
             return true;
         }
 
-        boolean copyResourcesRecursively(final URL originUrl, final File destination)
-                throws MojoExecutionException {
+        boolean copyResourcesRecursively(final URL originUrl, final File destination) throws MojoExecutionException {
             try {
                 final URLConnection urlConnection = originUrl.openConnection();
                 if (urlConnection instanceof JarURLConnection) {
@@ -389,8 +375,7 @@ public class BuildInstallersMojo
             }
         }
 
-        boolean copyStream(final InputStream is, final File f)
-                throws MojoExecutionException {
+        boolean copyStream(final InputStream is, final File f) throws MojoExecutionException {
             try {
                 return copyStream(is, new FileOutputStream(f));
             } catch (final FileNotFoundException e) {
@@ -398,8 +383,7 @@ public class BuildInstallersMojo
             }
         }
 
-        boolean copyStream(final InputStream is, final OutputStream os)
-                throws MojoExecutionException {
+        boolean copyStream(final InputStream is, final OutputStream os) throws MojoExecutionException {
             try {
                 final byte[] buf = new byte[1024];
 

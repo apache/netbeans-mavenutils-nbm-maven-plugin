@@ -37,8 +37,7 @@ import org.apache.netbeans.nbm.utils.ExamineManifest;
  *
  * @author Milos Kleint
  */
-public class CollectLibrariesNodeVisitor
-        implements DependencyNodeVisitor {
+public class CollectLibrariesNodeVisitor implements DependencyNodeVisitor {
 
     /**
      * The collected list of nodes.
@@ -79,8 +78,8 @@ public class CollectLibrariesNodeVisitor
     public CollectLibrariesNodeVisitor(List<String> explicitLibraries,
             List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
             Log log, DependencyNode root, boolean useOsgiDependencies) {
-        nodes = new ArrayList<Artifact>();
-        artifacts = new HashMap<String, Artifact>();
+        nodes = new ArrayList<>();
+        artifacts = new HashMap<>();
         for (Artifact a : runtimeArtifacts) {
             artifacts.put(a.getDependencyConflictId(), a);
         }
@@ -97,6 +96,7 @@ public class CollectLibrariesNodeVisitor
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean visit(DependencyNode node) {
         if (throwable != null) {
             return false;
@@ -122,8 +122,7 @@ public class CollectLibrariesNodeVisitor
             }
             if (AbstractNbmMojo.matchesLibrary(artifact, explicitLibs, depExaminator, log, useOsgiDependencies)) {
                 if (depExaminator.isNetBeansModule()) {
-                    log.warn(
-                            "You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId());
+                    log.warn("You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId());
                 }
 
                 nodes.add(artifact);
@@ -141,12 +140,13 @@ public class CollectLibrariesNodeVisitor
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean endVisit(DependencyNode node) {
         if (throwable != null) {
             return false;
         }
         if (node == root) {
-            if (nodes.size() > 0) {
+            if (!nodes.isEmpty()) {
                 log.info("Adding on module's Class-Path:");
                 for (Artifact inc : nodes) {
                     log.info("    " + inc.getId());
@@ -162,8 +162,7 @@ public class CollectLibrariesNodeVisitor
      * @return the list of collected dependency nodes
      * @throws MojoExecutionException if a throwable is set
      */
-    public List<Artifact> getArtifacts()
-            throws MojoExecutionException {
+    public List<Artifact> getArtifacts() throws MojoExecutionException {
         if (throwable != null) {
             throw throwable;
         }

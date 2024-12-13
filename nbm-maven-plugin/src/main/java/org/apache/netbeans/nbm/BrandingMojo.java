@@ -19,11 +19,13 @@ package org.apache.netbeans.nbm;
  * under the License.
  */
 import java.io.File;
+import java.io.IOException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
@@ -97,8 +99,7 @@ public class BrandingMojo extends AbstractNbmMojo {
     public void execute()
             throws MojoExecutionException {
         if (!"nbm".equals(project.getPackaging())) {
-            getLog().error(
-                    "The nbm:branding goal shall be used within a NetBeans module project only (packaging 'nbm')");
+            getLog().error("The nbm:branding goal shall be used within a NetBeans module project only (packaging 'nbm')");
         }
         if (!brandingSources.isDirectory()) {
             getLog().info("No branding to process.");
@@ -144,9 +145,7 @@ public class BrandingMojo extends AbstractNbmMojo {
                 }
                 String effectiveBranding = rootDir.getName();
                 // create jar-files from each toplevel .jar directory
-                scanner.setIncludes(new String[]{
-                    "**/*.jar"
-                });
+                scanner.setIncludes(new String[]{"**/*.jar"});
                 scanner.setBasedir(rootDir);
                 scanner.scan();
                 for (String jarDirectoryPath : scanner.getIncludedDirectories()) {
@@ -168,7 +167,7 @@ public class BrandingMojo extends AbstractNbmMojo {
                 }
             }
 
-        } catch (Exception ex) {
+        } catch (IOException | IllegalStateException | ArchiverException ex) {
             throw new MojoExecutionException("Error creating branding", ex);
         }
     }

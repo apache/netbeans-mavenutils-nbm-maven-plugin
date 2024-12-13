@@ -60,14 +60,12 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
         String id = grId + ":" + artId;
         boolean explicit = libraries.remove(id);
         if (explicit) {
-            log.debug(
-                    id + " included as module library, explicitly declared in module descriptor.");
+            log.debug(id + " included as module library, explicitly declared in module descriptor.");
             return explicit;
         }
         if (Artifact.SCOPE_PROVIDED.equals(artifact.getScope()) || Artifact.SCOPE_SYSTEM.equals(
                 artifact.getScope())) {
-            log.debug(
-                    id + " omitted as module library, has scope 'provided/system'");
+            log.debug(id + " omitted as module library, has scope 'provided/system'");
             return false;
         }
         if ("nbm".equals(artifact.getType())) {
@@ -78,8 +76,7 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
             // I guess it won't matter much in 6.9+, in older versions it could be a problem.
             return false;
         }
-        log.debug(
-                id + " included as module library, squeezed through all the filters.");
+        log.debug(id + " included as module library, squeezed through all the filters.");
         return true;
     }
 
@@ -95,8 +92,7 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
                     if (dep.getExplicitValue() != null) {
                         return dep;
                     }
-                    log.warn(
-                            id + " declared as module dependency in descriptor, but not a NetBeans module");
+                    log.warn(id + " declared as module dependency in descriptor, but not a NetBeans module");
                     return null;
                 }
             }
@@ -120,29 +116,24 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
 
     protected final NetBeansModule readModuleDescriptor(File descriptor) throws MojoExecutionException {
         if (descriptor == null) {
-            throw new MojoExecutionException(
-                    "The module descriptor has to be configured.");
+            throw new MojoExecutionException("The module descriptor has to be configured.");
         }
         if (!descriptor.exists()) {
-            throw new MojoExecutionException(
-                    "The module descriptor is missing: '" + descriptor + "'.");
+            throw new MojoExecutionException("The module descriptor is missing: '" + descriptor + "'.");
         }
         try (Reader r = new FileReader(descriptor)) {
             NetBeansModuleXpp3Reader reader = new NetBeansModuleXpp3Reader();
             NetBeansModule module = reader.read(r);
             return module;
         } catch (IOException | XmlPullParserException exc) {
-            throw new MojoExecutionException(
-                    "Error while reading module descriptor '" + descriptor + "'.",
-                    exc);
+            throw new MojoExecutionException("Error while reading module descriptor '" + descriptor + "'.", exc);
         }
     }
 
     protected final NetBeansModule createDefaultDescriptor(MavenProject project, boolean log) {
 
         if (log) {
-            getLog().info(
-                    "No Module Descriptor defined, trying to fallback to generated values:");
+            getLog().info("No Module Descriptor defined, trying to fallback to generated values:");
         }
         NetBeansModule module = new NetBeansModule();
         return module;
@@ -153,9 +144,9 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
             Map<Artifact, ExamineManifest> examinerCache, Log log,
             boolean useOsgiDependencies)
             throws MojoExecutionException {
-        List<Artifact> include = new ArrayList<Artifact>();
+        List<Artifact> include = new ArrayList<>();
         if (module != null) {
-            List<String> librList = new ArrayList<String>();
+            List<String> librList = new ArrayList<>();
             if (module.getLibraries() != null) {
                 librList.addAll(module.getLibraries());
             }
@@ -174,13 +165,12 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
             List<Artifact> libraryArtifacts, Log log,
             boolean useOsgiDependencies)
             throws MojoExecutionException {
-        List<Dependency> deps = new ArrayList<Dependency>();
+        List<Dependency> deps = new ArrayList<>();
         if (customDependencies != null) {
             deps.addAll(Arrays.asList(customDependencies));
         }
         if (module != null && !module.getDependencies().isEmpty()) {
-            log.warn(
-                    "dependencies in module descriptor are deprecated, use the plugin's parameter moduleDependencies");
+            log.warn("dependencies in module descriptor are deprecated, use the plugin's parameter moduleDependencies");
 
             //we need to make sure a dependency is not twice there, module deps override the config
             //(as is the case with other configurations)

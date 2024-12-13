@@ -97,8 +97,7 @@ public class RunNetBeansMojo extends AbstractMojo {
         List<File> clusters = new ArrayList<>();
         if (!clusterBuildDir.exists() || clusterBuildDir.listFiles() == null) {
             throw new MojoExecutionException(
-                    "No clusters to include in execution found. "
-                    + "Please run the nbm:cluster or nbm:cluster-app goals before this one.");
+                    "No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one.");
         }
         File[] fls = clusterBuildDir.listFiles();
         for (File fl : fls) {
@@ -144,7 +143,7 @@ public class RunNetBeansMojo extends AbstractMojo {
             appName = "netbeans";
         }
 
-        //http://www.netbeans.org/issues/show_bug.cgi?id=174819
+        //https://bz.apache.org/netbeans/show_bug.cgi?id=174819
         StringReader sr = new StringReader(appName + "_extraclusters=\"" + buff + "\"\n"
                 + "extraclusters=\""
                 + buff + "\"\n" + "extra_clusters=\"" + buff + "\"");
@@ -211,6 +210,7 @@ public class RunNetBeansMojo extends AbstractMojo {
             getLog().info("Executing: " + cmdLine);
             StreamConsumer out = new StreamConsumer() {
 
+                @Override
                 public void consumeLine(String line) {
                     getLog().info(line);
                 }
