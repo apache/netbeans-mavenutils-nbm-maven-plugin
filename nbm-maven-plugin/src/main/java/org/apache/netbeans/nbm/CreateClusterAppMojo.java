@@ -18,7 +18,6 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-import com.google.common.collect.Sets;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -963,15 +962,13 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
             BundleTuple bundleTuple = it.next();
             boolean found = false;
             for (BundleTuple knownBT : known) {
-                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiExports(), knownBT.manifest.getOsgiImports());
-                if (!is.isEmpty()) {
+                if (!intersection(bundleTuple.manifest.getOsgiExports(), knownBT.manifest.getOsgiImports()).isEmpty()) {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
                 }
                 //dependencyTokens are requireBundle - matches the module property
-                is = Sets.intersection(Collections.singleton(bundleTuple.manifest.getModule()), new HashSet(knownBT.manifest.getDependencyTokens()));
-                if (!is.isEmpty()) {
+                if (knownBT.manifest.getDependencyTokens().contains(bundleTuple.manifest.getModule())) {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
@@ -996,15 +993,13 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
             BundleTuple bundleTuple = it.next();
             boolean found = false;
             for (BundleTuple knownBT : known) {
-                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiImports(), knownBT.manifest.getOsgiExports());
-                if (!is.isEmpty()) {
+                if (!intersection(bundleTuple.manifest.getOsgiImports(), knownBT.manifest.getOsgiExports()).isEmpty()) {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
                 }
                 //dependencyTokens are requireBundle - matches the module property
-                is = Sets.intersection(Collections.singleton(knownBT.manifest.getModule()), new HashSet(bundleTuple.manifest.getDependencyTokens()));
-                if (!is.isEmpty()) {
+                if (bundleTuple.manifest.getDependencyTokens().contains(knownBT.manifest.getModule())) {
                     found = true;
                     bundleTuple.cluster = knownBT.cluster;
                     break;
@@ -1037,13 +1032,18 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
                 if (subEnt.getKey().equals(cluster)) {
                     continue;
                 }
-                Sets.SetView<String> is = Sets.intersection(subEnt.getValue(), deps);
-                if (!is.isEmpty()) {
+                if (!intersection(subEnt.getValue(), deps).isEmpty()) {
                     addToMap(cluster2depClusters, cluster, Collections.singletonList(subEnt.getKey()));
                 }
             }
         }
         return cluster2depClusters;
+    }
+
+    private static Set<String> intersection(Set<String> first, Collection<String> second) {
+        Set<String> intersection = new HashSet<>(first);
+        intersection.retainAll(second);
+        return intersection;
     }
 
     static class BundleTuple {
