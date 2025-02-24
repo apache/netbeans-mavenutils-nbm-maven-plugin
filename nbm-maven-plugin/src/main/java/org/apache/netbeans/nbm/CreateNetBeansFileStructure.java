@@ -77,8 +77,7 @@ import org.netbeans.nbbuild.JHIndexer;
  * @author Milos Kleint
  *
  */
-public abstract class CreateNetBeansFileStructure
-        extends AbstractNbmMojo {
+public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
 
     /**
      * NetBeans module assembly build directory. directory where the the
@@ -179,7 +178,7 @@ public abstract class CreateNetBeansFileStructure
      * by the user. It installs disabled. Since 3.11</p>
      *
      * For details, see
-     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans
+     * <a href="https://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans
      * Module system docs</a>
      *
      * Since 3.14, for autoload and eager modules, we automatically set
@@ -197,7 +196,7 @@ public abstract class CreateNetBeansFileStructure
      * codename base of the module, uniquely identifying the module within the
      * NetBeans runtime. usually the package name equivalent. Can include the
      * major release version. See
-     * <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest">
+     * <a href="https://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest">
      * NetBeans Module system docs</a>
      *
      * @since 3.8
@@ -221,7 +220,7 @@ public abstract class CreateNetBeansFileStructure
     @Parameter
     private List<String> externals;
 
-    private MavenResourcesFiltering mavenResourcesFiltering;
+    private final MavenResourcesFiltering mavenResourcesFiltering;
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     protected MavenSession session;
@@ -237,10 +236,8 @@ public abstract class CreateNetBeansFileStructure
         this.mavenResourcesFiltering = mavenResourcesFiltering;
     }
 
-
     @Override
-    public void execute()
-            throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         antProject = registerNbmAntTasks();
         if (descriptor != null && descriptor.exists()) {
             module = readModuleDescriptor(descriptor);
@@ -269,8 +266,7 @@ public abstract class CreateNetBeansFileStructure
         moduleName = NetBeansManifestUpdateMojo.stripVersionFromCodebaseName(moduleName.replaceAll("-", "."));
         moduleJarName = moduleName.replace('.', '-');
         if ("extra".equals(cluster) && module.getCluster() != null) {
-            getLog().warn(
-                    "Parameter cluster in module descriptor is deprecated, use the plugin configuration element.");
+            getLog().warn("Parameter cluster in module descriptor is deprecated, use the plugin configuration element.");
             cluster = module.getCluster();
         }
         File jarFile = new File(buildDir, finalName + ".jar");
@@ -336,13 +332,11 @@ public abstract class CreateNetBeansFileStructure
 
                     try {
                         FileUtils.getFileUtils().copyFile(source, target, null, true, false);
-                        if (externals != null && externals.contains(artifact.getGroupId() + ":" + artifact.
-                                getArtifactId())) // MNBMODULE-138
-                        {
+                        if (externals != null && externals.contains(artifact.getGroupId() + ":" + artifact.getArtifactId())) {// MNBMODULE-138
+
                             String name = target.getName();
                             getLog().info("Using *.external replacement for " + name);
-                            try (PrintWriter external
-                                    = new PrintWriter(new File(targetDir, name + ".external"), "UTF-8")) {
+                            try (PrintWriter external = new PrintWriter(new File(targetDir, name + ".external"), "UTF-8")) {
                                 writeExternal(external, artifact);
                             }
                         }
@@ -439,8 +433,7 @@ public abstract class CreateNetBeansFileStructure
 
     }
 
-    private void copyDeprecatedNbmResources()
-            throws BuildException, MojoExecutionException {
+    private void copyDeprecatedNbmResources() throws BuildException, MojoExecutionException {
         // copy additional resources..
         List<NbmResource> ress = module.getNbmResources();
         if (ress.size() > 0) {
@@ -502,8 +495,8 @@ public abstract class CreateNetBeansFileStructure
     // this is a nasty workaround for the problem.
     // alternatively we could try invoking the indexer from a separate jvm i guess,
     // ut that's more work.
-    private void clearStaticFieldsInJavaHelpIndexer() // MNBMODULE-51 hack
-    {
+    private void clearStaticFieldsInJavaHelpIndexer() { // MNBMODULE-51 hack
+
         try {
             Class clazz = Class.forName("com.sun.java.help.search.Indexer");
             Field fld = clazz.getDeclaredField("kitRegistry");
@@ -526,8 +519,7 @@ public abstract class CreateNetBeansFileStructure
         }
     }
 
-    private void copyNbmResources()
-            throws MojoExecutionException {
+    private void copyNbmResources() throws MojoExecutionException {
         try {
             if (StringUtils.isEmpty(encoding) && isFilteringEnabled(nbmResources)) {
                 getLog().warn("File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
@@ -559,8 +551,7 @@ public abstract class CreateNetBeansFileStructure
         return false;
     }
 
-    static void writeExternal(PrintWriter w, Artifact artifact)
-            throws IOException {
+    static void writeExternal(PrintWriter w, Artifact artifact) throws IOException {
         w.write("CRC:");
         File file = artifact.getFile();
         w.write(Long.toString(CreateClusterAppMojo.crcForFile(file).getValue()));

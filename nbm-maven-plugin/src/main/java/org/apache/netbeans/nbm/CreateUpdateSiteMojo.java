@@ -151,10 +151,8 @@ public class CreateUpdateSiteMojo
         this.layouts = layouts;
     }
 
-
     @Override
-    public void execute()
-            throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         Project antProject = registerNbmAntTasks();
         File nbmBuildDirFile = new File(outputDirectory, "netbeans_site");
         if (!nbmBuildDirFile.exists()) {

@@ -43,6 +43,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.codehaus.plexus.archiver.ArchiverException;
 
 /**
  * Builds a macOS application bundle for Mavenized NetBeans application. <br>
@@ -55,8 +56,7 @@ import java.util.stream.Stream;
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         threadSafe = true,
         defaultPhase = LifecyclePhase.PACKAGE)
-public class BuildMacMojo
-        extends AbstractNbmMojo {
+public class BuildMacMojo extends AbstractNbmMojo {
 
     /**
      * output directory.
@@ -157,7 +157,7 @@ public class BuildMacMojo
                 archiver.createArchive();
             }
 
-        } catch (Exception ex) {
+        } catch (IOException | MojoExecutionException | ArchiverException ex) {
             throw new MojoExecutionException("Build macOS application bundle failed: " + ex, ex);
         }
     }

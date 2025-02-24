@@ -93,12 +93,9 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * @throws MojoFailureException if an expected problem occurs
      */
     @Override
-    public void execute()
-            throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         if (!"nbm-application".equals(project.getPackaging())) {
-            throw new MojoFailureException(
-                    "The nbm:run-platform goal shall be used within a NetBeans Application project only "
-                    + "('nbm-application' packaging)");
+            throw new MojoFailureException("The nbm:run-platform goal shall be used within a NetBeans Application project only ('nbm-application' packaging)");
         }
 
         netbeansUserdir.mkdirs();
@@ -171,6 +168,7 @@ public class RunPlatformAppMojo extends AbstractMojo {
             getLog().info("Executing: " + cmdLine);
             StreamConsumer out = new StreamConsumer() {
 
+                @Override
                 public void consumeLine(String line) {
                     getLog().info(line);
                 }

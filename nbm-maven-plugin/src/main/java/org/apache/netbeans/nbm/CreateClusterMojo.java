@@ -20,7 +20,6 @@ package org.apache.netbeans.nbm;
  */
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -37,7 +36,6 @@ import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.io.InputStreamFacade;
 
 /**
  * Create the NetBeans module clusters from reactor. Semi-deprecated; used only
@@ -46,8 +44,7 @@ import org.codehaus.plexus.util.io.InputStreamFacade;
  * @author Milos Kleint
  */
 @Mojo(name = "cluster", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class CreateClusterMojo
-        extends AbstractNbmMojo {
+public class CreateClusterMojo extends AbstractNbmMojo {
 
     /**
      * NetBeans module assembly build directory. directory where the the
@@ -77,8 +74,8 @@ public class CreateClusterMojo
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
 
-    public void execute()
-            throws MojoExecutionException, MojoFailureException {
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
         Project antProject = registerNbmAntTasks();
 
         if (!clusterBuildDir.exists()) {
@@ -86,7 +83,7 @@ public class CreateClusterMojo
         }
 
         List<MavenProject> reactorProjects = mavenSession.getProjects();
-        if (reactorProjects != null && reactorProjects.size() > 0) {
+        if (reactorProjects != null && !reactorProjects.isEmpty()) {
             for (MavenProject proj : reactorProjects) {
 
                 File nbmDir = new File(nbmBuildDir, "clusters");
@@ -103,8 +100,7 @@ public class CreateClusterMojo
                         copyTask.execute();
                     } catch (BuildException ex) {
                         getLog().error("Cannot merge modules into cluster");
-                        throw new MojoExecutionException(
-                                "Cannot merge modules into cluster", ex);
+                        throw new MojoExecutionException("Cannot merge modules into cluster", ex);
                     }
                 } else {
                     if ("nbm".equals(proj.getPackaging())) {
@@ -122,8 +118,7 @@ public class CreateClusterMojo
 
                         File jar = new File(proj.getBuild().getDirectory(), proj.getBuild().getFinalName() + ".jar");
                         if (!jar.exists()) {
-                            getLog().error("Skipping " + proj.getId()
-                                    + ". Cannot find the main artifact in output directory.");
+                            getLog().error("Skipping " + proj.getId() + ". Cannot find the main artifact in output directory.");
                             continue;
                         }
                         mnf.setJarFile(jar);
@@ -147,18 +142,8 @@ public class CreateClusterMojo
                         try {
                             FileUtils.copyFile(jar, moduleArt);
                             final File moduleConf = new File(confModules, cnbDashed + ".xml");
-                            FileUtils.copyStreamToFile(new InputStreamFacade() {
-                                public InputStream getInputStream() throws IOException {
-                                    return new StringInputStream(CreateClusterAppMojo.createBundleConfigFile(cnb, mnf.
-                                            isBundleAutoload()), "UTF-8");
-                                }
-                            }, moduleConf);
-                            FileUtils.copyStreamToFile(new InputStreamFacade() {
-                                public InputStream getInputStream() throws IOException {
-                                    return new StringInputStream(CreateClusterAppMojo.createBundleUpdateTracking(cnb,
-                                            moduleArt, moduleConf, specVer), "UTF-8");
-                                }
-                            }, new File(updateTracting, cnbDashed + ".xml"));
+                            FileUtils.copyStreamToFile(() -> new StringInputStream(CreateClusterAppMojo.createBundleConfigFile(cnb, mnf.isBundleAutoload()), "UTF-8"), moduleConf);
+                            FileUtils.copyStreamToFile(() -> new StringInputStream(CreateClusterAppMojo.createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8"), new File(updateTracting, cnbDashed + ".xml"));
                         } catch (IOException exc) {
                             getLog().error(exc);
                         }

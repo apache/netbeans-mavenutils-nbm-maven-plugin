@@ -1,128 +1,121 @@
+/*
+ * Copyright 2024 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.netbeans.nbm;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.netbeans.nbm.utils.ExamineManifest;
-import org.apache.netbeans.nbm.CreateClusterAppMojo.BundleTuple;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import static org.codehaus.plexus.PlexusTestCase.getBasedir;
+import static org.junit.Assert.assertThrows;
+import org.mockito.Mockito;
 
 /**
  *
- * @author mkleint
  */
-public class CreateClusterAppMojoTest {
+public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
 
-    public CreateClusterAppMojoTest() {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
     }
 
-    @Test
-    public void computeClusterOrderingTest() throws Exception {
-        HashMap<String, Set<String>> clusterDeps = new HashMap<String, Set<String>>();
-        HashMap<String, Set<String>> clusterModules = new HashMap<String, Set<String>>();
-        clusterModules.put("platform", new HashSet<String>(Arrays.asList(new String[]{
-            "pl-a", "pl-b", "pl-c"
-        })));
-        clusterModules.put("ide", new HashSet<String>(Arrays.asList(new String[]{
-            "i-a", "i-b", "i-c"
-        })));
-        clusterModules.put("java", new HashSet<String>(Arrays.asList(new String[]{
-            "j-a", "j-b", "j-c"
-        })));
-
-        clusterDeps.put("java", new HashSet<String>(Arrays.asList(new String[]{
-            "i-a", "pl-b", "pl-c"
-        })));
-        clusterDeps.put("ide", new HashSet<String>(Arrays.asList(new String[]{
-            "pl-b", "pl-c"
-        })));
-        Map<String, Set<String>> res = CreateClusterAppMojo.computeClusterOrdering(clusterDeps, clusterModules);
-        assertNotNull(res);
-        Set<String> resJava = res.get("java");
-        assertNotNull(resJava);
-        assertEquals(resJava.size(), 2);
-        assertTrue(resJava.contains("ide"));
-        assertTrue(resJava.contains("platform"));
-
-        Set<String> resIde = res.get("ide");
-        assertNotNull(resIde);
-        assertEquals(resIde.size(), 1);
-        assertTrue(resIde.contains("platform"));
-
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
     }
 
-    @Test
-    public void assignClustersToBundles() throws Exception {
-        ArrayList<BundleTuple> bundles = new ArrayList<BundleTuple>();
-        BundleTuple tup1 = createBundleTuple("a.b.c", new File(getClass().getResource("/osgimanifests" + File.separator + "a.b.c.MF").toURI()));
-        bundles.add(tup1);
-        BundleTuple tup2 = createBundleTuple("b.c.d", new File(getClass().getResource("/osgimanifests" + File.separator + "b.c.d.MF").toURI()));
-        assertTrue(Arrays.toString(tup2.manifest.getOsgiImports().toArray()), tup2.manifest.getOsgiImports().contains("a.b.c"));
-        bundles.add(tup2);
-        HashMap<String, Set<String>> clusterDeps = new HashMap<String, Set<String>>();
-        clusterDeps.put("java", new HashSet<String>(Arrays.asList(new String[]{
-            "i-a", "pl-b", "pl-c"
-        })));
-        clusterDeps.put("ide", new HashSet<String>(Arrays.asList(new String[]{
-            "pl-b", "pl-c", "a.b.c"
-        })));
-
-        CreateClusterAppMojo.assignClustersToBundles(bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null);
-        assertEquals("ide", tup1.cluster);
-        assertEquals("ide", tup2.cluster);
-
-        clusterDeps.clear();
-        clusterDeps.put("ide", new HashSet<String>(Arrays.asList(new String[]{
-            "i-a", "pl-b", "pl-c"
-        })));
-        clusterDeps.put("java", new HashSet<String>(Arrays.asList(new String[]{
-            "pl-b", "pl-c", "b.c.d"
-        })));
-        tup2.cluster = null;
-        tup1.cluster = null;
-
-        CreateClusterAppMojo.assignClustersToBundles(bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null);
-        assertEquals("java", tup2.cluster);
-        assertEquals("java", tup1.cluster);
-
+    public void testInvalidPackaging() throws Exception {
+        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-app-simple/plugin-config.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+        CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
+        assertNotNull(createclusterappMojo);
+        MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclusterappMojo.execute());
+        assertEquals("This goal only makes sense on project with nbm-application packaging", assertThrows.getMessage());
     }
 
-    private BundleTuple createBundleTuple(String cnb, File file) throws MojoExecutionException {
-        assertTrue(file.exists());
+    public void testValidPackagingNoLauncher() throws Exception {
+        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-app-complete-harness/plugin-configa.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+        CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
+        assertNotNull(createclusterappMojo);
+        MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclusterappMojo.execute());
+        assertEquals("We could not find org-netbeans-bootstrap among the modules in the application. Launchers could not be found.", assertThrows.getMessage());
+    }
 
-        ExamineManifest em = new ExamineManifest(null);
-        em.setManifestFile(file);
-        em.setPopulateDependencies(true);
-        em.checkFile();
-        assertEquals(cnb, em.getModule());
-        BundleTuple toRet = new BundleTuple(null, em);
+    public void testValidPackagingHarnessLauncher() throws Exception {
+        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-app-complete-harness/plugin-configb.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+        CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
+        // F//ile buildfolder = (File) getVariableValueFromObject(createclusterappMojo, "outputDirectory");
+        createDummyApp("project-cluster-app-complete-harnessb", "mybrand");
+        assertNotNull(createclusterappMojo);
+        createclusterappMojo.execute();
+    }
 
-        return toRet;
+    public void testValidPackagingHarnessLauncherDefault() throws Exception {
+        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-app-complete-harness/plugin-configc.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+        CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
+        MavenSession mocksession = Mockito.mock(MavenSession.class);
+        setVariableValueToObject(createclusterappMojo, "session", mocksession);
+        ArtifactRepository ar = Mockito.mock(ArtifactRepository.class);
+        Mockito.doReturn(ar).when(mocksession).getLocalRepository();
+        Mockito.doReturn("").when(ar).getBasedir();
+        // Mockito.doReturn(mocksession).when(ar).ger
+        String s = new String();
+        Mockito.doReturn(s).when(ar).pathOf(Mockito.any());
+        // F//ile buildfolder = (File) getVariableValueFromObject(createclusterappMojo, "outputDirectory");
+        // createDummyApp("project-cluster-app-complete-harnessb", "mybrand");
+        assertNotNull(createclusterappMojo);
+        MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclusterappMojo.execute());
+        assertEquals("Failed to retrieve the nbm file from repository", assertThrows.getMessage());
+    }
+
+    private void createDummyApp(String folder, String branding) throws IOException {
+        File file = new File(getBasedir(), "target/test-harness/" + folder + "/" + branding + "/harness/");
+        file.mkdirs();
+        File launchers = new File(file, "launchers/");
+        launchers.mkdirs();
+        for (String launchname : Arrays.asList("app.exe", "app64.exe", "app.sh")) {
+            File launch = new File(launchers, launchname);
+            launch.createNewFile();
+        }
+
+        /**
+         * if (binDir.exists()) { File exe = new File(binDir, "app.exe");
+         * FileUtils.copyFile(exe, destExe); File exe64 = new File(binDir,
+         * "app64.exe"); if (exe64.isFile()) { FileUtils.copyFile(exe64,
+         * destExe64); } File exew = new File(binDir, "app_w.exe"); if
+         * (exew.exists()) //in 6.7 the _w.exe file is no more. {
+         * FileUtils.copyFile(exew, destExeW); } File sh = new File(binDir,
+         * "app.sh"); FileUtils.copyFile(sh, destSh);
+         */
     }
 }

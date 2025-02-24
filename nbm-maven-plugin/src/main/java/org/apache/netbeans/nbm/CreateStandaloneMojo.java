@@ -36,8 +36,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @author Milos Kleint
  */
 @Mojo(name = "standalone-zip", requiresProject = true, threadSafe = true)
-public class CreateStandaloneMojo
-        extends AbstractMojo {
+public class CreateStandaloneMojo extends AbstractMojo {
 
     /**
      * The branding token for the application based on NetBeans platform.
@@ -66,8 +65,7 @@ public class CreateStandaloneMojo
      * @throws MojoFailureException if an expected problem occurs
      */
     @Override
-    public void execute()
-            throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
             File nbmBuildDirFile = new File(outputDirectory, brandingToken);

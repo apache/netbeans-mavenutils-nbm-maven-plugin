@@ -62,8 +62,7 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
         threadSafe = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         defaultPhase = LifecyclePhase.PACKAGE)
-public class CreateNbmMojo
-        extends CreateNetBeansFileStructure {
+public class CreateNbmMojo extends CreateNetBeansFileStructure {
 
     /**
      * keystore location for signing the nbm file
@@ -221,15 +220,13 @@ public class CreateNbmMojo
         boolean reqRestart = requiresRestart;
         if (!reqRestart && module.isRequiresRestart()) {
             reqRestart = module.isRequiresRestart();
-            getLog().warn(
-                    "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn("Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
         }
         nbmTask.setNeedsrestart(Boolean.toString(reqRestart));
         String moduleAuthor = author;
         if (module.getAuthor() != null) {
             moduleAuthor = module.getAuthor();
-            getLog().warn(
-                    "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn("Module descriptor's author field is deprecated, use plugin's configuration in pom.xml");
         }
         nbmTask.setModuleauthor(moduleAuthor);
         if (keystore != null && keystorealias != null && keystorepassword != null) {
@@ -257,14 +254,12 @@ public class CreateNbmMojo
         File licFile = licenseFile;
         if (module.getLicenseName() != null) {
             licName = module.getLicenseName();
-            getLog().warn(
-                    "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn("Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml");
         }
         if (module.getLicenseFile() != null) {
             File lf = new File(project.getBasedir(), module.getLicenseFile());
             licFile = lf;
-            getLog().warn(
-                    "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn("Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml");
 
         }
         if (licName != null && licFile != null) {
@@ -285,8 +280,7 @@ public class CreateNbmMojo
         }
         String hpUrl = homePageUrl;
         if (module.getHomepageUrl() != null) {
-            getLog().warn(
-                    "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn("Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml");
             hpUrl = module.getHomepageUrl();
         }
         if (hpUrl != null) {
@@ -295,27 +289,21 @@ public class CreateNbmMojo
         String distribUrl = distributionUrl;
         if (module.getDistributionUrl() != null) {
             distribUrl = module.getDistributionUrl();
-            getLog().warn(
-                    "Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml");
+            getLog().warn("Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml");
         }
         if (distribUrl != null) {
-            ArtifactRepository distRepository = CreateUpdateSiteMojo.getDeploymentRepository(
-                    distribUrl, layouts);
+            ArtifactRepository distRepository = CreateUpdateSiteMojo.getDeploymentRepository(distribUrl, layouts);
             String dist = null;
             if (distRepository == null) {
                 if (!distribUrl.contains("::")) {
-                    dist
-                            = distribUrl + (distribUrl.endsWith("/") ? "" : "/")
-                            + nbmFile.getName();
+                    dist = distribUrl + (distribUrl.endsWith("/") ? "" : "/") + nbmFile.getName();
                 }
             } else {
                 Artifact art = artifactFactory.createArtifact(
                         project.getGroupId(), project.getArtifactId(),
                         project.getVersion(), null, "nbm-file");
 
-                dist
-                        = distRepository.getUrl() + (distRepository.getUrl().endsWith("/") ? "" : "/")
-                        + distRepository.pathOf(art);
+                dist = distRepository.getUrl() + (distRepository.getUrl().endsWith("/") ? "" : "/") + distRepository.pathOf(art);
 
             }
             nbmTask.setDistribution(dist);

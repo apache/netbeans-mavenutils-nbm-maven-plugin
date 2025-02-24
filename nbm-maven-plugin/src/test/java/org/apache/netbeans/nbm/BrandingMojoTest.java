@@ -1,58 +1,91 @@
+/*
+ * Copyright 2024 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.netbeans.nbm;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 import java.io.File;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.junit.Assert;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
- * @author mkleint
  */
-public class BrandingMojoTest {
+public class BrandingMojoTest extends AbstractMojoTestCase {
 
-    public BrandingMojoTest() {
+    private final String BRANDING_SOURCES = "target/nofolder.dummy";
+    private final String BRANDING_SOURCES_FOLDER = "target/folder/";
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
     }
 
-    /**
-     * Test of destinationFileName method, of class BrandingMojo.
-     */
-    @Test
-    public void testDestinationFileName() {
-        assertEquals("cut_brandingToken.gif", BrandingMojo.destinationFileName("cut.gif", "brandingToken"));
-        assertEquals("cut_brandingToken", BrandingMojo.destinationFileName("cut", "brandingToken"));
-        assertEquals("cut_pressed_brandingToken.gif", BrandingMojo.destinationFileName("cut_pressed.gif", "brandingToken"));
-        assertEquals("path1" + File.separator + "path2" + File.separator + "cut_brandingToken", BrandingMojo.destinationFileName("path1" + File.separator + "path2" + File.separator + "cut", "brandingToken"));
-        assertEquals("path.1" + File.separator + "path.2" + File.separator + "cut_brandingToken", BrandingMojo.destinationFileName("path.1" + File.separator + "path.2" + File.separator + "cut", "brandingToken"));
-        assertEquals("path.1" + File.separator + "cut_pressed_brandingToken.gif", BrandingMojo.destinationFileName("path.1" + File.separator + "cut_pressed.gif", "brandingToken"));
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+    }
+
+    public void testInvalidPackaging() throws Exception {
+        File pom = new File(getBasedir(), "target/test-classes/unit/basic-branding-jar/plugin-config.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+        BrandingMojo brandingMojo = (BrandingMojo) lookupMojo("branding", pom);
+        assertNotNull(brandingMojo);
+        File specificLocalRepositoryPath = new File(getBasedir() + "/" + BRANDING_SOURCES);
+        setVariableValueToObject(brandingMojo, "brandingSources", specificLocalRepositoryPath);
+        brandingMojo.execute();
     }
 
     @Test
-    public void testLocale() {
-        assertEquals("en_us", BrandingMojo.getLocale("aaa_en_us.properties")[1]);
-        assertEquals("en_us_ca", BrandingMojo.getLocale("aaa_en_us_ca.properties")[1]);
-        assertEquals("en_us_ca", BrandingMojo.getLocale("aa_en_us_ca.properties")[1]);
-        assertEquals("en_us_ca", BrandingMojo.getLocale("bb_aa_en_us_ca.properties")[1]);
-        assertEquals("en", BrandingMojo.getLocale("bb_aaa_en.properties")[1]);
-        assertEquals(null, BrandingMojo.getLocale("bb_aaa_end.properties")[1]);
-        assertEquals(null, BrandingMojo.getLocale("bb_aa_end.properties")[1]);
-        assertEquals(null, BrandingMojo.getLocale("bb.properties")[1]);
+    public void testInvalidPackagingFolder() throws Exception {
+        File pom = new File(getBasedir(), "target/test-classes/unit/basic-branding-jar/plugin-config.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+        BrandingMojo brandingMojo = (BrandingMojo) lookupMojo("branding", pom);
+        assertNotNull(brandingMojo);
+        File specificLocalRepositoryPath = new File(getBasedir() + "/" + BRANDING_SOURCES_FOLDER);
+        specificLocalRepositoryPath.mkdirs();
+        setVariableValueToObject(brandingMojo, "brandingSources", specificLocalRepositoryPath);
+        MojoExecutionException nobrandingmojoexecutionexception = Assert.assertThrows(MojoExecutionException.class, () -> brandingMojo.execute());
+        assertEquals("brandingToken must be defined for mojo:branding", nobrandingmojoexecutionexception.getMessage());
+    }
+
+    @Test
+    public void testInvalidPackaging3() throws Exception {
+        File pom = new File(getBasedir(), "target/test-classes/unit/basic-branding-jar/plugin-config.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+        BrandingMojo brandingMojo = (BrandingMojo) lookupMojo("branding", pom);
+        assertNotNull(brandingMojo);
+        File specificLocalRepositoryPath = new File(getBasedir() + "/" + BRANDING_SOURCES_FOLDER);
+        specificLocalRepositoryPath.mkdirs();
+        setVariableValueToObject(brandingMojo, "brandingSources", specificLocalRepositoryPath);
+        setVariableValueToObject(brandingMojo, "brandingToken", "mybrandingtoken");
+        brandingMojo.execute();
+    }
+
+    @Test
+    public void testValidPackaging3() throws Exception {
+        File pom = new File(getBasedir(), "target/test-classes/unit/basic-branding-nbm/plugin-config.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+        BrandingMojo brandingMojo = (BrandingMojo) lookupMojo("branding", pom);
+        assertNotNull(brandingMojo);
+        setVariableValueToObject(brandingMojo, "brandingToken", "mybrandingtoken");
+        brandingMojo.execute();
     }
 }

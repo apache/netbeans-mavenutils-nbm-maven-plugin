@@ -41,7 +41,7 @@ public class AdaptNbVersion {
         if (SNAPSHOT.equals(version) && TYPE_IMPLEMENTATION.equals(type)) {
             return "0.0.0." + generateSnapshotValue(date);
         }
-        StringBuffer toReturn = new StringBuffer();
+        StringBuilder toReturn = new StringBuilder();
         while (tok.hasMoreTokens()) {
             String token = tok.nextToken();
             if (TYPE_IMPLEMENTATION.equals(type)) {
