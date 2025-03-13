@@ -59,8 +59,11 @@ import org.apache.tools.ant.util.StringUtils;
  * <a href="https://bits.netbeans.org/mavenutilities/nbm-maven-plugin/nbm-maven-plugin/buildinstexample.html">how-to</a>
  * on customizing the installer.
  *
+ * @deprecated  Apache NetBeans nbi harness is deprecated. Use <a href="https://github.com/apache/netbeans-nbpackage">nbpackage</a>.
+ *              Will be removed in nbm-plugin 15.0
  * @author <a href="mailto:frantisek@mantlik.cz">Frantisek Mantlik</a>
  */
+@Deprecated(forRemoval = true,since = "14.3")
 @Mojo(name = "build-installers",
         requiresProject = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME,
