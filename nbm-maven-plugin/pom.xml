@@ -400,7 +400,7 @@ under the License.
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <release>8</release>
+                            <release>${jdkbaseline}</release>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -410,7 +410,7 @@ under the License.
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
-                            <release>8</release>
+                            <release>${jdkbaseline}</release>
                         </configuration>
                     </plugin>
                 </plugins>
