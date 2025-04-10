@@ -78,6 +78,7 @@
         <netbeans.version>RELEASE250</netbeans.version>
         <javax.inject.version>1</javax.inject.version>
         <jdkbaseline>11</jdkbaseline>
+        <mockito.version>5.17.0</mockito.version>
     </properties>
 
     <dependencyManagement>
