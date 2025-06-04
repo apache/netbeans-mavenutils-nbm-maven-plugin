@@ -53,20 +53,6 @@ under the License.
                                     <type>nbm</type>
                                     <destFileName>harness.nbm</destFileName>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.netbeans.modules</groupId>
-                                    <artifactId>org-netbeans-libs-nbi-ant</artifactId>
-                                    <version>${netbeans.version}</version>
-                                    <type>nbm</type>
-                                    <destFileName>nbi-ant.nbm</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.netbeans.modules</groupId>
-                                    <artifactId>org-netbeans-libs-nbi-engine</artifactId>
-                                    <version>${netbeans.version}</version>
-                                    <type>nbm</type>
-                                    <destFileName>nbi-engine.nbm</destFileName>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -101,72 +87,6 @@ under the License.
                                 </unzip>
                                 <mkdir dir="${project.build.directory}/classes/harness/jnlp" />
                                 <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes" />
-                                <unzip src="${dependency.directory}nbi-ant.nbm" dest="${project.build.directory}/classes">
-                                    <patternset>
-                                        <include name="netbeans/modules/" />
-                                        <include name="netbeans/nbi/" />
-                                    </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
-                                </unzip>
-                                <unzip src="${dependency.directory}nbi-engine.nbm" dest="${project.build.directory}/classes">
-                                    <patternset>
-                                        <include name="netbeans/modules/" />
-                                    </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
-                                </unzip>
-                                <!-- patch product.xml - unable to delete temp files after build finishes -->
-                                <replace file="${project.build.directory}/classes/harness/nbi/.common/product.xml">
-                                    <replacetoken expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}>"]]></replacetoken>
-                                    <replacevalue expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}" deleteonexit="true">]]></replacevalue>
-                                </replace>
-                                <!-- patch replace exec with ant task in common.xml -->
-                                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
-                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true">
-                                    <replacetoken expandProperties="false">@EXEC@</replacetoken>
-                                    <replacevalue expandProperties="false"><![CDATA[ant inheritrefs="false"
-                dir="${cvs.dir}/${nbproject.path}">
-                  <target name="clean" />
-                  <property name="ignore.native" value="true" />
-                  <property name="no.dependencies" value="true" />
-                  <property name="dont.build.custom.tasks" value="true" />
-                  <property name="custom.tasks.cls" value="${custom.tasks.cls}" />
-            </ant]]></replacevalue>
-                                </replace>
-                                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
-                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true">
-                                    <replacetoken expandProperties="false">@EXEC@</replacetoken>
-                                    <replacevalue expandProperties="false"><![CDATA[condition property="nb.jdk.home.value"
-                   value="${@java.home@}/.."
-                   else="${@java.home@}">
-                <not>
-                    <equals arg1="Apple Inc." arg2="${java.vendor}" />
-                </not>
-        </condition>
-        <condition property="custom.parameter.name" value="reference.NBI_Engine.jar">
-            <contains string="${nb.custom.parameter}" substring="reference.NBI_Engine.jar" />
-        </condition>
-        <condition property="custom.parameter.value" value="${core.engine.dist.file}">
-            <contains string="${nb.custom.parameter}" substring="reference.NBI_Engine.jar" />
-        </condition>
-        <condition property="custom.parameter.name" value="javac.classpath">
-            <contains string="${nb.custom.parameter}" substring="javac.classpath" />
-        </condition>
-        <condition property="custom.parameter.value" value="${engine.dist.file}">
-            <contains string="${nb.custom.parameter}" substring="javac.classpath" />
-        </condition>
-        <echoproperties />
-        <ant inheritRefs="false" dir="${cvs.dir}/${nbproject.path}" >
-                  <target name="clean" />
-                  <target name="compile" />
-                  <property name="platforms.JDK_1.5.home" value="${nb.jdk.home.value}" />
-                  <property name="ignore.native" value="true" />
-                  <property name="no.dependencies" value="true" />
-                  <property name="dont.build.custom.tasks" value="true" />
-                  <property name="custom.tasks.cls" value="${custom.tasks.cls}" />
-                  <property name="${custom.parameter.name}" value="${custom.parameter.value}" />
-        </ant]]></replacevalue>
-                                </replace>
-                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true" token="@java.home@" value="java.home" />
                             </target>
                         </configuration>
                     </execution>
