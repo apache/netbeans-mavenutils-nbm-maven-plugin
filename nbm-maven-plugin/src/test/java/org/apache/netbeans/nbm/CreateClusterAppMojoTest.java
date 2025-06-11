@@ -21,10 +21,17 @@ import java.util.Arrays;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import static org.codehaus.plexus.PlexusTestCase.getBasedir;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
 import static org.junit.Assert.assertThrows;
 import org.mockito.Mockito;
 
@@ -47,6 +54,8 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
         File pom = new File(getBasedir(), "target/test-classes/unit/cluster-app-simple/plugin-config.xml");
         assertNotNull(pom);
         assertTrue(pom.exists());
+        MavenSession mocksession = Mockito.mock(MavenSession.class);
+        getContainer().addComponent(mocksession, MavenSession.class.getName());
         CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
         setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
         assertNotNull(createclusterappMojo);
@@ -58,6 +67,8 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
         File pom = new File(getBasedir(), "target/test-classes/unit/cluster-app-complete-harness/plugin-configa.xml");
         assertNotNull(pom);
         assertTrue(pom.exists());
+        MavenSession mocksession = Mockito.mock(MavenSession.class);
+        getContainer().addComponent(mocksession, MavenSession.class.getName());
         CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
         setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
         assertNotNull(createclusterappMojo);
@@ -69,9 +80,10 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
         File pom = new File(getBasedir(), "target/test-classes/unit/cluster-app-complete-harness/plugin-configb.xml");
         assertNotNull(pom);
         assertTrue(pom.exists());
+        MavenSession mocksession = Mockito.mock(MavenSession.class);
+        getContainer().addComponent(mocksession, MavenSession.class.getName());
         CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
         setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
-        // F//ile buildfolder = (File) getVariableValueFromObject(createclusterappMojo, "outputDirectory");
         createDummyApp("project-cluster-app-complete-harnessb", "mybrand");
         assertNotNull(createclusterappMojo);
         createclusterappMojo.execute();
@@ -81,18 +93,24 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
         File pom = new File(getBasedir(), "target/test-classes/unit/cluster-app-complete-harness/plugin-configc.xml");
         assertNotNull(pom);
         assertTrue(pom.exists());
-        CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
-        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
-        MavenSession mocksession = Mockito.mock(MavenSession.class);
-        setVariableValueToObject(createclusterappMojo, "session", mocksession);
+        MavenProject mockproject = Mockito.mock(MavenProject.class);
+        mockproject.getProjectBuildingRequest();
+        DefaultMavenExecutionRequest defaultMavenExecutionRequest = new DefaultMavenExecutionRequest();
+        defaultMavenExecutionRequest.setUserProperties(null);
+        DefaultRepositorySystemSession reposession = MavenRepositorySystemUtils.newSession();
+        reposession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(reposession, new LocalRepository(new File("target/local-repo/"))));
+        MavenSession mocksession
+                = new MavenSession(getContainer(), reposession, defaultMavenExecutionRequest, new DefaultMavenExecutionResult());
         ArtifactRepository ar = Mockito.mock(ArtifactRepository.class);
-        Mockito.doReturn(ar).when(mocksession).getLocalRepository();
         Mockito.doReturn("").when(ar).getBasedir();
-        // Mockito.doReturn(mocksession).when(ar).ger
         String s = new String();
         Mockito.doReturn(s).when(ar).pathOf(Mockito.any());
-        // F//ile buildfolder = (File) getVariableValueFromObject(createclusterappMojo, "outputDirectory");
-        // createDummyApp("project-cluster-app-complete-harnessb", "mybrand");
+        getContainer().addComponent(mocksession, MavenSession.class.getName());
+        CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
+
+        setVariableValueToObject(createclusterappMojo, "session", mocksession);
+
         assertNotNull(createclusterappMojo);
         MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclusterappMojo.execute());
         assertEquals("Failed to retrieve the nbm file from repository", assertThrows.getMessage());
