@@ -37,7 +37,7 @@ under the License.
     <inceptionYear>2005</inceptionYear>
 
     <prerequisites>
-      <maven>3.2.5</maven>
+        <maven>3.2.5</maven>
     </prerequisites>
 
     <!--profiles>
@@ -74,10 +74,6 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-xml</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -226,7 +222,7 @@ under the License.
                     </reportSet>
                 </reportSets>
             </plugin>
-           <plugin>
+            <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>

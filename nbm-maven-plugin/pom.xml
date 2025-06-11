@@ -102,10 +102,6 @@ under the License.
             <artifactId>plexus-io</artifactId>
             <version>3.5.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-xml</artifactId>
-        </dependency>
         <dependency><!-- use harness from NetBeans 13.0  -->
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
@@ -124,12 +120,6 @@ under the License.
 
         <!-- BAD BOYS: we want to get rid of these -->
         <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-compat</artifactId>
-            <version>${maven.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-filtering</artifactId>
             <version>3.4.0</version>
@@ -138,6 +128,11 @@ under the License.
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-dependency-tree</artifactId>
             <version>3.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-artifact-transfer</artifactId>
+            <version>0.13.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
@@ -157,6 +152,12 @@ under the License.
         </dependency>
 
         <!-- tests -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-compat</artifactId>
+            <version>${maven.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

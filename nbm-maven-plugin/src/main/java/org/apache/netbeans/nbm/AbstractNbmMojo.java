@@ -32,18 +32,19 @@ import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.netbeans.nbm.model.Dependency;
 import org.apache.netbeans.nbm.model.NetBeansModule;
 import org.apache.netbeans.nbm.model.io.xpp3.NetBeansModuleXpp3Reader;
@@ -309,8 +310,9 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
 
     protected final ArtifactResult turnJarToNbmFile(Artifact art, ArtifactFactory artifactFactory,
             ArtifactResolver artifactResolver, MavenProject project,
-            ArtifactRepository localRepository)
+            MavenSession session)
             throws MojoExecutionException {
+        ArtifactRepository localRepository = session.getLocalRepository();
         if ("jar".equals(art.getType()) || "nbm".equals(art.getType())) {
             //TODO, it would be nice to have a check to see if the
             // "to-be-created" module nbm artifact is actually already in the
@@ -345,14 +347,11 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
                         art.getClassifier(),
                         art.getScope());
                 try {
-                    artifactResolver.resolve(nbmArt, project.getRemoteArtifactRepositories(), localRepository);
-                } catch (ArtifactResolutionException ex) {
-                    //shall be check before actually resolving from repos?
-                    checkReactor(art, nbmArt);
-                    if (!nbmArt.isResolved()) {
-                        throw new MojoExecutionException("Failed to retrieve the nbm file from repository", ex);
-                    }
-                } catch (ArtifactNotFoundException ex) {
+                    ProjectBuildingRequest pBuildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+                    pBuildingRequest.setLocalRepository(localRepository);
+                    pBuildingRequest.setRemoteRepositories(project.getRemoteArtifactRepositories());
+                    nbmArt = artifactResolver.resolveArtifact(pBuildingRequest, nbmArt).getArtifact();
+                } catch (ArtifactResolverException ex) {                   
                     //shall be check before actually resolving from repos?
                     checkReactor(art, nbmArt);
                     if (!nbmArt.isResolved()) {

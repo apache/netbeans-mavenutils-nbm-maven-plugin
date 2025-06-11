@@ -56,10 +56,7 @@ import java.util.zip.ZipFile;
 import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -68,7 +65,10 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -175,13 +175,13 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
 
     private final ArtifactResolver artifactResolver;
 
-    @Parameter(defaultValue = "${session}", required = true, readonly = true)
-    protected MavenSession session;
+    private final MavenSession session;
 
     @Inject
-    public CreateClusterAppMojo(ArtifactFactory artifactFactory, ArtifactResolver artifactResolver) {
+    public CreateClusterAppMojo(ArtifactFactory artifactFactory, ArtifactResolver artifactResolver, MavenSession session) {
         this.artifactFactory = artifactFactory;
         this.artifactResolver = artifactResolver;
+        this.session = session;
     }
 
     @Override
@@ -217,7 +217,7 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
             @SuppressWarnings("unchecked")
             Set<Artifact> artifacts = project.getArtifacts();
             for (Artifact art : artifacts) {
-                ArtifactResult res = turnJarToNbmFile(art, artifactFactory, artifactResolver, project, session.getLocalRepository());
+                ArtifactResult res = turnJarToNbmFile(art, artifactFactory, artifactResolver, project, session);
                 if (res.hasConvertedArtifact()) {
                     art = res.getConvertedArtifact();
                 }
@@ -787,11 +787,14 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
                                     coords[3], coords[4]);
                         }
                         try {
+                            ProjectBuildingRequest pBuildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+                            pBuildingRequest.setLocalRepository(session.getLocalRepository());
+                            pBuildingRequest.setRemoteRepositories(project.getRemoteArtifactRepositories());
                             artifactResolver.
-                                    resolve(artifact, project.getRemoteArtifactRepositories(), session.getLocalRepository());
+                                    resolveArtifact(pBuildingRequest, artifact);
                             FileUtils.copyFile(artifact.getFile(), f);
                             found = true;
-                        } catch (AbstractArtifactResolutionException x) {
+                        } catch (ArtifactResolverException x) {
                             getLog().warn("Cannot find " + line.substring(8), x);
                         }
                     }
@@ -845,8 +848,11 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
                 "compile",
                 "nbm-file");
         try {
-            artifactResolver.resolve(nbmArt, project.getRemoteArtifactRepositories(), session.getLocalRepository());
-        } catch (ArtifactResolutionException | ArtifactNotFoundException ex) {
+            ProjectBuildingRequest pBuildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+            pBuildingRequest.setLocalRepository(session.getLocalRepository());
+            pBuildingRequest.setRemoteRepositories(project.getRemoteArtifactRepositories());
+            nbmArt = artifactResolver.resolveArtifact(pBuildingRequest, nbmArt).getArtifact();
+        } catch (ArtifactResolverException ex) {
             throw new MojoExecutionException("Failed to retrieve the nbm file from repository", ex);
         }
         return nbmArt.getFile();

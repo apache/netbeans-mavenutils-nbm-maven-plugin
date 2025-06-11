@@ -29,9 +29,10 @@ import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -181,7 +182,7 @@ public class CreateUpdateSiteMojo
                     continue;
                 }
                 ArtifactResult res
-                        = turnJarToNbmFile(art, artifactFactory, artifactResolver, project, session.getLocalRepository());
+                        = turnJarToNbmFile(art, artifactFactory, artifactResolver, project, session);
                 if (res.hasConvertedArtifact()) {
                     art = res.getConvertedArtifact();
                 }
@@ -325,8 +326,8 @@ public class CreateUpdateSiteMojo
                 if (repoLayout == null) {
                     throw new MojoExecutionException("Cannot find repository layout: " + layout);
                 }
-
-                repo = new DefaultArtifactRepository(id, url, repoLayout);
+                ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy(true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
+                repo = new MavenArtifactRepository(id, url, repoLayout, policy, policy);
             }
         }
         return repo;
