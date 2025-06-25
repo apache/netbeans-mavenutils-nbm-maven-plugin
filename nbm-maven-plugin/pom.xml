@@ -280,27 +280,6 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <quiet>true</quiet>
-                    <links>
-                        <!--<link>http://download-llnw.oracle.com/javaee/1.4/api/</link>-->
-                        <!-- unreachable site <link>http://commons.apache.org/collections/apidocs-COLLECTIONS_3_0/</link>-->
-                        <link>https://commons.apache.org/proper/commons-dbcp/apidocs/</link>
-                        <link>https://commons.apache.org/proper/commons-fileupload/apidocs/</link>
-                        <link>https://commons.apache.org/proper/commons-logging/apidocs/</link>
-                        <link>https://commons.apache.org/proper/commons-pool/apidocs/</link>
-                        <link>https://junit.org/junit4/javadoc/latest/</link>
-                        <link>https://logging.apache.org/log4j/1.x/apidocs/</link>
-                        <!-- unreachable site <link>http://jakarta.apache.org/regexp/apidocs/</link> -->
-                        <link>https://velocity.apache.org/engine/1.5/apidocs/</link>
-                        <link>https://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>
-                        <link>https://maven.apache.org/ref/${maven.version}/maven-model/apidocs/</link>
-                        <link>https://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
-                        <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-project/apidocs/</link>-->
-                        <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-reporting/maven-reporting-api/apidocs/</link>-->
-                        <link>https://maven.apache.org/ref/${maven.version}/maven-settings/apidocs/</link>
-                    </links>
-                </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -310,7 +289,6 @@ under the License.
                     </reportSet>
                 </reportSets>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
