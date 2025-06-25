@@ -18,13 +18,28 @@ package org.apache.netbeans.nbm;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.netbeans.nbm.handlers.NbmApplicationArtifactHandler;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
 
 /**
  *
@@ -104,6 +119,7 @@ public class CreateNbmMojoTest extends AbstractMojoTestCase {
         setVariableValueToObject(createnbmmojo, "finalName", "foo");
         File dummyHelper = new File(getBasedir(), "target/test-classes/unit/nbm-nbm-withcontent-site/notexisting.help");
         setVariableValueToObject(createnbmmojo, "nbmJavahelpSource", dummyHelper);
+        setVariableValueToObject(createnbmmojo, "session", newTestMavenSession());
         createDummyJarApp("project-nbm-nbm-withcontent-site");
         createnbmmojo.execute();
     }
@@ -124,4 +140,24 @@ public class CreateNbmMojoTest extends AbstractMojoTestCase {
         }
     }
 
+    // overrides
+    protected MavenSession newTestMavenSession() {
+        try {
+            MavenProject project = new MavenProject();
+            project.setPackaging(NbmApplicationArtifactHandler.NAME);
+            project.setArtifacts(Collections.emptySet());
+            project.setDependencyArtifacts(Collections.emptySet());
+
+            MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+            MavenExecutionResult result = new DefaultMavenExecutionResult();
+            DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
+            repoSession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory(new DefaultLocalPathComposer()).newInstance(repoSession, new LocalRepository("")));
+            MavenSession session = new MavenSession(getContainer(), repoSession, request, result);
+            session.setCurrentProject(project);
+            session.setProjects(Arrays.asList( project));
+            return session;
+        } catch (Exception e) {
+            throw new  RuntimeException(e);
+        }
+    }
 }

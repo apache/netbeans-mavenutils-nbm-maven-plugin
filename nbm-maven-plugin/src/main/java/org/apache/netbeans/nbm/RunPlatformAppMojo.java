@@ -42,13 +42,13 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  *
  */
 @Mojo(name = "run-platform", requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class RunPlatformAppMojo extends AbstractMojo {
+public final class RunPlatformAppMojo extends AbstractMojo {
 
     /**
      * The branding token for the application based on NetBeans platform.
      */
     @Parameter(required = true, property = "netbeans.branding.token")
-    protected String brandingToken;
+    private String brandingToken;
     /**
      * output directory where the NetBeans application is created.
      */
@@ -59,13 +59,13 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * NetBeans user directory for the executed instance.
      */
     @Parameter(required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir")
-    protected File netbeansUserdir;
+    private File netbeansUserdir;
     /**
      * additional command line arguments passed to the application. can be used
      * to debug the IDE.
      */
     @Parameter(property = "netbeans.run.params")
-    protected String additionalArguments;
+    private String additionalArguments;
 
     /**
      * Attach a debugger to the application JVM. If set to "true", the process
@@ -78,7 +78,7 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * @since 3.11
      */
     @Parameter(property = "netbeans.run.params.debug")
-    protected String debugAdditionalArguments;
+    private String debugAdditionalArguments;
 
     /**
      * The Maven Project.

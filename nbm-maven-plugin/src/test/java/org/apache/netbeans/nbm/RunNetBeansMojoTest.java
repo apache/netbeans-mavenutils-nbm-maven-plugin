@@ -16,8 +16,6 @@
 package org.apache.netbeans.nbm;
 
 import java.io.File;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.junit.Assert;

@@ -24,7 +24,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectDependenciesResolver;
 import org.codehaus.plexus.archiver.util.DefaultFileSet;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.util.FileUtils;
@@ -44,6 +45,9 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.codehaus.plexus.archiver.ArchiverException;
+import org.eclipse.aether.RepositorySystem;
+
+import javax.inject.Inject;
 
 /**
  * Builds a macOS application bundle for Mavenized NetBeans application. <br>
@@ -56,18 +60,18 @@ import org.codehaus.plexus.archiver.ArchiverException;
         requiresDependencyResolution = ResolutionScope.RUNTIME,
         threadSafe = true,
         defaultPhase = LifecyclePhase.PACKAGE)
-public class BuildMacMojo extends AbstractNbmMojo {
+public final class BuildMacMojo extends AbstractNbmMojo {
 
     /**
      * output directory.
      */
     @Parameter(defaultValue = "${project.build.directory}", required = true)
-    protected File outputDirectory;
+    private File outputDirectory;
     /**
      * The branding token for the application based on NetBeans platform.
      */
     @Parameter(property = "netbeans.branding.token", required = true)
-    protected String brandingToken;
+    private String brandingToken;
     /**
      * Optional macOS icon file (in ICNS format) to use for the application
      * bundle to replace the default icon from the harness.
@@ -101,11 +105,10 @@ public class BuildMacMojo extends AbstractNbmMojo {
     @Parameter(property = "netbeans.mac.title", required = false)
     private String macAppTitle;
 
-    /**
-     * The Maven Project.
-     */
-    @Parameter(defaultValue = "${project}", required = true, readonly = true)
-    private MavenProject project;
+    @Inject
+    public BuildMacMojo(RepositorySystem repositorySystem, MavenProjectHelper mavenProjectHelper, ProjectDependenciesResolver projectDependenciesResolver, Artifacts artifacts) {
+        super(repositorySystem, mavenProjectHelper, projectDependenciesResolver, artifacts);
+    }
 
     @Override
     public void execute()

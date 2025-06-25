@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -41,15 +42,15 @@ import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.execution.MavenSession;
+
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.shared.filtering.MavenFilteringException;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.filtering.MavenResourcesExecution;
 import org.apache.maven.shared.filtering.MavenResourcesFiltering;
 import org.apache.netbeans.nbm.model.NbmResource;
@@ -63,6 +64,8 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PatternSet;
 import org.apache.tools.ant.util.FileUtils;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.Artifact;
 import org.netbeans.nbbuild.CreateModuleXML;
 import org.netbeans.nbbuild.MakeListOfNBM;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -125,9 +128,6 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
     @Parameter(defaultValue = "${basedir}/src/main/javahelp")
     protected File nbmJavahelpSource;
 
-    @Parameter(required = true, readonly = true, property = "project")
-    protected MavenProject project;
-
     /**
      * A list of additional resources to include in the NBM file. (Not in the
      * module JAR; see <code>InstalledFileLocator</code> for retrieval.)
@@ -157,7 +157,6 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
      * @since 3.2
      */
     @Parameter(property = "encoding", defaultValue = "${project.build.sourceEncoding}")
-
     protected String encoding;
 
     /**
@@ -202,7 +201,7 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
      * @since 3.8
      */
     @Parameter(defaultValue = "${project.groupId}.${project.artifactId}")
-    private String codeNameBase;
+    protected String codeNameBase;
 
     /**
      * list of groupId:artifactId pairs describing libraries that go into the
@@ -218,12 +217,7 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
      * @since 3.8
      */
     @Parameter
-    private List<String> externals;
-
-    private final MavenResourcesFiltering mavenResourcesFiltering;
-
-    @Parameter(defaultValue = "${session}", required = true, readonly = true)
-    protected MavenSession session;
+    protected List<String> externals;
 
     //items used by the CreateNBMMojo.
     protected Project antProject;
@@ -231,8 +225,11 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
     protected File clusterDir;
     protected String moduleJarName;
 
+    protected final MavenResourcesFiltering mavenResourcesFiltering;
+
     @Inject
-    public CreateNetBeansFileStructure(MavenResourcesFiltering mavenResourcesFiltering) {
+    public CreateNetBeansFileStructure(RepositorySystem repositorySystem, MavenProjectHelper mavenProjectHelper, ProjectDependenciesResolver projectDependenciesResolver, Artifacts artifacts, MavenResourcesFiltering mavenResourcesFiltering) {
+        super(repositorySystem, mavenProjectHelper, projectDependenciesResolver, artifacts);
         this.mavenResourcesFiltering = mavenResourcesFiltering;
     }
 
@@ -317,8 +314,7 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
 
         if (module != null) {
             // copy libraries to the designated place..
-            @SuppressWarnings("unchecked")
-            List<Artifact> artifacts = project.getRuntimeArtifacts();
+            Collection<Artifact> artifacts = RepositoryUtils.toArtifacts(project.getRuntimeArtifacts());
             for (Artifact artifact : artifacts) {
                 File source = artifact.getFile();
 
@@ -336,8 +332,8 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
 
                             String name = target.getName();
                             getLog().info("Using *.external replacement for " + name);
-                            try (PrintWriter external = new PrintWriter(new File(targetDir, name + ".external"), "UTF-8")) {
-                                writeExternal(external, artifact);
+                            try (PrintWriter external = new PrintWriter(new File(targetDir, name + ".external"), StandardCharsets.UTF_8)) {
+                                writeExternal(super.artifacts, external, artifact);
                             }
                         }
                     } catch (IOException ex) {
@@ -527,7 +523,7 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
             }
             MavenResourcesExecution mavenResourcesExecution
                     = new MavenResourcesExecution(Arrays.asList(nbmResources), clusterDir, project, encoding,
-                            Collections.EMPTY_LIST, Collections.EMPTY_LIST, session);
+                            Collections.emptyList(), Collections.emptyList(), session);
             mavenResourcesExecution.setEscapeWindowsPaths(true);
             mavenResourcesFiltering.filterResources(mavenResourcesExecution);
         } catch (MavenFilteringException ex) {
@@ -551,7 +547,7 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
         return false;
     }
 
-    static void writeExternal(PrintWriter w, Artifact artifact) throws IOException {
+    static void writeExternal(Artifacts artifacts, PrintWriter w, Artifact artifact) throws IOException {
         w.write("CRC:");
         File file = artifact.getFile();
         w.write(Long.toString(CreateClusterAppMojo.crcForFile(file).getValue()));
@@ -564,8 +560,8 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
         w.write(':');
         w.write(artifact.getVersion());
         w.write(':');
-        w.write(artifact.getType());
-        if (artifact.getClassifier() != null) {
+        w.write(artifacts.getArtifactType(artifact).getId());
+        if (artifact.getClassifier() != null && !artifact.getClassifier().trim().isEmpty()) {
             w.write(':');
             w.write(artifact.getClassifier());
         }
@@ -574,7 +570,7 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
         w.
                 write( /* M3: RepositorySystem.DEFAULT_REMOTE_REPO_URL + '/' */
                         "http://repo.maven.apache.org/maven2/");
-        w.write(new DefaultRepositoryLayout().pathOf(artifact));
+        w.write(artifacts.pathOf(artifact));
         w.write('\n');
         w.flush();
     }

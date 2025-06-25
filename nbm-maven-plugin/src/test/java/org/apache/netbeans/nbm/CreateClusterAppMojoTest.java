@@ -18,14 +18,28 @@ package org.apache.netbeans.nbm;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import static org.codehaus.plexus.PlexusTestCase.getBasedir;
 import static org.junit.Assert.assertThrows;
+
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.netbeans.nbm.handlers.NbmApplicationArtifactHandler;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
 import org.mockito.Mockito;
 
 /**
@@ -48,6 +62,10 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
         assertNotNull(pom);
         assertTrue(pom.exists());
         CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        MavenProject project = (MavenProject) getVariableValueFromObject(createclusterappMojo, "project");
+        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
+        MavenSession mocksession = newTestMavenSession(project);
+        setVariableValueToObject(createclusterappMojo, "session", mocksession);
         setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
         assertNotNull(createclusterappMojo);
         MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclusterappMojo.execute());
@@ -59,6 +77,10 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
         assertNotNull(pom);
         assertTrue(pom.exists());
         CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        MavenProject project = (MavenProject) getVariableValueFromObject(createclusterappMojo, "project");
+        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
+        MavenSession mocksession = newTestMavenSession(project);
+        setVariableValueToObject(createclusterappMojo, "session", mocksession);
         setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
         assertNotNull(createclusterappMojo);
         MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclusterappMojo.execute());
@@ -70,6 +92,10 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
         assertNotNull(pom);
         assertTrue(pom.exists());
         CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        MavenProject project = (MavenProject) getVariableValueFromObject(createclusterappMojo, "project");
+        setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
+        MavenSession mocksession = newTestMavenSession(project);
+        setVariableValueToObject(createclusterappMojo, "session", mocksession);
         setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
         // F//ile buildfolder = (File) getVariableValueFromObject(createclusterappMojo, "outputDirectory");
         createDummyApp("project-cluster-app-complete-harnessb", "mybrand");
@@ -82,15 +108,10 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
         assertNotNull(pom);
         assertTrue(pom.exists());
         CreateClusterAppMojo createclusterappMojo = (CreateClusterAppMojo) lookupMojo("cluster-app", pom);
+        MavenProject project = (MavenProject) getVariableValueFromObject(createclusterappMojo, "project");
         setVariableValueToObject(createclusterappMojo, "brandingToken", "mybrand");
-        MavenSession mocksession = Mockito.mock(MavenSession.class);
+        MavenSession mocksession = newTestMavenSession(project);
         setVariableValueToObject(createclusterappMojo, "session", mocksession);
-        ArtifactRepository ar = Mockito.mock(ArtifactRepository.class);
-        Mockito.doReturn(ar).when(mocksession).getLocalRepository();
-        Mockito.doReturn("").when(ar).getBasedir();
-        // Mockito.doReturn(mocksession).when(ar).ger
-        String s = new String();
-        Mockito.doReturn(s).when(ar).pathOf(Mockito.any());
         // F//ile buildfolder = (File) getVariableValueFromObject(createclusterappMojo, "outputDirectory");
         // createDummyApp("project-cluster-app-complete-harnessb", "mybrand");
         assertNotNull(createclusterappMojo);
@@ -118,4 +139,25 @@ public class CreateClusterAppMojoTest extends AbstractMojoTestCase {
          * "app.sh"); FileUtils.copyFile(sh, destSh);
          */
     }
+
+    // overrides
+
+    protected MavenSession newTestMavenSession(MavenProject project) {
+        try {
+            project.setArtifacts(Collections.emptySet());
+            project.setDependencyArtifacts(Collections.emptySet());
+
+            MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+            MavenExecutionResult result = new DefaultMavenExecutionResult();
+            DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
+            repoSession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory(new DefaultLocalPathComposer()).newInstance(repoSession, new LocalRepository("")));
+            MavenSession session = new MavenSession(getContainer(), repoSession, request, result);
+            session.setCurrentProject(project);
+            session.setProjects(Arrays.asList( project));
+            return session;
+        } catch (Exception e) {
+            throw new  RuntimeException(e);
+        }
+    }
 }
+

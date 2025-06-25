@@ -34,13 +34,13 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
-import javax.inject.Inject;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.GenerateKey;
 import org.apache.tools.ant.taskdefs.SignJar;
@@ -56,9 +56,12 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
+import org.eclipse.aether.RepositorySystem;
 import org.netbeans.nbbuild.MakeJNLP;
 import org.netbeans.nbbuild.ModuleSelector;
 import org.netbeans.nbbuild.VerifyJNLP;
+
+import javax.inject.Inject;
 
 /**
  * Create webstartable binaries for a 'nbm-application'.
@@ -69,23 +72,13 @@ import org.netbeans.nbbuild.VerifyJNLP;
  */
 @Deprecated(forRemoval = true,since = "14.3")
 @Mojo(name = "webstart-app", defaultPhase = LifecyclePhase.PACKAGE)
-public class CreateWebstartAppMojo
-        extends AbstractNbmMojo {
-
-    /**
-     * The Maven project.
-     *
-     */
-    @org.apache.maven.plugins.annotations.Parameter(required = true, readonly = true, property = "project")
-    private MavenProject project;
-
-    private final MavenProjectHelper projectHelper;
+public final class CreateWebstartAppMojo extends AbstractNbmMojo {
 
     /**
      * The branding token for the application based on NetBeans platform.
      */
     @org.apache.maven.plugins.annotations.Parameter(required = true, property = "netbeans.branding.token")
-    protected String brandingToken;
+    private String brandingToken;
 
     /**
      * output directory where the the NetBeans application will be created.
@@ -191,8 +184,8 @@ public class CreateWebstartAppMojo
     private String additionalArguments;
 
     @Inject
-    public CreateWebstartAppMojo(MavenProjectHelper projectHelper) {
-        this.projectHelper = projectHelper;
+    public CreateWebstartAppMojo(RepositorySystem repositorySystem, MavenProjectHelper mavenProjectHelper, ProjectDependenciesResolver projectDependenciesResolver, Artifacts artifacts) {
+        super(repositorySystem, mavenProjectHelper, projectDependenciesResolver, artifacts);
     }
 
     /**
@@ -328,7 +321,7 @@ public class CreateWebstartAppMojo
             } else {
                 props.setProperty("app.vendor", "Nobody");
             }
-            String description = project.getDescription() != null ? project.getDescription() : "No Project Description";
+            String description = project.getDescription() != null ? session.getCurrentProject().getDescription() : "No Project Description";
             props.setProperty("app.description", description);
             props.setProperty("branding.token", brandingToken);
             props.setProperty("master.jnlp.file.name", masterJnlpFileName);
@@ -548,7 +541,7 @@ public class CreateWebstartAppMojo
             archiver.createArchive();
 
             // attach standalone so that it gets installed/deployed
-            projectHelper.attachArtifact(project, "war", webstartClassifier, destinationFile);
+            mavenProjectHelper.attachArtifact(project, "war", webstartClassifier, destinationFile);
 
         } catch (Exception ex) {
             throw new MojoExecutionException("Error creating webstartable binary.", ex);
