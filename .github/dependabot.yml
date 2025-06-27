@@ -16,10 +16,17 @@
 # under the License.
 
 version: 2
+
 updates:
+
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: "master"
     schedule:
-      interval: "daily"
+      interval: "weekly"
 
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "master"
+    schedule:
+      interval: "weekly"
