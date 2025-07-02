@@ -1,0 +1,2 @@
+OpenIDE-Module-Provides: com.sun.xml.bind
+OpenIDE-Module: org.netbeans.libs.jaxb/1

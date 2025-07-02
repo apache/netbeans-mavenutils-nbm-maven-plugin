@@ -1,0 +1,2 @@
+Manifest-Version: 1.0
+AutoUpdate-Essential-Module: true
