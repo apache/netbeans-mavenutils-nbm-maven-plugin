@@ -29,6 +29,7 @@ import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,26 +40,28 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
+
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.shared.dependency.analyzer.DefaultClassAnalyzer;
 import org.apache.maven.shared.dependency.analyzer.asm.ASMDependencyAnalyzer;
-import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
-import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.netbeans.nbm.model.Dependency;
 import org.apache.netbeans.nbm.model.NetBeansModule;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
 /**
  * Goal for generating NetBeans module system specific manifest entries, part of
@@ -87,14 +90,14 @@ import org.apache.tools.ant.taskdefs.ManifestException;
         requiresProject = true,
         threadSafe = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
+public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
 
     /**
      * NetBeans module assembly build directory. directory where the the
      * NetBeans jar and nbm file get constructed.
      */
     @Parameter(defaultValue = "${project.build.directory}/nbm", property = "maven.nbm.buildDir")
-    protected File nbmBuildDir;
+    private File nbmBuildDir;
 
     /**
      * a NetBeans module descriptor containing dependency information and more
@@ -104,13 +107,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
      */
     @Deprecated
     @Parameter(defaultValue = "${basedir}/src/main/nbm/module.xml")
-    protected File descriptor;
-
-    /**
-     * maven project
-     */
-    @Parameter(required = true, readonly = true, property = "project")
-    private MavenProject project;
+    private File descriptor;
 
     /**
      * The location of JavaHelp sources for the project. The documentation
@@ -123,7 +120,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
      * @since 2.7
      */
     @Parameter(defaultValue = "${basedir}/src/main/javahelp")
-    protected File nbmJavahelpSource;
+    private File nbmJavahelpSource;
 
     /**
      * Path to manifest file that will be used as base and enhanced with
@@ -278,20 +275,13 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
      * @since 3.8 (3.14 in manifest goal)
      */
     @Parameter(defaultValue = "normal")
-    protected String moduleType;
-
-    /**
-     * The dependency tree builder to use.
-     */
-    private final DependencyGraphBuilder dependencyGraphBuilder;
-
-    @Parameter(defaultValue = "${session}", required = true, readonly = true)
-    private MavenSession session;
+    private String moduleType;
 
     @Inject
-    public NetBeansManifestUpdateMojo(DependencyGraphBuilder dependencyGraphBuilder) {
-        this.dependencyGraphBuilder = dependencyGraphBuilder;
+    public NetBeansManifestUpdateMojo(RepositorySystem repositorySystem, MavenProjectHelper mavenProjectHelper, ProjectDependenciesResolver projectDependenciesResolver, Artifacts artifacts) {
+        super(repositorySystem, mavenProjectHelper, projectDependenciesResolver, artifacts);
     }
+
     /**
      * execute plugin
      *
@@ -333,8 +323,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
 //<!-- if a NetBeans specific manifest is defined, examine this one, otherwise the already included one.
 // ignoring the case when some of the NetBeans attributes are already defined in the jar and more is included.
         File specialManifest = sourceManifestFile;
-        File nbmManifest = (module.getManifest() != null ? new File(
-                project.getBasedir(), module.getManifest()) : null);
+        File nbmManifest = (module.getManifest() != null ? new File(project.getBasedir(), module.getManifest()) : null);
         if (nbmManifest != null && nbmManifest.exists()) {
             //deprecated, but if actually defined, will use it.
             specialManifest = nbmManifest;
@@ -381,7 +370,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
                 timestamp);
         String projectCNB = conditionallyAddAttribute(mainSection, "OpenIDE-Module", moduleName);
         String packagesValue;
-        if (publicPackages != null && publicPackages.size() > 0) {
+        if (publicPackages != null && !publicPackages.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (String pub : publicPackages) {
                 if (pub == null) { //#MNBMODULE-237
@@ -417,10 +406,8 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
 //        conditionallyAddAttribute(mainSection, "OpenIDE-Module-IDE-Dependencies", "IDE/1 > 3.40");
         // localization items
         if (!examinator.isLocalized()) {
-            conditionallyAddAttribute(mainSection,
-                    "OpenIDE-Module-Display-Category", project.getGroupId());
-            conditionallyAddAttribute(mainSection, "OpenIDE-Module-Name",
-                    project.getName());
+            conditionallyAddAttribute(mainSection, "OpenIDE-Module-Display-Category", project.getGroupId());
+            conditionallyAddAttribute(mainSection, "OpenIDE-Module-Name", project.getName());
             conditionallyAddAttribute(mainSection,
                     "OpenIDE-Module-Short-Description", shorten(project.getDescription()));
             conditionallyAddAttribute(mainSection,
@@ -428,17 +415,12 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         }
         getLog().debug("module =" + module);
 
-        final String scope = includeRuntimeModuleLibraries ? Artifact.SCOPE_COMPILE_PLUS_RUNTIME : Artifact.SCOPE_COMPILE;
-        ProjectBuildingRequest prjbr = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
-        prjbr.setProject(project);
-        DependencyNode treeroot = createDependencyTree(prjbr, dependencyGraphBuilder, scope);
+        DependencyNode treeroot = createDependencyTree(project, includeRuntimeModuleLibraries);
         Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-        @SuppressWarnings("unchecked")
-        List<Artifact> libArtifacts = getLibraryArtifacts(treeroot, module, project.getRuntimeArtifacts(),
+        List<Artifact> libArtifacts = getLibraryArtifacts(artifacts, treeroot, module, RepositoryUtils.toArtifacts(project.getRuntimeArtifacts()),
                 examinerCache, getLog(), useOSGiDependencies);
         List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts(treeroot, module, moduleDependencies,
-                project, examinerCache,
-                libArtifacts, getLog(), useOSGiDependencies);
+                project, examinerCache, libArtifacts, getLog(), useOSGiDependencies);
         StringBuilder classPath = new StringBuilder();
         StringBuilder mavenClassPath = new StringBuilder();
         String dependencies = "";
@@ -458,7 +440,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
                     append(':').
                     append(a.getBaseVersion());
 
-            if (a.getClassifier() != null) {
+            if (a.getClassifier() != null && !a.getClassifier().trim().isEmpty()) {
                 mavenClassPath.append(":").append(a.getClassifier());
             }
         }
@@ -553,8 +535,8 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
 
     //MNBMODULE-137
     static String artifactToClassPathEntry(Artifact a, String codenamebase) {
-        return "ext/" + codenamebase + "/" + a.getGroupId().replace('.', '-') + "/" + a.getArtifactId() + (a.
-                getClassifier() != null ? "-" + a.getClassifier() : "") + "." + a.getArtifactHandler().getExtension();
+        return "ext/" + codenamebase + "/" + a.getGroupId().replace('.', '-') + "/" + a.getArtifactId() +
+                ((a.getClassifier() != null && !a.getClassifier().trim().isEmpty()) ? "-" + a.getClassifier() : "") + "." + a.getExtension();
     }
 
     /**
@@ -583,7 +565,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         return base;
     }
 
-    String conditionallyAddAttribute(Manifest.Section section, String key, String value) {
+    static String conditionallyAddAttribute(Manifest.Section section, String key, String value) {
         Manifest.Attribute attr = section.getAttribute(key);
         if (attr == null) {
             attr = new Manifest.Attribute();
@@ -592,7 +574,6 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
             try {
                 section.addConfiguredAttribute(attr);
             } catch (ManifestException ex) {
-                getLog().error("Cannot update manifest (key=" + key + ")");
                 ex.printStackTrace();
             }
         }
@@ -627,16 +608,16 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
 
         Set<String> own = projectModuleOwnClasses(project, libArtifacts);
         deps.removeAll(own);
-        CollectModuleLibrariesNodeVisitor visitor = new CollectModuleLibrariesNodeVisitor(
-                project.getRuntimeArtifacts(), examinerCache, getLog(), treeroot, useOSGiDependencies);
+        CollectModuleLibrariesNodeVisitor visitor = new CollectModuleLibrariesNodeVisitor(artifacts,
+                RepositoryUtils.toArtifacts(project.getRuntimeArtifacts()), examinerCache, getLog(), treeroot, useOSGiDependencies);
         treeroot.accept(visitor);
         Map<String, List<Artifact>> modules = visitor.getDeclaredArtifacts();
         Map<Artifact, Set<String>> moduleAllClasses = new HashMap<Artifact, Set<String>>();
 
         for (ModuleWrapper wr : moduleArtifacts) {
-            if (modules.containsKey(wr.artifact.getDependencyConflictId())) {
+            if (modules.containsKey(ArtifactIdUtils.toVersionlessId(wr.artifact))) {
                 ExamineManifest man = examinerCache.get(wr.artifact);
-                List<Artifact> arts = modules.get(wr.artifact.getDependencyConflictId());
+                List<Artifact> arts = modules.get(ArtifactIdUtils.toVersionlessId(wr.artifact));
                 Set<String>[] classes = visibleModuleClasses(arts, man, wr.dependency, projectCodeNameBase, false);
                 deps.removeAll(classes[0]);
                 moduleAllClasses.put(wr.artifact, classes[1]);
@@ -648,15 +629,15 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         if (!deps.isEmpty()) {
             Map<String, List<Artifact>> transmodules = visitor.getTransitiveArtifacts();
             for (ModuleWrapper wr : moduleArtifacts) {
-                if (transmodules.containsKey(wr.artifact.getDependencyConflictId())) {
+                if (transmodules.containsKey(ArtifactIdUtils.toVersionlessId(wr.artifact))) {
                     ExamineManifest man = examinerCache.get(wr.artifact);
-                    List<Artifact> arts = transmodules.get(wr.artifact.getDependencyConflictId());
+                    List<Artifact> arts = transmodules.get(ArtifactIdUtils.toVersionlessId(wr.artifact));
                     Set<String>[] classes = visibleModuleClasses(arts, man, wr.dependency, projectCodeNameBase, true);
                     classes[0].retainAll(deps);
                     if (classes[0].size() > 0) {
                         String module = wr.osgi ? "OSGi bundle" : "module";
                         getLog().error(
-                                "Project uses classes from transitive " + module + " " + wr.artifact.getId()
+                                "Project uses classes from transitive " + module + " " + ArtifactIdUtils.toId(wr.artifact)
                                 + " which will not be accessible at runtime.");
                         getLog().info(
                                 "To fix the problem, add this module as direct dependency. "
@@ -669,8 +650,8 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
                         getLog().info("Private classes referenced in transitive module: " + Arrays.toString(
                                 classes[1].toArray()));
                         getLog().error(
-                                "Project depends on packages not accessible at runtime in transitive module "
-                                + wr.artifact.getId() + " which will not be accessible at runtime.");
+                                "Project depends on packages not accessible at runtime in transitive module " +
+                                ArtifactIdUtils.toId(wr.artifact) + " which will not be accessible at runtime.");
                         deps.removeAll(classes[1]);
                     }
                 }
@@ -680,8 +661,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
                 if (deps.removeAll(e.getValue())) {
                     strs.retainAll(e.getValue());
                     getLog().info("Private classes referenced in module: " + Arrays.toString(strs.toArray()));
-                    getLog().error("Project depends on packages not accessible at runtime in module " + e.getKey().
-                            getId());
+                    getLog().error("Project depends on packages not accessible at runtime in module " + ArtifactIdUtils.toId(e.getKey()));
                 }
             }
             if (verifyRuntime.equalsIgnoreCase(FAIL)) {
@@ -757,7 +737,7 @@ public class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         URL fl = new File(outputDirectory).toURI().toURL();
         projectClasses.addAll(analyzer.analyze(fl));
 
-        List<Artifact> libs = project.getRuntimeArtifacts();
+        Collection<Artifact> libs = RepositoryUtils.toArtifacts(project.getRuntimeArtifacts());
 
         for (Artifact lib : libs) {
             URL url = lib.getFile().toURI().toURL();

@@ -36,7 +36,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @author Milos Kleint
  */
 @Mojo(name = "standalone-zip", requiresProject = true, threadSafe = true)
-public class CreateStandaloneMojo extends AbstractMojo {
+public final class CreateStandaloneMojo extends AbstractMojo {
 
     /**
      * The branding token for the application based on NetBeans platform.

@@ -92,7 +92,7 @@ public class CreateClusterAppMojoStaticTest {
             "pl-b", "pl-c", "a.b.c"
         })));
 
-        CreateClusterAppMojo.assignClustersToBundles(bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null);
+        CreateClusterAppMojo.assignClustersToBundles(null, bundles, Collections.emptySet(), clusterDeps, Collections.emptyMap(), null);
         assertEquals("ide", tup1.cluster);
         assertEquals("ide", tup2.cluster);
 
@@ -106,7 +106,7 @@ public class CreateClusterAppMojoStaticTest {
         tup2.cluster = null;
         tup1.cluster = null;
 
-        CreateClusterAppMojo.assignClustersToBundles(bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null);
+        CreateClusterAppMojo.assignClustersToBundles(null, bundles, Collections.<String>emptySet(), clusterDeps, Collections.<String, Set<String>>emptyMap(), null);
         assertEquals("java", tup2.cluster);
         assertEquals("java", tup1.cluster);
 

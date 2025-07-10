@@ -47,30 +47,30 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  *
  */
 @Mojo(name = "run-ide", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class RunNetBeansMojo extends AbstractMojo {
+public final class RunNetBeansMojo extends AbstractMojo {
 
     /**
      * directory where the module(s)' NetBeans cluster(s) are located. is
      * related to nbm:cluster goal.
      */
     @Parameter(required = true, defaultValue = "${project.build.directory}/netbeans_clusters")
-    protected File clusterBuildDir;
+    private File clusterBuildDir;
     /**
      * directory where the the NetBeans platform/IDE installation is, denotes
      * the root directory of NetBeans installation.
      */
     @Parameter(required = true, property = "netbeans.installation")
-    protected File netbeansInstallation;
+    private File netbeansInstallation;
     /**
      * NetBeans user directory for the executed instance.
      */
     @Parameter(required = true, defaultValue = "${project.build.directory}/userdir", property = "netbeans.userdir")
-    protected File netbeansUserdir;
+    private File netbeansUserdir;
     /**
      * additional command line arguments.
      */
     @Parameter(property = "netbeans.run.params")
-    protected String additionalArguments;
+    private String additionalArguments;
 
     /**
      * Attach a debugger to the application JVM. If set to "true", the process
@@ -83,7 +83,7 @@ public class RunNetBeansMojo extends AbstractMojo {
      * @since 3.11.1
      */
     @Parameter(property = "netbeans.run.params.debug")
-    protected String debugAdditionalArguments;
+    private String debugAdditionalArguments;
 
     /**
      *

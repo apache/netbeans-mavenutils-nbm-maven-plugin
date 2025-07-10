@@ -22,13 +22,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -36,6 +37,9 @@ import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.aether.RepositorySystem;
+
+import javax.inject.Inject;
 
 /**
  * Create the NetBeans module clusters from reactor. Semi-deprecated; used only
@@ -44,14 +48,14 @@ import org.codehaus.plexus.util.FileUtils;
  * @author Milos Kleint
  */
 @Mojo(name = "cluster", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class CreateClusterMojo extends AbstractNbmMojo {
+public final class CreateClusterMojo extends AbstractNbmMojo {
 
     /**
      * NetBeans module assembly build directory. directory where the the
      * NetBeans jar and nbm file get constructed.
      */
     @Parameter(defaultValue = "${project.build.directory}/nbm", property = "maven.nbm.buildDir")
-    protected File nbmBuildDir;
+    private File nbmBuildDir;
 
     /**
      * NetBeans module's cluster. Replaces the cluster element in module
@@ -59,20 +63,18 @@ public class CreateClusterMojo extends AbstractNbmMojo {
      *
      */
     @Parameter(required = true, defaultValue = "extra")
-    protected String cluster;
+    private String cluster;
 
     /**
      * directory where the the NetBeans cluster will be created.
      */
     @Parameter(defaultValue = "${project.build.directory}/netbeans_clusters", required = true)
-    protected File clusterBuildDir;
+    private File clusterBuildDir;
 
-    /**
-     * If the executed project is a reactor project, this will contains the full
-     * list of projects in the reactor.
-     */
-    @Parameter(defaultValue = "${session}", required = true, readonly = true)
-    private MavenSession mavenSession;
+    @Inject
+    public CreateClusterMojo(RepositorySystem repositorySystem, MavenProjectHelper mavenProjectHelper, ProjectDependenciesResolver projectDependenciesResolver, Artifacts artifacts) {
+        super(repositorySystem, mavenProjectHelper, projectDependenciesResolver, artifacts);
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -82,7 +84,7 @@ public class CreateClusterMojo extends AbstractNbmMojo {
             clusterBuildDir.mkdirs();
         }
 
-        List<MavenProject> reactorProjects = mavenSession.getProjects();
+        List<MavenProject> reactorProjects = session.getProjects();
         if (reactorProjects != null && !reactorProjects.isEmpty()) {
             for (MavenProject proj : reactorProjects) {
 
@@ -153,9 +155,9 @@ public class CreateClusterMojo extends AbstractNbmMojo {
             }
             //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
             File[] files = clusterBuildDir.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    File stamp = new File(files[i], ".lastModified");
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    File stamp = new File(file, ".lastModified");
                     if (!stamp.exists()) {
                         try {
                             stamp.createNewFile();
@@ -163,7 +165,7 @@ public class CreateClusterMojo extends AbstractNbmMojo {
                             ex.printStackTrace();
                         }
                     }
-                    stamp.setLastModified(getOutputTimestampOrNow(mavenSession.getCurrentProject()).getTime());
+                    stamp.setLastModified(getOutputTimestampOrNow(project).getTime());
                 }
             }
             getLog().info("Created NetBeans module cluster(s) at " + clusterBuildDir);

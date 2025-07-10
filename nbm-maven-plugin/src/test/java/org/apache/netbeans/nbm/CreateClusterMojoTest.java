@@ -61,7 +61,7 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
         assertTrue(pom.exists());
         CreateClusterMojo createclustermojo = (CreateClusterMojo) lookupMojo("cluster", pom);
         MavenSession mocksession = Mockito.mock(MavenSession.class);
-        setVariableValueToObject(createclustermojo, "mavenSession", mocksession);
+        setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
         MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclustermojo.execute());
         assertEquals("This goal only makes sense on reactor projects.", assertThrows.getMessage());
@@ -87,7 +87,7 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
 
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
-        setVariableValueToObject(createclustermojo, "mavenSession", mocksession);
+        setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
         MojoFailureException assertThrows = assertThrows(MojoFailureException.class, () -> createclustermojo.execute());
         assertEquals("The NetBeans binary directory structure for foo is not created yet." + "\n Please execute 'mvn install nbm:cluster' "
@@ -117,7 +117,7 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
         File clusterdir = (File) getVariableValueFromObject(createclustermojo, "nbmBuildDir");
         File file = new File(clusterdir, "clusters");
         file.mkdirs();
-        setVariableValueToObject(createclustermojo, "mavenSession", mocksession);
+        setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
 
         createclustermojo.execute();
@@ -150,7 +150,7 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
 
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
-        setVariableValueToObject(createclustermojo, "mavenSession", mocksession);
+        setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
         createclustermojo.execute();
     }
@@ -182,7 +182,8 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
             @Override
             public Properties getProperties() {
                 Properties properties = new Properties();
-                properties.put("project.build.outputTimestamp", "0");
+                // ZIP dates allowed only: valid range 1980-01-01T00:00:02Z to 2099-12-31T23:59:59Z
+                properties.put("project.build.outputTimestamp", "1980-01-01T00:00:02Z");
                 return properties;
             }
 
@@ -199,7 +200,8 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
         Mockito.doReturn(new MavenProjectStub()).when(mocksession).getCurrentProject();
-        setVariableValueToObject(createclustermojo, "mavenSession", mocksession);
+        setVariableValueToObject(createclustermojo, "project", lmp.get(0));
+        setVariableValueToObject(createclustermojo, "session", mocksession);
         setVariableValueToObject(createclustermojo, "cluster", "cl");
         assertNotNull(createclustermojo);
         createclustermojo.execute();

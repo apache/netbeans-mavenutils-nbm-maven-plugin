@@ -23,7 +23,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,25 +42,23 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.inject.Inject;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.execution.MavenSession;
+
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -69,6 +67,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectDependenciesResolver;
+import org.apache.netbeans.nbm.handlers.NbmFileArtifactHandler;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -78,6 +79,13 @@ import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.netbeans.nbbuild.MakeListOfNBM;
 
 /**
@@ -91,7 +99,7 @@ import org.netbeans.nbbuild.MakeListOfNBM;
         requiresProject = true,
         threadSafe = true,
         requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class CreateClusterAppMojo extends AbstractNbmMojo {
+public final class CreateClusterAppMojo extends AbstractNbmMojo {
 
     /**
      * output directory where the the NetBeans application will be created.
@@ -100,16 +108,10 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
     private File outputDirectory;
 
     /**
-     * The Maven Project.
-     */
-    @Parameter(defaultValue = "${project}", required = true, readonly = true)
-    private MavenProject project;
-
-    /**
      * The branding token for the application based on NetBeans platform.
      */
     @Parameter(property = "netbeans.branding.token", required = true)
-    protected String brandingToken;
+    private String brandingToken;
 
     /**
      * Optional path to custom etc/${brandingToken}.conf file. If not defined, a
@@ -171,17 +173,9 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
         "org.openide.modules.jre.JavaFX" //MNBMODULE-234
     });
 
-    private final ArtifactFactory artifactFactory;
-
-    private final ArtifactResolver artifactResolver;
-
-    @Parameter(defaultValue = "${session}", required = true, readonly = true)
-    protected MavenSession session;
-
     @Inject
-    public CreateClusterAppMojo(ArtifactFactory artifactFactory, ArtifactResolver artifactResolver) {
-        this.artifactFactory = artifactFactory;
-        this.artifactResolver = artifactResolver;
+    public CreateClusterAppMojo(RepositorySystem repositorySystem, MavenProjectHelper mavenProjectHelper, ProjectDependenciesResolver projectDependenciesResolver, Artifacts artifacts) {
+        super(repositorySystem, mavenProjectHelper, projectDependenciesResolver, artifacts);
     }
 
     @Override
@@ -214,22 +208,21 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
 
             List<BundleTuple> bundles = new ArrayList<>();
 
-            @SuppressWarnings("unchecked")
-            Set<Artifact> artifacts = project.getArtifacts();
+            Collection<Artifact> artifacts = RepositoryUtils.toArtifacts(project.getArtifacts());
             for (Artifact art : artifacts) {
-                ArtifactResult res = turnJarToNbmFile(art, artifactFactory, artifactResolver, project, session.getLocalRepository());
+                ArtifactResult res = turnJarToNbmFile(art, project);
                 if (res.hasConvertedArtifact()) {
                     art = res.getConvertedArtifact();
                 }
 
-                if (art.getType().equals("nbm-file")) {
+                if (super.artifacts.getArtifactType(art).getId().equals("nbm-file")) {
                     try {
                         JarFile jf = new JarFile(art.getFile());
                         try {
                             String clusterName = findCluster(jf);
                             ClusterTuple cluster = processCluster(clusterName, nbmBuildDirFile, art);
 
-                            getLog().debug("Copying " + art.getId() + " to cluster " + clusterName);
+                            getLog().debug("Copying " + ArtifactIdUtils.toId(art) + " to cluster " + clusterName);
                             Enumeration<JarEntry> enu = jf.entries();
 
                             // we need to trigger this ant task to generate the update_tracking file.
@@ -376,7 +369,7 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
                                         }
                                     }
                                     if (!classpathFile.isFile()) {
-                                        getLog().warn("Could not resolve Class-Path item in " + art.getId()
+                                        getLog().warn("Could not resolve Class-Path item in " + ArtifactIdUtils.toId(art)
                                                 + ", path is:" + path + ", skipping");
                                         continue; //try to guard against future failures
                                     }
@@ -385,12 +378,12 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
                                     //ex.setPopulateDependencies( true );
                                     ex.checkFile();
                                     if (ex.isOsgiBundle()) {
-                                        if (art.getId().contains(groupIdPrefix
+                                        if (ArtifactIdUtils.toId(art).contains(groupIdPrefix
                                                 + ".modules:org-netbeans-modules-maven-embedder")) {
                                             // in this case we dont want module-maven-embedder to be considered as
                                             // wrapper for his libs guava is provided but ide have it also
                                         } else {
-                                            getLog().debug(ex.getModule() + " added by " + art.getId() + " located in: " + classpathFile);
+                                            getLog().debug(ex.getModule() + " added by " + ArtifactIdUtils.toId(art) + " located in: " + classpathFile);
                                             wrappedBundleCNBs.add(ex.getModule());
                                         }
                                     }
@@ -522,7 +515,7 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
             clusterModules.clear();
 
             //now assign the cluster to bundles based on dependencies..
-            assignClustersToBundles(bundles, wrappedBundleCNBs, clusterDependencies, cluster2depClusters, getLog());
+            assignClustersToBundles(project, bundles, wrappedBundleCNBs, clusterDependencies, cluster2depClusters, getLog());
 
             for (BundleTuple ent : bundles) {
                 Artifact art = ent.artifact;
@@ -535,7 +528,7 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
 
                 ClusterTuple cluster = processCluster(clstr, nbmBuildDirFile, art);
                 if (cluster.newer) {
-                    getLog().info("Copying " + art.getId() + " to cluster " + clstr);
+                    getLog().info("Copying " + ArtifactIdUtils.toId(art) + " to cluster " + clstr);
                     File modules = new File(cluster.location, "modules");
                     modules.mkdirs();
                     File config = new File(cluster.location, "config");
@@ -765,7 +758,7 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
 
     private void externalDownload(File f, InputStream is) throws IOException {
         // Cf. org.netbeans.nbbuild.AutoUpdate
-        BufferedReader r = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        BufferedReader r = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         long crc = -1;
         long size = -1;
         boolean found = false;
@@ -779,19 +772,20 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
                     if (!found) {
                         String[] coords = rest.substring(4).trim().split(":");
                         Artifact artifact;
+                        String type = coords[3];
+                        ArtifactType artifactType = artifacts.getArtifactType(type);
                         if (coords.length == 4) {
-                            artifact = artifactFactory.
-                                    createArtifact(coords[0], coords[1], coords[2], null, coords[3]);
+                            artifact = new DefaultArtifact(coords[0], coords[1],  null, artifactType.getExtension(), coords[2], artifactType);
                         } else {
-                            artifact = artifactFactory.createArtifactWithClassifier(coords[0], coords[1], coords[2],
-                                    coords[3], coords[4]);
+                            artifact = new DefaultArtifact(coords[0], coords[1], coords[4], artifactType.getExtension(), coords[2], artifactType);
                         }
                         try {
-                            artifactResolver.
-                                    resolve(artifact, project.getRemoteArtifactRepositories(), session.getLocalRepository());
+                            ArtifactRequest request = new ArtifactRequest(artifact, project.getRemoteProjectRepositories(), "nbm");
+                            org.eclipse.aether.resolution.ArtifactResult result = repositorySystem.resolveArtifact(session.getRepositorySession(), request);
+                            artifact = result.getArtifact();
                             FileUtils.copyFile(artifact.getFile(), f);
                             found = true;
-                        } catch (AbstractArtifactResolutionException x) {
+                        } catch (ArtifactResolutionException x) {
                             getLog().warn("Cannot find " + line.substring(8), x);
                         }
                     }
@@ -823,8 +817,7 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
     }
 
     private File getHarnessNbm() throws MojoExecutionException {
-        @SuppressWarnings("unchecked")
-        Set<Artifact> artifacts = project.getArtifacts();
+        Collection<Artifact> artifacts = RepositoryUtils.toArtifacts(project.getArtifacts());
         String version = null;
         for (Artifact a : artifacts) {
             if ((groupIdPrefix + ".modules").equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
@@ -838,16 +831,20 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
                     "We could not find org-netbeans-bootstrap among the modules in the application. "
                     + "Launchers could not be found.");
         }
-        Artifact nbmArt = artifactFactory.createArtifact(
+        ArtifactType nmbFileType = super.artifacts.getArtifactType(NbmFileArtifactHandler.NAME);
+        Artifact nbmArt = new DefaultArtifact(
                 groupIdPrefix + ".modules",
                 "org-netbeans-modules-apisupport-harness",
+                null,
+                nmbFileType.getExtension(),
                 version,
-                "compile",
-                "nbm-file");
+                nmbFileType);
         try {
-            artifactResolver.resolve(nbmArt, project.getRemoteArtifactRepositories(), session.getLocalRepository());
-        } catch (ArtifactResolutionException | ArtifactNotFoundException ex) {
-            throw new MojoExecutionException("Failed to retrieve the nbm file from repository", ex);
+            ArtifactRequest request = new ArtifactRequest(nbmArt, project.getRemoteProjectRepositories(), "nbm");
+            org.eclipse.aether.resolution.ArtifactResult result = repositorySystem.resolveArtifact(session.getRepositorySession(), request);
+            nbmArt = result.getArtifact();
+        } catch (ArtifactResolutionException e) {
+            throw new MojoExecutionException("Failed to retrieve the nbm file from repository", e);
         }
         return nbmArt.getFile();
     }
@@ -899,9 +896,11 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
     // - 2 or more modules from unrelated clusters we cannot easily decide,
     //   most likely should be in common denominator cluster but our cluster2depClusters map is not transitive,
     //   only lists direct dependencies
-    static void assignClustersToBundles(List<BundleTuple> bundles, Set<String> wrappedBundleCNBs,
-            Map<String, Set<String>> clusterDependencies,
-            Map<String, Set<String>> cluster2depClusters, Log log) {
+    static void assignClustersToBundles(MavenProject mavenProject, List<BundleTuple> bundles, Set<String> wrappedBundleCNBs,
+                                        Map<String, Set<String>> clusterDependencies,
+                                        Map<String, Set<String>> cluster2depClusters, Log log) {
+        Collection<Artifact> directDeps = mavenProject != null ? RepositoryUtils.toArtifacts(mavenProject.getDependencyArtifacts()) : bundles.stream().map(b -> b.artifact).filter(Objects::nonNull).collect(Collectors.toSet());
+        Predicate<Artifact> isTransitive = a -> !directDeps.contains(a);
         List<BundleTuple> toProcess = new ArrayList<>();
         List<BundleTuple> known = new ArrayList<>();
         for (Iterator<BundleTuple> it = bundles.iterator(); it.hasNext();) {
@@ -911,9 +910,9 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
             String spec = ex.getModule();
             //null check for tests
             //have a way to force inclusion of osgi items. Direct dependency is never wrapped by modules.
-            if (art != null && art.getDependencyTrail().size() > 2 && wrappedBundleCNBs.contains(spec)) {
+            if (art != null && isTransitive.test(art) && wrappedBundleCNBs.contains(spec)) {
                 // we already have this one as a wrapped module.
-                log.debug("Not including bundle " + art.getDependencyConflictId()
+                log.debug("Not including bundle " + ArtifactIdUtils.toVersionlessId(art)
                         + ". It is already included in a NetBeans module");
                 it.remove();
                 continue;
@@ -1083,7 +1082,7 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
                 + "</module>\n";
     }
 
-    static String createBundleUpdateTracking(String cnb, File moduleArt, File moduleConf, String specVersion) throws FileNotFoundException, IOException {
+    static String createBundleUpdateTracking(String cnb, File moduleArt, File moduleConf, String specVersion) throws IOException {
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<module codename=\"" + cnb + "\">\n"
@@ -1097,7 +1096,7 @@ public class CreateClusterAppMojo extends AbstractNbmMojo {
 
     }
 
-    static CRC32 crcForFile(File inFile) throws FileNotFoundException, IOException {
+    static CRC32 crcForFile(File inFile) throws IOException {
         CRC32 crc = new CRC32();
         try (InputStream inFileStream = new FileInputStream(inFile)) {
             byte[] array = new byte[(int) inFile.length()];

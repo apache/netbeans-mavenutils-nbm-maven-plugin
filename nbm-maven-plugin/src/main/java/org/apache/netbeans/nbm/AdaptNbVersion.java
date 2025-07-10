@@ -63,14 +63,14 @@ public class AdaptNbVersion {
                     token = token.substring(0, token.indexOf('_'));
                 }
                 try {
-                    Integer intValue = Integer.valueOf(token);
-                    token = intValue.toString();
+                    int intValue = Integer.parseInt(token);
+                    token = Integer.toString(intValue);
                 } catch (NumberFormatException exc) {
                     // ignore, will just not be added to the
                     token = "";
                 }
             }
-            if (token.length() > 0) {
+            if (!token.isEmpty()) {
                 if (toReturn.length() != 0) {
                     toReturn.append(".");
                 }
