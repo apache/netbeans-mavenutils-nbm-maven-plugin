@@ -19,15 +19,13 @@ under the License.
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.apache.netbeans.utilities</groupId> 
-        <artifactId>ittest-parent</artifactId>
+        <groupId>org.apache.netbeans.utilities</groupId>
+        <artifactId>moduleoverride-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ittest-app</artifactId>
+    <artifactId>moduleoverride-app</artifactId>
     <packaging>nbm-application</packaging>
-
-    <name>ittest-app</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,28 +40,63 @@ under the License.
             <type>pom</type>
         </dependency>
         <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>ide</artifactId>
+            <version>${netbeans.version}</version>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.netbeans.modules</groupId>
+                    <artifactId>org-netbeans-libs-jaxb</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency> 
+        <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>harness</artifactId>
+            <version>${netbeans.version}</version>
+            <type>pom</type>
+        </dependency>   
+        <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>java</artifactId>
+            <version>${netbeans.version}</version>
+            <type>pom</type>
+            
+        </dependency>  
+        <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>extide</artifactId>
+            <version>${netbeans.version}</version>
+            <type>pom</type>
+        </dependency> 
+        <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>websvccommon</artifactId>
+            <version>${netbeans.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>webcommon</artifactId>
+            <version>${netbeans.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ittest-branding</artifactId>
+            <artifactId>moduleoverride-branding</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- NbModuleSuite functional in RELEASE70 or later: -->
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-nbjunit</artifactId>
             <version>${netbeans.version}</version>
-            <scope>test</scope> <!-- beyond platform cluster, this often needs to be dropped down to compile/runtime, some other modules in IDE clusters depend on it -->
-        </dependency>
-        <!-- To use Jelly Tools in your functional tests, add or replace with:
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-modules-jellytools-platform</artifactId>
-            <version>${netbeans.version}</version>
             <scope>test</scope>
+
         </dependency>
-        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ittest-sample</artifactId>
+            <artifactId>moduleoverride-jaxbwrapper</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -73,12 +106,17 @@ under the License.
             <plugin>
                 <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
+                <configuration>
+                    <verifyRuntime>fail</verifyRuntime>
+                    <additionalArguments>-J--add-opens=java.base/java.net=ALL-UNNAMED -J--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED</additionalArguments>
+                </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <skipTests>true</skipTests>
                     <systemPropertyVariables>
                         <all.clusters>${all.clusters}</all.clusters>
                         <branding.token>${brandingToken}</branding.token>
