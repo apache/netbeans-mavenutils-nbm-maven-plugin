@@ -20,6 +20,8 @@ package org.apache.netbeans.nbm;
  */
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -83,12 +85,13 @@ public final class CreateClusterMojo extends AbstractNbmMojo {
         if (!clusterBuildDir.exists()) {
             clusterBuildDir.mkdirs();
         }
-
+        // relativize to get path from target
+        Path relativizedfolder = Paths.get(session.getCurrentProject().getBuild().getDirectory()).relativize(nbmBuildDir.toPath());
         List<MavenProject> reactorProjects = session.getProjects();
         if (reactorProjects != null && !reactorProjects.isEmpty()) {
             for (MavenProject proj : reactorProjects) {
-
-                File nbmDir = new File(nbmBuildDir, "clusters");
+                // nbmDir scan for each reactor project
+                File nbmDir = new File(proj.getBuild().getDirectory(), relativizedfolder.toString() + File.separator + "clusters");
                 if (nbmDir.exists()) {
                     Copy copyTask = (Copy) antProject.createTask("copy");
                     copyTask.setTodir(clusterBuildDir);

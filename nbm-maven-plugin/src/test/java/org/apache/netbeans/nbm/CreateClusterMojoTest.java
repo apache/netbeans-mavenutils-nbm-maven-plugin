@@ -18,6 +18,8 @@ package org.apache.netbeans.nbm;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -62,6 +64,7 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
         CreateClusterMojo createclustermojo = (CreateClusterMojo) lookupMojo("cluster", pom);
         MavenSession mocksession = Mockito.mock(MavenSession.class);
         setVariableValueToObject(createclustermojo, "session", mocksession);
+        Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
         assertNotNull(createclustermojo);
         MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclustermojo.execute());
         assertEquals("This goal only makes sense on reactor projects.", assertThrows.getMessage());
@@ -85,8 +88,16 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
                 return "foo";
             }
 
+            @Override
+            public Build getBuild() {
+                Build mock = Mockito.mock(Build.class);
+                Mockito.doReturn(getBasedir() + File.separator + "nbm").when(mock).getDirectory();
+                return mock;
+            }
+
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
+        Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
         setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
         MojoFailureException assertThrows = assertThrows(MojoFailureException.class, () -> createclustermojo.execute());
@@ -112,8 +123,21 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
                 return "foo";
             }
 
+            @Override
+            public Build getBuild() {
+                Build mock = Mockito.mock(Build.class);
+                Mockito.doReturn(getBasedir() + File.separator + "nbm").when(mock).getDirectory();
+                try {
+                    Files.createDirectories(Paths.get(getBasedir() + File.separator + "nbm"));
+                } catch (IOException ex) {
+                    System.getLogger(CreateClusterMojoTest.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                }
+                return mock;
+            }
+
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
+        Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
         File clusterdir = (File) getVariableValueFromObject(createclustermojo, "nbmBuildDir");
         File file = new File(clusterdir, "clusters");
         file.mkdirs();
@@ -150,6 +174,7 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
 
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
+        Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
         setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
         createclustermojo.execute();
@@ -199,7 +224,7 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
 
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
-        Mockito.doReturn(new MavenProjectStub()).when(mocksession).getCurrentProject();
+        Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
         setVariableValueToObject(createclustermojo, "project", lmp.get(0));
         setVariableValueToObject(createclustermojo, "session", mocksession);
         setVariableValueToObject(createclustermojo, "cluster", "cl");
@@ -221,5 +246,29 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
             jos.putNextEntry(jarAdd);
             jos.closeEntry();
         }
+    }
+
+    private static class MavenProjectStubImpl extends MavenProjectStub {
+
+        public MavenProjectStubImpl() {
+        }
+
+        @Override
+        public String getPackaging() {
+            return "nbm";
+        }
+
+        @Override
+        public String getId() {
+            return "foo";
+        }
+
+        @Override
+        public Build getBuild() {
+            Build mock = Mockito.mock(Build.class);
+            Mockito.doReturn(getBasedir() + File.separator + "nbm").when(mock).getDirectory();
+            return mock;
+        }
+
     }
 }
