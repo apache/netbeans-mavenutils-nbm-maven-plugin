@@ -254,7 +254,7 @@
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
                             <!-- last jdk 8 compatible version -->
-                            <version>11.0.1</version>
+                            <version>10.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
