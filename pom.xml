@@ -77,7 +77,7 @@
         <skin.artifactId>maven-fluido-skin</skin.artifactId>
         <skin.version>2.0.0</skin.version>
         <!-- version of Apache NetBeans for harness build -->
-        <netbeans.version>RELEASE260</netbeans.version>
+        <netbeans.version>RELEASE270</netbeans.version>
         <javax.inject.version>1</javax.inject.version>
         <jdkbaseline>11</jdkbaseline>
         <mockito.version>5.18.0</mockito.version>
