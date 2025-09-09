@@ -292,7 +292,7 @@
                     <version>3.11.3</version>
                     <configuration>
                         <quiet>true</quiet>
-                        <source>${jdkbaseline}</source>
+                        <release>${jdkbaseline}</release>
                         <detectLinks>true</detectLinks>
                     </configuration>
                 </plugin>
