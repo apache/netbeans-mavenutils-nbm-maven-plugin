@@ -81,7 +81,7 @@
         <javax.inject.version>1</javax.inject.version>
         <jdkbaseline>11</jdkbaseline>
         <mockito.version>5.18.0</mockito.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <slf4j.version>2.0.17</slf4j.version>
     </properties>
 
     <dependencyManagement>
