@@ -71,7 +71,7 @@
         <resolver.version>1.9.24</resolver.version>
         <!-- Used in ASF parent to enforce Maven version -->
         <minimalMavenBuildVersion>3.6.3</minimalMavenBuildVersion>
-        <maven.plugin.version>3.15.1</maven.plugin.version>
+        <maven.plugin.version>3.15.2</maven.plugin.version>
         <invoker.plugin.version>3.9.1</invoker.plugin.version>
         <skin.groupId>org.apache.maven.skins</skin.groupId>
         <skin.artifactId>maven-fluido-skin</skin.artifactId>
