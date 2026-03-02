@@ -55,7 +55,7 @@ jobs:
         run: ./mvnw -B -ntp verify -P run-its
 
       - name: Create Test Summary
-        uses: mikepenz/action-junit-report@e08919a3b1fb83a78393dfb775a9c37f17d8eea6 # v6.0.1
+        uses: mikepenz/action-junit-report@49b2ca06f62aa7ef83ae6769a2179271e160d8e4 # v6.3.1
         if: always()
         with:
           annotate_only: true
