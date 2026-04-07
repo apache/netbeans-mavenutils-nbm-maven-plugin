@@ -80,7 +80,7 @@
         <netbeans.version>RELEASE280</netbeans.version>
         <javax.inject.version>1</javax.inject.version>
         <jdkbaseline>11</jdkbaseline>
-        <mockito.version>5.18.0</mockito.version>
+        <mockito.version>5.22.0</mockito.version>
         <slf4j.version>1.7.36</slf4j.version>
     </properties>
 
@@ -99,7 +99,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -167,7 +167,7 @@
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-archiver</artifactId>
-                <version>3.6.5</version>
+                <version>3.6.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven.plugin-testing</groupId>
@@ -183,7 +183,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-archiver</artifactId>
-                <version>4.10.4</version>
+                <version>4.11.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -193,7 +193,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.20.0</version>
+                <version>2.21.0</version>
             </dependency>
 
             <dependency>
@@ -215,7 +215,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.13</version>
+                    <version>0.8.14</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -274,12 +274,12 @@
                 <plugin>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>
-                    <version>0.16.1</version>
+                    <version>0.17</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.1</version>
+                    <version>3.15.0</version>
                     <configuration>
                         <showDeprecation>true</showDeprecation>
                         <release>${jdkbaseline}</release>
@@ -309,7 +309,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -343,17 +343,17 @@
                 <plugin>
                     <groupId>org.codehaus.modello</groupId>
                     <artifactId>modello-maven-plugin</artifactId>
-                    <version>2.5.1</version>
+                    <version>2.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -363,7 +363,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>3.5.4</version>
+                    <version>3.5.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -378,7 +378,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.4</version>
+                    <version>3.5.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -413,7 +413,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.10.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -428,7 +428,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -443,7 +443,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -453,7 +453,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.4</version>
+                    <version>3.5.5</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -551,9 +551,18 @@
             </properties>
         </profile>
         <profile>
+            <id>downgrade-release-for-jdk17-it</id>
+            <activation>
+                <jdk>(17,21]</jdk>
+            </activation>
+            <properties>
+                <netbeans.version.it>RELEASE280</netbeans.version.it>
+            </properties>
+        </profile>
+        <profile>
             <id>it-for-current-jdk</id>
             <activation>
-                <jdk>(17,)</jdk>
+                <jdk>(21,)</jdk>
             </activation>
             <properties>
                 <netbeans.version.it>${netbeans.version}</netbeans.version.it>
