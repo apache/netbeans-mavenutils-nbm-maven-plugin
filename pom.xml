@@ -67,7 +67,7 @@
 
     <properties>
         <!--  <mojo.java.target>1.6</mojo.java.target> -->
-        <maven.version>3.9.14</maven.version>
+        <maven.version>3.9.15</maven.version>
         <resolver.version>1.9.27</resolver.version>
         <!-- Used in ASF parent to enforce Maven version -->
         <minimalMavenBuildVersion>3.6.3</minimalMavenBuildVersion>
