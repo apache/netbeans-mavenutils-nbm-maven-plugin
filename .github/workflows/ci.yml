@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 11, 17, 21, 25 ]
+        java: [ 11, 17, 21, 25, 26 ]
       fail-fast: false
 
     steps:
@@ -53,6 +53,9 @@ jobs:
 
       - name: Build & Test
         run: ./mvnw -B -ntp verify -P run-its
+
+      - name: Site
+        run: ./mvnw site
 
       - name: Create Test Summary
         uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386 # v6.4.0
