@@ -52,7 +52,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build & Test
-        run: ./mvnw -B -ntp verify -P run-its
+        run: ./mvnw -B -ntp verify site -P run-its
 
       - name: Create Test Summary
         uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386 # v6.4.0
