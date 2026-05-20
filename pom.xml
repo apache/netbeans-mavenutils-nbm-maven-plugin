@@ -27,7 +27,7 @@
 
     <groupId>org.apache.netbeans.utilities</groupId>
     <artifactId>utilities-parent</artifactId>
-    <version>14.6-SNAPSHOT</version>
+    <version>15.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Apache Netbeans Maven Utilities</name>
@@ -67,21 +67,22 @@
 
     <properties>
         <!--  <mojo.java.target>1.6</mojo.java.target> -->
-        <maven.version>3.9.15</maven.version>
+        <maven.version>3.9.16</maven.version>
         <resolver.version>1.9.27</resolver.version>
         <!-- Used in ASF parent to enforce Maven version -->
         <minimalMavenBuildVersion>3.6.3</minimalMavenBuildVersion>
         <maven.plugin.version>3.15.2</maven.plugin.version>
-        <invoker.plugin.version>3.9.1</invoker.plugin.version>
+        <invoker.plugin.version>3.10.1</invoker.plugin.version>
         <skin.groupId>org.apache.maven.skins</skin.groupId>
         <skin.artifactId>maven-fluido-skin</skin.artifactId>
-        <skin.version>2.0.0</skin.version>
+        <skin.version>2.1.0</skin.version>
         <!-- version of Apache NetBeans for harness build -->
-        <netbeans.version>RELEASE280</netbeans.version>
+        <netbeans.version>RELEASE300</netbeans.version>
         <javax.inject.version>1</javax.inject.version>
-        <jdkbaseline>11</jdkbaseline>
+        <jdkbaseline>21</jdkbaseline>
         <mockito.version>5.22.0</mockito.version>
         <slf4j.version>1.7.36</slf4j.version>
+        <pmdVersion>7.24.0</pmdVersion>
     </properties>
 
     <dependencyManagement>
@@ -250,11 +251,11 @@
                             <artifactId>maven-shared-resources</artifactId>
                             <version>6</version>
                         </dependency>
+                        <!-- align puppy checkstyle version with latest jdk supported in the workflow -->
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <!-- last jdk 8 compatible version -->
-                            <version>10.0</version>
+                            <version>13.4.2</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -270,11 +271,34 @@
                     <configuration>
                         <targetJdk>${jdkbaseline}</targetJdk>
                     </configuration>
+                    <!-- align pmd version with latest jdk supported in the workflow -->
+                    <dependencies>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-core</artifactId>
+                            <version>${pmdVersion}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-java</artifactId>
+                            <version>${pmdVersion}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-javascript</artifactId>
+                            <version>${pmdVersion}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-jsp</artifactId>
+                            <version>${pmdVersion}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>
-                    <version>0.17</version>
+                    <version>0.18</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -343,7 +367,7 @@
                 <plugin>
                     <groupId>org.codehaus.modello</groupId>
                     <artifactId>modello-maven-plugin</artifactId>
-                    <version>2.6.0</version>
+                    <version>2.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -438,12 +462,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-invoker-plugin</artifactId>
-                    <version>3.9.1</version>
+                    <version>${invoker.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.2</version>
+                    <version>3.6.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -530,43 +554,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <!-- select the artefact version according to supported jdk -->
-        <profile>
-            <id>downgrade-release-for-jdk8-it</id>
-            <activation>
-                <jdk>(,11]</jdk>
-            </activation>
-            <properties>
-                <netbeans.version.it>RELEASE126</netbeans.version.it>
-            </properties>
-        </profile>
-        <profile>
-            <id>downgrade-release-for-jdk11-it</id>
-            <activation>
-                <jdk>(11,17]</jdk>
-            </activation>
-            <properties>
-                <netbeans.version.it>RELEASE210</netbeans.version.it>
-            </properties>
-        </profile>
-        <profile>
-            <id>downgrade-release-for-jdk17-it</id>
-            <activation>
-                <jdk>(17,21]</jdk>
-            </activation>
-            <properties>
-                <netbeans.version.it>RELEASE280</netbeans.version.it>
-            </properties>
-        </profile>
-        <profile>
-            <id>it-for-current-jdk</id>
-            <activation>
-                <jdk>(21,)</jdk>
-            </activation>
-            <properties>
-                <netbeans.version.it>${netbeans.version}</netbeans.version.it>
-            </properties>
         </profile>
     </profiles>
 </project>
