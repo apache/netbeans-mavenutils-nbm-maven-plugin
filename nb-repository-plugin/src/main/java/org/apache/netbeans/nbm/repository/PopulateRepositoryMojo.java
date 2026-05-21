@@ -230,6 +230,15 @@ public class PopulateRepositoryMojo
     private String dependencyRepositoryId;
 
     /**
+     * Number of times to retry a failed deployment. A value of {@code 0} means
+     * a single attempt with no retries (the default). Must be at least {@code 0}.
+     *
+     * @since 15.0
+     */
+    @Parameter(defaultValue = "0", property = "retryFailedDeploymentCount")
+    private int retryFailedDeploymentCount;
+
+    /**
      * Colon separated artefact coordinate groupId:artefactId:version that
      * represent parent to be used
      *
@@ -639,11 +648,21 @@ public class PopulateRepositoryMojo
 
     void deploy(DeployRequest deployRequest)
             throws MojoExecutionException {
-        try {
-            repositorySystem.deploy(session.getRepositorySession(), deployRequest);
-        } catch (DeploymentException ex) {
-            throw new MojoExecutionException("Error deploying artifact", ex);
+        int attempts = Math.max(0, retryFailedDeploymentCount) + 1;
+        DeploymentException lastException = null;
+        for (int attempt = 1; attempt <= attempts; attempt++) {
+            try {
+                repositorySystem.deploy(session.getRepositorySession(), deployRequest);
+                return;
+            } catch (DeploymentException ex) {
+                lastException = ex;
+                if (attempt < attempts) {
+                    getLog().warn("Deployment attempt " + attempt + "/" + attempts + " failed, retrying. "
+                            + ex.getMessage());
+                }
+            }
         }
+        throw new MojoExecutionException("Error deploying artifact", lastException);
     }
 
     //performs the same tasks as the MavenProjectHelper
