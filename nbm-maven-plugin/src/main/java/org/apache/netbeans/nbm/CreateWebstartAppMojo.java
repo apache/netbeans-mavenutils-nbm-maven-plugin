@@ -65,12 +65,11 @@ import javax.inject.Inject;
 
 /**
  * Create webstartable binaries for a 'nbm-application'.
- * @deprecated webstart is not available on jdk 11+. Will be removed in nbm-plugin 15.0
  * @author Johan Andrén
  * @author Milos Kleint
  * @since 3.0
  */
-@Deprecated(forRemoval = true,since = "14.3")
+
 @Mojo(name = "webstart-app", defaultPhase = LifecyclePhase.PACKAGE)
 public final class CreateWebstartAppMojo extends AbstractNbmMojo {
 

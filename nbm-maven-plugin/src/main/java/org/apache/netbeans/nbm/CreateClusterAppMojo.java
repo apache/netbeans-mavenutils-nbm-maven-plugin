@@ -48,7 +48,6 @@ import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
-import java.util.jar.Pack200;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -281,14 +280,8 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
                                             try (BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(fl))) {
                                                 InputStream instream = jf.getInputStream(ent);
                                                 if (ispack200) {
-                                                    try (JarOutputStream jos = new JarOutputStream(outstream)) {
-                                                        Pack200.Unpacker unp = Pack200.newUnpacker();
-                                                        GZIPInputStream gzip = new GZIPInputStream(instream);
-                                                        unp.unpack(gzip, jos);
-                                                    } catch (LinkageError cnfe) {
-                                                        throw new BuildException("Using jdk 14 and later prevents "
-                                                                + "reading of NBM created with pack200");
-                                                    }
+                                                    throw new BuildException("nbm-maven-plugin use jdk 21 built harness and cannot  "
+                                                            + "read of NBM created with pack200");
                                                 } else {
                                                     IOUtil.copy(instream, outstream);
                                                 }
