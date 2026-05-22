@@ -17,60 +17,49 @@ package org.apache.netbeans.nbm;
 
 import java.io.File;
 import java.util.Map;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import org.apache.maven.api.plugin.testing.InjectMojo;
+import org.apache.maven.api.plugin.testing.MojoExtension;
+import org.apache.maven.api.plugin.testing.MojoTest;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  */
-public class RunPlatformAppMojoTest extends AbstractMojoTestCase {
+@MojoTest
+class RunPlatformAppMojoTest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testInvalidPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/run-platform-jar/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        RunPlatformAppMojo runPlatformAppMojo = (RunPlatformAppMojo) lookupMojo("run-platform", pom);
+    @Test
+    @InjectMojo(goal = "run-platform", pom = "src/test/resources/unit/run-platform-jar/plugin-config.xml")
+    void testInvalidPackaging(RunPlatformAppMojo runPlatformAppMojo) throws Exception {
         assertNotNull(runPlatformAppMojo);
-        MojoFailureException incorrectpackaging = Assert.assertThrows(MojoFailureException.class, () -> runPlatformAppMojo.execute());
+        MojoFailureException incorrectpackaging = assertThrows(MojoFailureException.class, () -> runPlatformAppMojo.execute());
         assertEquals("The nbm:run-platform goal shall be used within a NetBeans Application project only ('nbm-application' packaging)", incorrectpackaging.getMessage());
     }
 
-    public void testValidPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/run-platform-nbm-application/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        String branding = "mybrand";
-
-        RunPlatformAppMojo runPlatformAppMojo = (RunPlatformAppMojo) lookupMojo("run-platform", pom);
+    @Test
+    @InjectMojo(goal = "run-platform", pom = "src/test/resources/unit/run-platform-nbm-application/plugin-config.xml")
+    void testValidPackaging(RunPlatformAppMojo runPlatformAppMojo) throws Exception {
         assertNotNull(runPlatformAppMojo);
-        Map<String, Object> variablesAndValuesFromObject = getVariablesAndValuesFromObject(runPlatformAppMojo);
+        String branding = "mybrand";
+        Map<String, Object> variablesAndValuesFromObject = MojoExtension.getVariablesAndValuesFromObject(runPlatformAppMojo);
         File output = new File(variablesAndValuesFromObject.get("outputDirectory").toString());
         output.mkdirs();
         File brandingfolder = new File(output, branding);
         brandingfolder.mkdirs();
         File userfolder = new File(output, "usertest");
         userfolder.createNewFile();
-        File dummyLauncher = new File(getBasedir(), "target/test-classes/unit/build-mac-nbm-application/dummyLauncher");
+        File dummyLauncher = new File(MojoExtension.getBasedir(), "target/test-classes/unit/build-mac-nbm-application/dummyLauncher");
         dummyLauncher.createNewFile();
-        setVariableValueToObject(runPlatformAppMojo, "brandingToken", branding);
-        setVariableValueToObject(runPlatformAppMojo, "netbeansUserdir", userfolder);
-        File fileapp = new File(getBasedir(), "target/test-classes/unit/build-mac-nbm-applicationa");
+        MojoExtension.setVariableValueToObject(runPlatformAppMojo, "brandingToken", branding);
+        MojoExtension.setVariableValueToObject(runPlatformAppMojo, "netbeansUserdir", userfolder);
+        File fileapp = new File(MojoExtension.getBasedir(), "target/test-classes/unit/build-mac-nbm-applicationa");
         fileapp.mkdirs();
-        MojoExecutionException executionfailure = Assert.assertThrows(MojoExecutionException.class, () -> runPlatformAppMojo.execute());
+        MojoExecutionException executionfailure = assertThrows(MojoExecutionException.class, () -> runPlatformAppMojo.execute());
         assertEquals("Failed executing NetBeans", executionfailure.getMessage());
     }
 

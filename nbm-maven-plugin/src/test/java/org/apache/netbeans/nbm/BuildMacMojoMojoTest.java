@@ -18,63 +18,52 @@ package org.apache.netbeans.nbm;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import org.apache.maven.api.plugin.testing.InjectMojo;
+import org.apache.maven.api.plugin.testing.MojoExtension;
+import org.apache.maven.api.plugin.testing.MojoTest;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  */
-public class BuildMacMojoMojoTest extends AbstractMojoTestCase {
+@MojoTest
+class BuildMacMojoMojoTest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testInvalidPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/build-mac-jar/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        BuildMacMojo buildmacMojo = (BuildMacMojo) lookupMojo("build-mac", pom);
+    @Test
+    @InjectMojo(goal = "build-mac", pom = "src/test/resources/unit/build-mac-jar/plugin-config.xml")
+    void testInvalidPackaging(BuildMacMojo buildmacMojo) throws Exception {
         assertNotNull(buildmacMojo);
-        MojoExecutionException incorrectpackaging = Assert.assertThrows(MojoExecutionException.class, () -> buildmacMojo.execute());
+        MojoExecutionException incorrectpackaging = assertThrows(MojoExecutionException.class, () -> buildmacMojo.execute());
         assertEquals("This goal only makes sense on project with 'nbm-application' packaging.", incorrectpackaging.getMessage());
     }
 
-    public void testValidPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/build-mac-nbm-application/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
+    @Test
+    @InjectMojo(goal = "build-mac", pom = "src/test/resources/unit/build-mac-nbm-application/plugin-config.xml")
+    void testValidPackaging(BuildMacMojo buildmacMojo) throws Exception {
         String branding = "mybrand";
         createDummyApp("project-build-mac-nbm-application", branding);
-
-        BuildMacMojo buildmacMojo = (BuildMacMojo) lookupMojo("build-mac", pom);
         assertNotNull(buildmacMojo);
-        Map<String, Object> variablesAndValuesFromObject = getVariablesAndValuesFromObject(buildmacMojo);
+        Map<String, Object> variablesAndValuesFromObject = MojoExtension.getVariablesAndValuesFromObject(buildmacMojo);
         File output = new File(variablesAndValuesFromObject.get("outputDirectory").toString());
         output.mkdirs();
         File brandingfolder = new File(output, branding);
         brandingfolder.mkdirs();
-        File dummyLauncher = new File(getBasedir(), "target/test-classes/unit/build-mac-nbm-application/dummyLauncher");
+        File dummyLauncher = new File(MojoExtension.getBasedir(), "target/test-classes/unit/build-mac-nbm-application/dummyLauncher");
         dummyLauncher.createNewFile();
-        setVariableValueToObject(buildmacMojo, "brandingToken", branding);
-        setVariableValueToObject(buildmacMojo, "macLauncherFile", dummyLauncher);
-        File fileapp = new File(getBasedir(), "target/test-classes/unit/build-mac-nbm-applicationa");
+        MojoExtension.setVariableValueToObject(buildmacMojo, "brandingToken", branding);
+        MojoExtension.setVariableValueToObject(buildmacMojo, "macLauncherFile", dummyLauncher);
+        File fileapp = new File(MojoExtension.getBasedir(), "target/test-classes/unit/build-mac-nbm-applicationa");
         fileapp.mkdirs();
 
         buildmacMojo.execute();
     }
 
     private void createDummyApp(String folder, String branding) throws IOException {
-        File file = new File(getBasedir(), "target/test-harness/" + folder + "/" + branding + ".app");
+        File file = new File(MojoExtension.getBasedir(), "target/test-harness/" + folder + "/" + branding + ".app");
         file.mkdirs();
         File bin = new File(file, "Contents/Resources/mybrand/bin");
         bin.mkdirs();

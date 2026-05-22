@@ -16,52 +16,37 @@
 package org.apache.netbeans.nbm;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.api.plugin.testing.InjectMojo;
+import org.apache.maven.api.plugin.testing.MojoExtension;
+
+import org.apache.maven.api.plugin.testing.MojoTest;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import static org.codehaus.plexus.PlexusTestCase.getBasedir;
-import org.junit.Assert;
-import static org.junit.Assert.assertThrows;
-import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  */
-public class CreateWebstartAppMojoTest extends AbstractMojoTestCase {
+@MojoTest
+class CreateWebstartAppMojoTest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testInvalidPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/webstart-app-simple/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateWebstartAppMojo createWebstartAppMojo = (CreateWebstartAppMojo) lookupMojo("webstart-app", pom);
-        setVariableValueToObject(createWebstartAppMojo, "brandingToken", "mybrand");
-        Map<String, Object> variablesAndValuesFromObject = getVariablesAndValuesFromObject(createWebstartAppMojo);
+    @Test
+    @InjectMojo(goal = "webstart-app", pom = "src/test/resources/unit/webstart-app-simple/plugin-config.xml")
+    void testInvalidPackaging(CreateWebstartAppMojo createWebstartAppMojo) throws Exception {
+        String branding = "mybrand";
+        MojoExtension.setVariableValueToObject(createWebstartAppMojo, "brandingToken", branding);
+        Map<String, Object> variablesAndValuesFromObject = MojoExtension.getVariablesAndValuesFromObject(createWebstartAppMojo);
         File output = new File(variablesAndValuesFromObject.get("outputDirectory").toString());
         output.mkdirs();
-        File outputbrand = new File(output, "mybrand");
+        File outputbrand = new File(output, branding);
         outputbrand.mkdirs();
         File outputbin = new File(outputbrand, "bin");
         outputbin.mkdirs();
-        MojoExecutionException incorrectpackaging = Assert.assertThrows(MojoExecutionException.class, () -> createWebstartAppMojo.execute());
+        MojoExecutionException incorrectpackaging = assertThrows(MojoExecutionException.class, () -> createWebstartAppMojo.execute());
         assertEquals("This goal only makes sense on project with nbm-application packaging.", incorrectpackaging.getMessage());
-    
+
     }
 
 }

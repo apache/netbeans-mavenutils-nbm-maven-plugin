@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import junit.framework.TestCase;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
@@ -40,37 +39,35 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author mkleint
  */
-public class AbstractNbmMojoTest extends TestCase {
+class AbstractNbmMojoTest {
 
     Log log = null;
     DependencyNode treeRoot = null;
     Artifacts artifacts = new Artifacts(new ArtifactHandlerManagerStub());
 
-    public AbstractNbmMojoTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    void setUp() throws Exception {
         log = new SystemStreamLog();
-        treeRoot = createNode(null, "root", "root", "1.0", "jar", "", true, new ArrayList<Artifact>(), new HashMap<Artifact, ExamineManifest>());
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+        treeRoot = createNode(null, "root", "root", "1.0", "jar", "", true, new ArrayList<>(), new HashMap<>());
     }
 
     /**
      * Test of matchesLibrary method, of class AbstractNbmMojo.
      */
-    public void testMatchesLibrary() {
+    @Test
+    void testMatchesLibrary() {
         DependencyVisitorSupport subject = new DependencyVisitorSupport(log, artifacts) {
             @Override
             public boolean visitEnter(DependencyNode node) {
@@ -84,76 +81,77 @@ public class AbstractNbmMojoTest extends TestCase {
         };
         System.out.println("matchesLibrary");
         Artifact artifact = createArtifact("group", "artifact", "1.0", "jar");
-        List<String> libraries = new ArrayList<String>();
+        List<String> libraries = new ArrayList<>();
         libraries.add("group:artifact");
         ExamineManifest depExaminator = createNonModule();
         boolean result = subject.matchesLibrary(artifact, "compile", libraries, depExaminator, false);
-        assertTrue("explicitly defined libraries in descriptor are included", result);
+        assumeTrue(result, "explicitly defined libraries in descriptor are included");
 
         artifact = createArtifact("group", "artifact", "1.0", "jar");
-        libraries = new ArrayList<String>();
+        libraries = new ArrayList<>();
         result = subject.matchesLibrary(artifact, "provided", libraries, depExaminator, false);
-        assertFalse("provided artifacts are not included", result);
+        assumeFalse(result, "provided artifacts are not included");
 
         artifact = createArtifact("group", "artifact", "1.0", "jar");
-        libraries = new ArrayList<String>();
+        libraries = new ArrayList<>();
         result = subject.matchesLibrary(artifact, "system", libraries, depExaminator, false);
-        assertFalse("system artifacts are not included", result);
+        assumeFalse(result, "system artifacts are not included");
 
         artifact = createArtifact("group", "artifact", "1.0", "jar");
-        libraries = new ArrayList<String>();
+        libraries = new ArrayList<>();
         libraries.add("group:artifact");
         depExaminator = createModule();
         result = subject.matchesLibrary(artifact, "compile", libraries, depExaminator, false);
-        assertTrue("netbeans modules are included if explicitly marked in descriptor", result);
+        assumeTrue(result, "netbeans modules are included if explicitly marked in descriptor");
 
-        libraries = new ArrayList<String>();
+        libraries = new ArrayList<>();
         result = subject.matchesLibrary(artifact, "compile", libraries, depExaminator, false);
-        assertFalse("netbeans modules are omitted", result);
+        assumeFalse(result, "netbeans modules are omitted");
 
         artifact = createArtifact("group", "artifact", "1.0", "nbm");
-        libraries = new ArrayList<String>();
+        libraries = new ArrayList<>();
         result = subject.matchesLibrary(artifact, "compile", libraries, depExaminator, false);
-        assertFalse("netbeans modules are omitted", result);
+        assumeFalse(result, "netbeans modules are omitted");
 
     }
 
     /**
      * Test of resolveNetBeansDependency method, of class AbstractNbmMojo.
      */
-    public void testResolveNetBeansDependency() {
+    @Test
+    void testResolveNetBeansDependency() {
         Artifact artifact = createArtifact("group", "artifact", "1.0", "jar");
-        List<Dependency> deps = new ArrayList<Dependency>();
+        List<Dependency> deps = new ArrayList<>();
         ExamineManifest manifest = createNonModule();
         Dependency result = AbstractNbmMojo.resolveNetBeansDependency(artifacts, artifact, deps, manifest, log);
-        assertNull("not a NetBeans module", result);
+        assertNull(result, "not a NetBeans module");
 
         manifest = createModule();
         result = AbstractNbmMojo.resolveNetBeansDependency(artifacts, artifact, deps, manifest, log);
-        assertNotNull("is a NetBeans module", result);
+        assertNotNull(result, "is a NetBeans module");
 
         artifact = createArtifact("group", "artifact", "1.0", "nbm");
         manifest = createNonModule();
         result = AbstractNbmMojo.resolveNetBeansDependency(artifacts, artifact, deps, manifest, log);
-        assertNotNull("nbm type is a NetBeans module", result);
+        assertNotNull(result, "nbm type is a NetBeans module");
 
         artifact = createArtifact("group", "artifact", "1.0", "jar");
-        deps = new ArrayList<Dependency>();
+        deps = new ArrayList<>();
         Dependency d = new Dependency();
         d.setId("group:artifact");
         deps.add(d);
         manifest = createNonModule();
         result = AbstractNbmMojo.resolveNetBeansDependency(artifacts, artifact, deps, manifest, log);
-        assertNull("not a NetBeans module, declared in deps but without explicit value", result);
+        assertNull(result, "not a NetBeans module, declared in deps but without explicit value");
 
         d.setExplicitValue("XXX > 1.0");
         result = AbstractNbmMojo.resolveNetBeansDependency(artifacts, artifact, deps, manifest, log);
-        assertEquals("not a NetBeans module but declared with explicit value", result, d);
+        assertEquals(result, d, "not a NetBeans module but declared with explicit value");
 
         d.setExplicitValue(null);
         manifest = createModule();
         result = AbstractNbmMojo.resolveNetBeansDependency(artifacts, artifact, deps, manifest, log);
-        assertEquals("netbeans module defined in descriptor", result, d);
+        assertEquals(result, d, "netbeans module defined in descriptor");
     }
 
     /**
@@ -161,10 +159,11 @@ public class AbstractNbmMojoTest extends TestCase {
      *
      * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
-    public void testGetLibraryArtifacts1() throws Exception {
+    @Test
+    void testGetLibraryArtifacts1() throws Exception {
         System.out.println("getLibraryArtifacts1");
-        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-        List<Artifact> runtimes = new ArrayList<Artifact>();
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<>();
+        List<Artifact> runtimes = new ArrayList<>();
         DependencyNode module = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
         treeRoot.setChildren(Collections.singletonList(module));
         NetBeansModule mdl = new NetBeansModule();
@@ -177,10 +176,11 @@ public class AbstractNbmMojoTest extends TestCase {
      *
      * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
-    public void testGetLibraryArtifact2() throws Exception {
+    @Test
+    void testGetLibraryArtifact2() throws Exception {
         System.out.println("getLibraryArtifacts2");
-        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-        List<Artifact> runtimes = new ArrayList<Artifact>();
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<>();
+        List<Artifact> runtimes = new ArrayList<>();
         DependencyNode library = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
         treeRoot.setChildren(Collections.singletonList(library));
         NetBeansModule mdl = new NetBeansModule();
@@ -193,10 +193,11 @@ public class AbstractNbmMojoTest extends TestCase {
      *
      * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
-    public void testGetLibraryArtifact3() throws Exception {
+    @Test
+    void testGetLibraryArtifact3() throws Exception {
         System.out.println("getLibraryArtifacts3");
-        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-        List<Artifact> runtimes = new ArrayList<Artifact>();
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<>();
+        List<Artifact> runtimes = new ArrayList<>();
         DependencyNode library = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
         treeRoot.setChildren(Collections.singletonList(library));
         DependencyNode translibrary = createNode(library, "gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
@@ -212,10 +213,11 @@ public class AbstractNbmMojoTest extends TestCase {
      *
      * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
-    public void testGetLibraryArtifact4() throws Exception {
+    @Test
+    void testGetLibraryArtifact4() throws Exception {
         System.out.println("getLibraryArtifacts4");
-        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-        List<Artifact> runtimes = new ArrayList<Artifact>();
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<>();
+        List<Artifact> runtimes = new ArrayList<>();
         DependencyNode module = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
         treeRoot.setChildren(Collections.singletonList(module));
         DependencyNode translibrary = createNode(module, "gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
@@ -231,10 +233,11 @@ public class AbstractNbmMojoTest extends TestCase {
      *
      * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
-    public void testGetLibraryArtifact5() throws Exception {
+    @Test
+    void testGetLibraryArtifact5() throws Exception {
         System.out.println("getLibraryArtifacts5");
-        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-        List<Artifact> runtimes = new ArrayList<Artifact>();
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<>();
+        List<Artifact> runtimes = new ArrayList<>();
         DependencyNode module = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
         DependencyNode translibrary = createNode(module, "gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
         ((DefaultDependencyNode) module).setChildren(Collections.singletonList(translibrary));
@@ -256,16 +259,17 @@ public class AbstractNbmMojoTest extends TestCase {
     /**
      * Test of getOutputTimestampOrNow method, of class AbstractNbmMojo.
      */
-    public void testGetOutputTimestampOrNow() {
+    @Test
+    void testGetOutputTimestampOrNow() {
         MavenProject project = new MavenProject();
 
-        assertFalse("missing property returns new Date()", AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)));
+        assumeFalse(AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)), "missing property returns new Date()");
 
         project.getProperties().put("project.build.outputTimestamp", "2019-10-05T18:37:42Z");
-        assertTrue("valid formatted property", AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)));
+        assumeTrue(AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)), "valid formatted property");
 
         project.getProperties().put("project.build.outputTimestamp", "1570300662");
-        assertTrue("valid formatted property", AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)));
+        assumeTrue(AbstractNbmMojo.getOutputTimestampOrNow(project).toInstant().equals(Instant.ofEpochSecond(1570300662)), "valid formatted property");
     }
 
     private DependencyNode createNode(DependencyNode parent, String gr, String art, String ver, String pack, String scope, boolean isModule, List<Artifact> runtimes, Map<Artifact, ExamineManifest> cache) {

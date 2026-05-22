@@ -22,28 +22,30 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.netbeans.nbm.stubs.ArtifactHandlerManagerStub;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
-public class CreateNetBeansFileStructureTest extends AbstractMojoTestCase {
+class CreateNetBeansFileStructureTest {
 
-    public void testWriteExternal() throws Exception {
+    @Test
+    void testWriteExternal() throws Exception {
 
-        String version = "4.13.2";  // TODO must be in local repo downloaded by other means -> fix this test!
+        String version = "6.1.0";  // TODO must be in local repo downloaded by other means -> fix this test!
 
         String localRepository = System.getProperty("localRepository");
-        String path = "junit/junit/" + version + "/junit-" + version + ".jar";
-        File junitFile  = new File(new File(localRepository), path);
-        Artifact a = new DefaultArtifact("junit", "junit", "jar", version).setFile(junitFile);
+        String path = "org/junit/jupiter/junit-jupiter/" + version + "/junit-jupiter-" + version + ".jar";
+        File junitFile = new File(new File(localRepository), path);
+        Artifact a = new DefaultArtifact("org.junit.jupiter", "junit-jupiter", "jar", version).setFile(junitFile);
         StringWriter w = new StringWriter();
         CreateNetBeansFileStructure.writeExternal(new Artifacts(new ArtifactHandlerManagerStub()), new PrintWriter(w), a);
         assertEquals(
-                "CRC:1161534166\n"
-                + "SIZE:384581\n"
-                + "URL:m2:/junit:junit:" + version + ":jar\n"
-                + "URL:http://repo.maven.apache.org/maven2/junit/junit/" + version + "/junit-" + version + ".jar\n",
+                "CRC:1362182011\n"
+                + "SIZE:6375\n"
+                + "URL:m2:/org.junit.jupiter:junit-jupiter:" + version + ":jar\n"
+                + "URL:http://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter/" + version + "/junit-jupiter-" + version + ".jar\n",
                 w.toString()
         );
     }

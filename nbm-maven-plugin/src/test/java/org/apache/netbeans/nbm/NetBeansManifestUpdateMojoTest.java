@@ -22,22 +22,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
-import junit.framework.TestCase;
-import org.apache.maven.project.DefaultProjectDependenciesResolver;
-import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.tools.ant.taskdefs.Manifest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author mkleint
  */
-public class NetBeansManifestUpdateMojoTest extends TestCase {
+class NetBeansManifestUpdateMojoTest {
 
-    public NetBeansManifestUpdateMojoTest(String testName) {
-        super(testName);
-    }
-
-    public void testCreateCompiledPatternList() {
+    @Test
+    void testCreateCompiledPatternList() {
         List<String> subpackages = Arrays.asList(new String[]{
             "org.milos.**",
             "org.tomas.**"
@@ -72,7 +70,8 @@ public class NetBeansManifestUpdateMojoTest extends TestCase {
         return false;
     }
 
-    public void testShorten() {
+    @Test
+    void testShorten() {
         Locale old = Locale.getDefault();
         Locale.setDefault(Locale.US);
         try {
@@ -87,7 +86,8 @@ public class NetBeansManifestUpdateMojoTest extends TestCase {
         }
     }
 
-    public void testNewlines() throws Exception {
+    @Test
+    void testNewlines() throws Exception {
         Manifest m = new Manifest();
         Manifest.Section s = m.getMainSection();
         NetBeansManifestUpdateMojo.conditionallyAddAttribute(s, "Desc", "Something.\n   Else.\n");
