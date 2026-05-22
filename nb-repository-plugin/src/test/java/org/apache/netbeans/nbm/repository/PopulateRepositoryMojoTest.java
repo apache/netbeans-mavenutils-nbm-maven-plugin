@@ -18,8 +18,6 @@ package org.apache.netbeans.nbm.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
-import java.io.File;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
@@ -30,7 +28,10 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.deployment.DeploymentException;
 import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
 import org.eclipse.aether.internal.impl.DefaultLocalPathPrefixComposerFactory;
 import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
@@ -39,8 +40,15 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
+import java.io.File;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -111,6 +119,135 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         assertEquals("ca70822c47a67fc3a11670270567c2d01566dae1", PopulateRepositoryMojo.encode(new byte[]{
             (byte) 0xca, (byte) 0x70, (byte) 0x82, (byte) 0x2c, (byte) 0x47, (byte) 0xa6, (byte) 0x7f, (byte) 0xc3, (byte) 0xa1, (byte) 0x16,
             (byte) 0x70, (byte) 0x27, (byte) 0x05, (byte) 0x67, (byte) 0xc2, (byte) 0xd0, (byte) 0x15, (byte) 0x66, (byte) 0xda, (byte) 0xe1,}));
+    }
+
+    public void testRetryFailedDeploymentCount_Default() throws Exception {
+        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
+        MavenSession session = createMavenSession();
+        setVariableValueToObject(mojo, "session", session);
+
+        // Mock repository system
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+
+        // Create a deploy request
+        DeployRequest deployRequest = new DeployRequest();
+
+        // Default: 0 retries => 1 attempt; success on first try
+        doAnswer(invocation -> null).when(repositorySystem).deploy(any(), any(DeployRequest.class));
+
+        mojo.deploy(deployRequest);
+
+        verify(repositorySystem, times(1)).deploy(any(), any(DeployRequest.class));
+    }
+
+    public void testRetryFailedDeploymentCount_CustomValue() throws Exception {
+        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
+        MavenSession session = createMavenSession();
+        setVariableValueToObject(mojo, "session", session);
+
+        // 2 retries => 3 attempts total (1 initial + 2 retries)
+        setVariableValueToObject(mojo, "retryFailedDeploymentCount", 2);
+
+        // Mock repository system
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+
+        // Create a deploy request
+        DeployRequest deployRequest = new DeployRequest();
+
+        doThrow(new DeploymentException("Temporary failure"))
+                .doThrow(new DeploymentException("Temporary failure"))
+                .doAnswer(invocation -> null)
+                .when(repositorySystem).deploy(any(), any(DeployRequest.class));
+
+        mojo.deploy(deployRequest);
+
+        verify(repositorySystem, times(3)).deploy(any(), any(DeployRequest.class));
+    }
+
+    public void testRetryFailedDeploymentCount_ZeroRetriesSingleAttemptOnFailure() throws Exception {
+        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
+        MavenSession session = createMavenSession();
+        setVariableValueToObject(mojo, "session", session);
+
+        // 0 retries => 1 attempt total (initial attempt only)
+        setVariableValueToObject(mojo, "retryFailedDeploymentCount", 0);
+
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+
+        DeployRequest deployRequest = new DeployRequest();
+
+        doThrow(new DeploymentException("Deployment failed"))
+                .when(repositorySystem).deploy(any(), any(DeployRequest.class));
+
+        try {
+            mojo.deploy(deployRequest);
+            fail("Expected MojoExecutionException");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Error deploying artifact"));
+        }
+
+        // max(0, 0) + 1 = 1 deploy call
+        verify(repositorySystem, times(1)).deploy(any(), any(DeployRequest.class));
+    }
+
+    public void testRetryFailedDeploymentCount_NegativeClampedToZeroRetries() throws Exception {
+        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
+        MavenSession session = createMavenSession();
+        setVariableValueToObject(mojo, "session", session);
+
+        // Negative retry count is clamped to 0 => 1 attempt total
+        setVariableValueToObject(mojo, "retryFailedDeploymentCount", -5);
+
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+
+        DeployRequest deployRequest = new DeployRequest();
+
+        doThrow(new DeploymentException("Deployment failed"))
+                .when(repositorySystem).deploy(any(), any(DeployRequest.class));
+
+        try {
+            mojo.deploy(deployRequest);
+            fail("Expected MojoExecutionException");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Error deploying artifact"));
+        }
+
+        // max(0, -5) + 1 = 1 deploy call
+        verify(repositorySystem, times(1)).deploy(any(), any(DeployRequest.class));
+    }
+
+    public void testRetryFailedDeploymentCount_AllAttemptsFailure() throws Exception {
+        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
+        MavenSession session = createMavenSession();
+        setVariableValueToObject(mojo, "session", session);
+
+        // 3 retries => 4 attempts total (1 initial + 3 retries)
+        setVariableValueToObject(mojo, "retryFailedDeploymentCount", 3);
+
+        // Mock repository system
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+
+        // Create a deploy request
+        DeployRequest deployRequest = new DeployRequest();
+
+        // Always fail
+        doThrow(new DeploymentException("Persistent failure"))
+                .when(repositorySystem).deploy(any(), any(DeployRequest.class));
+
+        // Call deploy - should throw exception after all retries exhausted
+        try {
+            mojo.deploy(deployRequest);
+            fail("Expected MojoExecutionException");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Error deploying artifact"));
+        }
+
+        verify(repositorySystem, times(4)).deploy(any(), any(DeployRequest.class));
     }
 
     private MavenSession createMavenSession() throws NoLocalRepositoryManagerException {

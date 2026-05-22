@@ -230,6 +230,15 @@ public class PopulateRepositoryMojo
     private String dependencyRepositoryId;
 
     /**
+     * Number of times to retry a failed deployment. A value of {@code 0} means
+     * a single attempt with no retries (the default). Must be at least {@code 0}.
+     *
+     * @since 15.0
+     */
+    @Parameter(defaultValue = "0", property = "retryFailedDeploymentCount")
+    private int retryFailedDeploymentCount;
+
+    /**
      * Colon separated artefact coordinate groupId:artefactId:version that
      * represent parent to be used
      *
@@ -533,28 +542,22 @@ public class PopulateRepositoryMojo
                             install(nbmArt.setFile(nbm));
                         }
                     }
-                    try {
-                        if (deploymentRepository != null) {
-                            DeployRequest deployRequest = new DeployRequest();
-                            deployRequest.setRepository(deploymentRepository);
-                            deployRequest.setTrace(RequestTrace.newChild(null, "nb-repository-plugin"));
-                            deployRequest.addArtifact(art.setFile(moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar));
-                            if (pom != null) {
-                                deployRequest.addArtifact(pomArt.setFile(pom));
-                            }
-                            if (javadoc != null) {
-                                deployRequest.addArtifact(javadocArt.setFile(javadoc));
-                            }
-                            if (source != null) {
-                                deployRequest.addArtifact(sourceArt.setFile(source));
-                            }
-                            if (nbm != null) {
-                                deployRequest.addArtifact(nbmArt.setFile(nbm));
-                            }
-                            repositorySystem.deploy(session.getRepositorySession(), deployRequest);
+                    if (deploymentRepository != null) {
+                        DeployRequest deployRequest = newDeployRequest(deploymentRepository);
+                        deployRequest.addArtifact(art.setFile(moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar));
+                        if (pom != null) {
+                            deployRequest.addArtifact(pomArt.setFile(pom));
                         }
-                    } catch (DeploymentException ex) {
-                        throw new MojoExecutionException("Error Deploying artifact", ex);
+                        if (javadoc != null) {
+                            deployRequest.addArtifact(javadocArt.setFile(javadoc));
+                        }
+                        if (source != null) {
+                            deployRequest.addArtifact(sourceArt.setFile(source));
+                        }
+                        if (nbm != null) {
+                            deployRequest.addArtifact(nbmArt.setFile(nbm));
+                        }
+                        deploy(deployRequest);
                     }
                 } finally {
                     if (moduleJarMinusCP != null) {
@@ -590,18 +593,11 @@ public class PopulateRepositoryMojo
                     install(pomArt.setFile(pom));
                     install(art.setFile(ex.getFile()));
                 }
-                try {
-                    if (deploymentRepository != null) {
-                        DeployRequest deployRequest = new DeployRequest();
-                        deployRequest.setRepository(deploymentRepository);
-                        deployRequest.setTrace(RequestTrace.newChild(null, "nb-repository-plugin"));
-                        deployRequest.addArtifact(pomArt.setFile(pom));
-                        deployRequest.addArtifact(art.setFile(ex.getFile()));
-
-                        repositorySystem.deploy(session.getRepositorySession(), deployRequest);
-                    }
-                } catch (DeploymentException exc) {
-                    throw new MojoExecutionException("Error Deploying artifact", exc);
+                if (deploymentRepository != null) {
+                    DeployRequest deployRequest = newDeployRequest(deploymentRepository);
+                    deployRequest.addArtifact(pomArt.setFile(pom));
+                    deployRequest.addArtifact(art.setFile(ex.getFile()));
+                    deploy(deployRequest);
                 }
             }
         }
@@ -620,17 +616,10 @@ public class PopulateRepositoryMojo
                 if (!skipLocalInstall) {
                     install(art.setFile(pom));
                 }
-                try {
-                    if (deploymentRepository != null) {
-                        DeployRequest deployRequest = new DeployRequest();
-                        deployRequest.setRepository(deploymentRepository);
-                        deployRequest.setTrace(RequestTrace.newChild(null, "nb-repository-plugin"));
-                        deployRequest.addArtifact(art.setFile(pom));
-
-                        repositorySystem.deploy(session.getRepositorySession(), deployRequest);
-                    }
-                } catch (DeploymentException ex) {
-                    throw new MojoExecutionException("Error Deploying artifact", ex);
+                if (deploymentRepository != null) {
+                    DeployRequest deployRequest = newDeployRequest(deploymentRepository);
+                    deployRequest.addArtifact(art.setFile(pom));
+                    deploy(deployRequest);
                 }
             }
 
@@ -648,6 +637,32 @@ public class PopulateRepositoryMojo
             // TODO: install exception that does not give a trace
             throw new MojoExecutionException("Error installing artifact", e);
         }
+    }
+
+    DeployRequest newDeployRequest(RemoteRepository deploymentRepository) {
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setRepository(deploymentRepository);
+        deployRequest.setTrace(RequestTrace.newChild(null, "nb-repository-plugin"));
+        return deployRequest;
+    }
+
+    void deploy(DeployRequest deployRequest)
+            throws MojoExecutionException {
+        int attempts = Math.max(0, retryFailedDeploymentCount) + 1;
+        DeploymentException lastException = null;
+        for (int attempt = 1; attempt <= attempts; attempt++) {
+            try {
+                repositorySystem.deploy(session.getRepositorySession(), deployRequest);
+                return;
+            } catch (DeploymentException ex) {
+                lastException = ex;
+                if (attempt < attempts) {
+                    getLog().warn("Deployment attempt " + attempt + "/" + attempts + " failed, retrying. "
+                            + ex.getMessage());
+                }
+            }
+        }
+        throw new MojoExecutionException("Error deploying artifact", lastException);
     }
 
     //performs the same tasks as the MavenProjectHelper
