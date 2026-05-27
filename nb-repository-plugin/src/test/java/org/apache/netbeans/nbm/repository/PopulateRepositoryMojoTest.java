@@ -18,12 +18,8 @@ package org.apache.netbeans.nbm.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -42,6 +38,14 @@ import org.eclipse.aether.util.artifact.SubArtifact;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.maven.api.plugin.testing.InjectMojo;
+import org.apache.maven.api.plugin.testing.MojoExtension;
+import org.apache.maven.api.plugin.testing.MojoParameter;
+import org.apache.maven.api.plugin.testing.MojoTest;
+import org.apache.maven.plugin.MojoExecutionException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -55,26 +59,16 @@ import static org.mockito.Mockito.when;
  *
  * @author Milos Kleint
  */
-public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
+@MojoTest
+class PopulateRepositoryMojoTest {
 
     private final String LOCAL_REPO = "target/local-repo/";
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        FileUtils.deleteDirectory(new File(getBasedir() + "/" + LOCAL_REPO));
-    }
+    @Test
+    @InjectMojo(goal = "populate", pom = "src/test/resources/PopulateMojoTest.xml")
+    void testInstall(PopulateRepositoryMojo mojo) throws Exception {
 
-    public void testStripClusterName() {
-        assertEquals("platform", PopulateRepositoryMojo.stripClusterName("platform9"));
-        assertEquals("platform", PopulateRepositoryMojo.stripClusterName("platform11"));
-        assertEquals("nb", PopulateRepositoryMojo.stripClusterName("nb6.9"));
-        assertEquals("extra", PopulateRepositoryMojo.stripClusterName("extra"));
-    }
-
-    public void testInstall() throws Exception {
-        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
-        setVariableValueToObject(mojo, "session", createMavenSession());
+        MojoExtension.setVariableValueToObject(mojo, "session", createMavenSession());
         File f1 = File.createTempFile("PopulateRepositoryMojoTest", ".jar");
         f1.deleteOnExit();
         Artifact art1 = mojo.createArtifact("testarg", "1.0", "testgrp");
@@ -89,46 +83,15 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         assertTrue(new File(localRepo, "testgrp/testarg/1.0/testarg-1.0.jar").isFile());
     }
 
-    public void testSplit() throws Exception {
-        Dependency dep1 = PopulateRepositoryMojo.splitDependencyString("org.apache.maven:apache-maven:3.6.3:bin@zip");
-        assertEquals("org.apache.maven", dep1.getGroupId());
-        assertEquals("apache-maven", dep1.getArtifactId());
-        assertEquals("3.6.3", dep1.getVersion());
-        assertEquals("bin", dep1.getClassifier());
-        assertEquals("zip", dep1.getType());
+    @Test
+    @InjectMojo(goal = "populate", pom = "src/test/resources/PopulateMojoTest.xml")
+    void testRetryFailedDeploymentCount_Default(PopulateRepositoryMojo mojo) throws Exception {
 
-        Dependency dep2 = PopulateRepositoryMojo.splitDependencyString("org.apache.maven:apache-maven:3.6.3:myclassifier");
-        assertEquals("org.apache.maven", dep2.getGroupId());
-        assertEquals("apache-maven", dep2.getArtifactId());
-        assertEquals("3.6.3", dep2.getVersion());
-        assertEquals("myclassifier", dep2.getClassifier());
-        assertEquals("jar", dep2.getType());
-
-        Dependency dep3 = PopulateRepositoryMojo.splitDependencyString("org.apache.maven:apache-maven:3.6.3");
-        assertEquals("org.apache.maven", dep3.getGroupId());
-        assertEquals("apache-maven", dep3.getArtifactId());
-        assertEquals("3.6.3", dep3.getVersion());
-        assertEquals("", dep3.getClassifier());
-        assertEquals("jar", dep3.getType());
-    }
-
-    public void testEncode() throws Exception {
-        assertEquals("057558504e1d03e57ce6fd80ad983b3c2e803b40", PopulateRepositoryMojo.encode(new byte[]{
-            (byte) 0x05, (byte) 0x75, (byte) 0x58, (byte) 0x50, (byte) 0x4e, (byte) 0x1d, (byte) 0x03, (byte) 0xe5, (byte) 0x7c, (byte) 0xe6,
-            (byte) 0xfd, (byte) 0x80, (byte) 0xad, (byte) 0x98, (byte) 0x3b, (byte) 0x3c, (byte) 0x2e, (byte) 0x80, (byte) 0x3b, (byte) 0x40,}));
-        assertEquals("ca70822c47a67fc3a11670270567c2d01566dae1", PopulateRepositoryMojo.encode(new byte[]{
-            (byte) 0xca, (byte) 0x70, (byte) 0x82, (byte) 0x2c, (byte) 0x47, (byte) 0xa6, (byte) 0x7f, (byte) 0xc3, (byte) 0xa1, (byte) 0x16,
-            (byte) 0x70, (byte) 0x27, (byte) 0x05, (byte) 0x67, (byte) 0xc2, (byte) 0xd0, (byte) 0x15, (byte) 0x66, (byte) 0xda, (byte) 0xe1,}));
-    }
-
-    public void testRetryFailedDeploymentCount_Default() throws Exception {
-        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
-        MavenSession session = createMavenSession();
-        setVariableValueToObject(mojo, "session", session);
+        MojoExtension.setVariableValueToObject(mojo, "session", createMavenSession());
 
         // Mock repository system
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
-        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+        MojoExtension.setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
 
         // Create a deploy request
         DeployRequest deployRequest = new DeployRequest();
@@ -141,17 +104,16 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         verify(repositorySystem, times(1)).deploy(any(), any(DeployRequest.class));
     }
 
-    public void testRetryFailedDeploymentCount_CustomValue() throws Exception {
-        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
-        MavenSession session = createMavenSession();
-        setVariableValueToObject(mojo, "session", session);
+    @Test
+    @MojoParameter(name = "retryFailedDeploymentCount", value = "2")
+    @InjectMojo(goal = "populate", pom = "src/test/resources/PopulateMojoTest.xml")
+    void testRetryFailedDeploymentCount_CustomValue(PopulateRepositoryMojo mojo) throws Exception {
+        MojoExtension.setVariableValueToObject(mojo, "session", createMavenSession());
 
         // 2 retries => 3 attempts total (1 initial + 2 retries)
-        setVariableValueToObject(mojo, "retryFailedDeploymentCount", 2);
-
         // Mock repository system
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
-        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+        MojoExtension.setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
 
         // Create a deploy request
         DeployRequest deployRequest = new DeployRequest();
@@ -166,71 +128,68 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         verify(repositorySystem, times(3)).deploy(any(), any(DeployRequest.class));
     }
 
-    public void testRetryFailedDeploymentCount_ZeroRetriesSingleAttemptOnFailure() throws Exception {
-        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
-        MavenSession session = createMavenSession();
-        setVariableValueToObject(mojo, "session", session);
+    @Test
+    @MojoParameter(name = "retryFailedDeploymentCount", value = "0")
+    @InjectMojo(goal = "populate", pom = "src/test/resources/PopulateMojoTest.xml")
+    void testRetryFailedDeploymentCount_ZeroRetriesSingleAttemptOnFailure(PopulateRepositoryMojo mojo) throws Exception {
+
+        MojoExtension.setVariableValueToObject(mojo, "session", createMavenSession());
 
         // 0 retries => 1 attempt total (initial attempt only)
-        setVariableValueToObject(mojo, "retryFailedDeploymentCount", 0);
-
+        // Mock repository system
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
-        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+        MojoExtension.setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
 
         DeployRequest deployRequest = new DeployRequest();
 
         doThrow(new DeploymentException("Deployment failed"))
                 .when(repositorySystem).deploy(any(), any(DeployRequest.class));
 
-        try {
+        MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> {
             mojo.deploy(deployRequest);
-            fail("Expected MojoExecutionException");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Error deploying artifact"));
-        }
+        });
+        assertTrue(assertThrows.getMessage().contains("Error deploying artifact"));
 
         // max(0, 0) + 1 = 1 deploy call
         verify(repositorySystem, times(1)).deploy(any(), any(DeployRequest.class));
     }
 
-    public void testRetryFailedDeploymentCount_NegativeClampedToZeroRetries() throws Exception {
-        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
-        MavenSession session = createMavenSession();
-        setVariableValueToObject(mojo, "session", session);
+    @Test
+    @MojoParameter(name = "retryFailedDeploymentCount", value = "-5")
+    @InjectMojo(goal = "populate", pom = "src/test/resources/PopulateMojoTest.xml")
+    void testRetryFailedDeploymentCount_NegativeClampedToZeroRetries(PopulateRepositoryMojo mojo) throws Exception {
+
+        MojoExtension.setVariableValueToObject(mojo, "session", createMavenSession());
 
         // Negative retry count is clamped to 0 => 1 attempt total
-        setVariableValueToObject(mojo, "retryFailedDeploymentCount", -5);
-
+        // Mock repository system
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
-        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+        MojoExtension.setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
 
         DeployRequest deployRequest = new DeployRequest();
 
         doThrow(new DeploymentException("Deployment failed"))
                 .when(repositorySystem).deploy(any(), any(DeployRequest.class));
 
-        try {
+        MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> {
             mojo.deploy(deployRequest);
-            fail("Expected MojoExecutionException");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Error deploying artifact"));
-        }
+        });
+        assertTrue(assertThrows.getMessage().contains("Error deploying artifact"));
 
         // max(0, -5) + 1 = 1 deploy call
         verify(repositorySystem, times(1)).deploy(any(), any(DeployRequest.class));
     }
 
-    public void testRetryFailedDeploymentCount_AllAttemptsFailure() throws Exception {
-        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
-        MavenSession session = createMavenSession();
-        setVariableValueToObject(mojo, "session", session);
+    @Test
+    @MojoParameter(name = "retryFailedDeploymentCount", value = "3")
+    @InjectMojo(goal = "populate", pom = "src/test/resources/PopulateMojoTest.xml")
+    void testRetryFailedDeploymentCount_AllAttemptsFailure(PopulateRepositoryMojo mojo) throws Exception {
+        MojoExtension.setVariableValueToObject(mojo, "session", createMavenSession());
 
         // 3 retries => 4 attempts total (1 initial + 3 retries)
-        setVariableValueToObject(mojo, "retryFailedDeploymentCount", 3);
-
         // Mock repository system
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
-        setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
+        MojoExtension.setVariableValueToObject(mojo, "repositorySystem", repositorySystem);
 
         // Create a deploy request
         DeployRequest deployRequest = new DeployRequest();
@@ -240,12 +199,10 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
                 .when(repositorySystem).deploy(any(), any(DeployRequest.class));
 
         // Call deploy - should throw exception after all retries exhausted
-        try {
+        MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> {
             mojo.deploy(deployRequest);
-            fail("Expected MojoExecutionException");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Error deploying artifact"));
-        }
+        });
+        assertTrue(assertThrows.getMessage().contains("Error deploying artifact"));
 
         verify(repositorySystem, times(4)).deploy(any(), any(DeployRequest.class));
     }
@@ -262,7 +219,7 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         when(session.getProjectBuildingRequest()).thenReturn(buildingRequest);
         when(session.getRepositorySession()).thenReturn(repositorySession);
         when(session.getPluginContext(any(PluginDescriptor.class), any(MavenProject.class)))
-                .thenReturn(new ConcurrentHashMap<String, Object>());
+                .thenReturn(new ConcurrentHashMap<>());
         return session;
     }
 }

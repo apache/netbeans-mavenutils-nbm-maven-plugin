@@ -16,44 +16,30 @@
 package org.apache.netbeans.nbm;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import static org.codehaus.plexus.PlexusTestCase.getBasedir;
-import static org.junit.Assert.assertThrows;
-import org.mockito.Mockito;
+import org.apache.maven.api.plugin.testing.InjectMojo;
+import org.apache.maven.api.plugin.testing.MojoExtension;
+import org.apache.maven.api.plugin.testing.MojoTest;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  */
-public class CreateStandaloneMojoTest extends AbstractMojoTestCase {
+@MojoTest
+class CreateStandaloneMojoTest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
+    @Test
+    @InjectMojo(goal = "standalone-zip", pom = "src/test/resources/unit/standalone-zip-simple/plugin-config.xml")
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
+    void testInvalidPackaging(CreateStandaloneMojo createStandaloneMojo) throws Exception {
+        String branding = "mybrand";
 
-    public void testInvalidPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/standalone-zip-simple/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateStandaloneMojo createStandaloneMojo = (CreateStandaloneMojo) lookupMojo("standalone-zip", pom);
-        setVariableValueToObject(createStandaloneMojo, "brandingToken", "mybrand");
-        Map<String, Object> variablesAndValuesFromObject = getVariablesAndValuesFromObject(createStandaloneMojo);
+        MojoExtension.setVariableValueToObject(createStandaloneMojo, "brandingToken", branding);
+
+        Map<String, Object> variablesAndValuesFromObject = MojoExtension.getVariablesAndValuesFromObject(createStandaloneMojo);
         File output = new File(variablesAndValuesFromObject.get("outputDirectory").toString());
         output.mkdirs();
-        File outputbrand = new File(output, "mybrand");
+        File outputbrand = new File(output, branding);
         outputbrand.mkdirs();
         File outputbin = new File(outputbrand, "bin");
         outputbin.mkdirs();

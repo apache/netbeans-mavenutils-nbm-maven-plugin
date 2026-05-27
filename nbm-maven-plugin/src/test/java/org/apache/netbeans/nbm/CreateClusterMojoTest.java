@@ -27,54 +27,45 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import org.apache.maven.api.plugin.testing.InjectMojo;
+import org.apache.maven.api.plugin.testing.MojoExtension;
+import org.apache.maven.api.plugin.testing.MojoParameter;
+import org.apache.maven.api.plugin.testing.MojoTest;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugin.testing.stubs.ArtifactStub;
 import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
 import org.apache.maven.project.MavenProject;
-import static org.codehaus.plexus.PlexusTestCase.getBasedir;
-import static org.junit.Assert.assertThrows;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
  *
  */
-public class CreateClusterMojoTest extends AbstractMojoTestCase {
+@MojoTest
+class CreateClusterMojoTest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testEmptyProject() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-simple/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateClusterMojo createclustermojo = (CreateClusterMojo) lookupMojo("cluster", pom);
+    @Test
+    @InjectMojo(goal = "cluster", pom = "src/test/resources/unit/cluster-simple/plugin-config.xml")
+    void testEmptyProject(CreateClusterMojo createclustermojo) throws Exception {
         MavenSession mocksession = Mockito.mock(MavenSession.class);
-        setVariableValueToObject(createclustermojo, "session", mocksession);
+        MojoExtension.setVariableValueToObject(createclustermojo, "session", mocksession);
         Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
         assertNotNull(createclustermojo);
         MojoExecutionException assertThrows = assertThrows(MojoExecutionException.class, () -> createclustermojo.execute());
         assertEquals("This goal only makes sense on reactor projects.", assertThrows.getMessage());
     }
 
-    public void testNoClusterPathNbmPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-aggregate/plugin-configa.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateClusterMojo createclustermojo = (CreateClusterMojo) lookupMojo("cluster", pom);
+    @Test
+    @InjectMojo(goal = "cluster", pom = "src/test/resources/unit/cluster-aggregate/plugin-configa.xml")
+    void testNoClusterPathNbmPackaging(CreateClusterMojo createclustermojo) throws Exception {
         MavenSession mocksession = Mockito.mock(MavenSession.class);
         List<MavenProject> lmp = new ArrayList<>();
         lmp.add(new MavenProjectStub() {
@@ -98,18 +89,16 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
         Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
-        setVariableValueToObject(createclustermojo, "session", mocksession);
+        MojoExtension.setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
         MojoFailureException assertThrows = assertThrows(MojoFailureException.class, () -> createclustermojo.execute());
         assertEquals("The NetBeans binary directory structure for foo is not created yet." + "\n Please execute 'mvn install nbm:cluster' "
                 + "to build all relevant projects in the reactor.", assertThrows.getMessage());
     }
 
-    public void testNoClusterPathNbmPackagingClusterfolder() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-aggregate/plugin-configb.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateClusterMojo createclustermojo = (CreateClusterMojo) lookupMojo("cluster", pom);
+    @Test
+    @InjectMojo(goal = "cluster", pom = "src/test/resources/unit/cluster-aggregate/plugin-configb.xml")
+    void testNoClusterPathNbmPackagingClusterfolder(CreateClusterMojo createclustermojo) throws Exception {
         MavenSession mocksession = Mockito.mock(MavenSession.class);
         List<MavenProject> lmp = new ArrayList<>();
         lmp.add(new MavenProjectStub() {
@@ -138,21 +127,19 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
         Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
-        File clusterdir = (File) getVariableValueFromObject(createclustermojo, "nbmBuildDir");
+        File clusterdir = (File) MojoExtension.getVariableValueFromObject(createclustermojo, "nbmBuildDir");
         File file = new File(clusterdir, "clusters");
         file.mkdirs();
-        setVariableValueToObject(createclustermojo, "session", mocksession);
+        MojoExtension.setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
 
         createclustermojo.execute();
         file.delete();
     }
 
-    public void testNoClusterPathBundlePackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-aggregate/plugin-configd.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateClusterMojo createclustermojo = (CreateClusterMojo) lookupMojo("cluster", pom);
+    @Test
+    @InjectMojo(goal = "cluster", pom = "src/test/resources/unit/cluster-aggregate/plugin-configd.xml")
+    void testNoClusterPathBundlePackaging(CreateClusterMojo createclustermojo) throws Exception {
         MavenSession mocksession = Mockito.mock(MavenSession.class);
         List<MavenProject> lmp = new ArrayList<>();
         lmp.add(new MavenProjectStub() {
@@ -175,16 +162,15 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
         Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
-        setVariableValueToObject(createclustermojo, "session", mocksession);
+        MojoExtension.setVariableValueToObject(createclustermojo, "session", mocksession);
         assertNotNull(createclustermojo);
         createclustermojo.execute();
     }
 
-    public void testNoClusterPathBundlePackagingJar() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/cluster-aggregate/plugin-configc.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateClusterMojo createclustermojo = (CreateClusterMojo) lookupMojo("cluster", pom);
+    @Test
+    @InjectMojo(goal = "cluster", pom = "src/test/resources/unit/cluster-aggregate/plugin-configc.xml")
+    @MojoParameter(name = "cluster", value = "cl")
+    void testNoClusterPathBundlePackagingJar(CreateClusterMojo createclustermojo) throws Exception {
         MavenSession mocksession = Mockito.mock(MavenSession.class);
         createDummyJarApp("project-cluster-aggregatec");
         List<MavenProject> lmp = new ArrayList<>();
@@ -225,15 +211,15 @@ public class CreateClusterMojoTest extends AbstractMojoTestCase {
         });
         Mockito.doReturn(lmp).when(mocksession).getProjects();
         Mockito.doReturn(new MavenProjectStubImpl()).when(mocksession).getCurrentProject();
-        setVariableValueToObject(createclustermojo, "project", lmp.get(0));
-        setVariableValueToObject(createclustermojo, "session", mocksession);
-        setVariableValueToObject(createclustermojo, "cluster", "cl");
+        MojoExtension.setVariableValueToObject(createclustermojo, "project", lmp.get(0));
+        MojoExtension.setVariableValueToObject(createclustermojo, "session", mocksession);
+
         assertNotNull(createclustermojo);
         createclustermojo.execute();
     }
 
     private void createDummyJarApp(String folder) throws IOException {
-        File file = new File(getBasedir(), "target/test-harness/" + folder + "/target/foo.jar");
+        File file = new File(MojoExtension.getBasedir(), "target/test-harness/" + folder + "/target/foo.jar");
         file.getParentFile().mkdirs();
         file.createNewFile();
         Manifest manifest = new Manifest();

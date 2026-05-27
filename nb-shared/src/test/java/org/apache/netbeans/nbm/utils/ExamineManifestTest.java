@@ -20,16 +20,16 @@ package org.apache.netbeans.nbm.utils;
  */
 import java.io.File;
 import java.io.PrintWriter;
-import junit.framework.TestCase;
 import org.apache.maven.plugin.logging.SystemStreamLog;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
-public class ExamineManifestTest extends TestCase {
 
-    public ExamineManifestTest(String testName) {
-        super(testName);
-    }
+class ExamineManifestTest {
 
-    public void testDependencyParsing() throws Exception {
+    @Test
+    void testDependencyParsing() throws Exception {
         ExamineManifest em = new ExamineManifest(new SystemStreamLog());
         File mf = File.createTempFile("ExamineManifestTes", ".mf");
         mf.deleteOnExit();
@@ -57,7 +57,8 @@ public class ExamineManifestTest extends TestCase {
         assertEquals(null, em.getModuleWithRelease());
     }
 
-    public void testBundles() throws Exception {
+    @Test
+    void testBundles() throws Exception {
         ExamineManifest em = new ExamineManifest(new SystemStreamLog());
         File mf = File.createTempFile("ExamineManifestTest", ".mf");
         mf.deleteOnExit();

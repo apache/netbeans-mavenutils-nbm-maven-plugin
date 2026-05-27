@@ -24,15 +24,12 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import org.apache.maven.api.plugin.testing.InjectMojo;
+import org.apache.maven.api.plugin.testing.MojoExtension;
+import org.apache.maven.api.plugin.testing.MojoParameter;
+import org.apache.maven.api.plugin.testing.MojoTest;
 
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.netbeans.nbm.handlers.NbmApplicationArtifactHandler;
@@ -40,92 +37,76 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  *
  */
-public class CreateNbmMojoTest extends AbstractMojoTestCase {
+@MojoTest
+class CreateNbmMojoTest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testInvalidPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/nbm-pom/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateNbmMojo createnbmmojo = (CreateNbmMojo) lookupMojo("nbm", pom);
+    @Test
+    @InjectMojo(goal = "nbm", pom = "src/test/resources/unit/nbm-pom/plugin-config.xml")
+    void testInvalidPackaging(CreateNbmMojo createnbmmojo) throws Exception {
         assertNotNull(createnbmmojo);
         createnbmmojo.execute();
     }
 
-    public void testValidPackaging() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/nbm-nbm/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateNbmMojo createnbmmojo = (CreateNbmMojo) lookupMojo("nbm", pom);
+    @Test
+    @InjectMojo(goal = "nbm", pom = "src/test/resources/unit/nbm-nbm/plugin-config.xml")
+    @MojoParameter(name = "codeNameBase", value = "my.group.my-artifact")
+    @MojoParameter(name = "finalName", value = "foo")
+    @MojoParameter(name = "nbmJavahelpSource", value = "${project.basedir}/target/test-classes/unit/nbm-nbm/notexisting.help")
+
+    void testValidPackaging(CreateNbmMojo createnbmmojo) throws Exception {
         assertNotNull(createnbmmojo);
-        setVariableValueToObject(createnbmmojo, "codeNameBase", "my.group.my-artifact");
-        setVariableValueToObject(createnbmmojo, "finalName", "foo");
-        File dummyHelper = new File(getBasedir(), "target/test-classes/unit/nbm-nbm/notexisting.help");
-        setVariableValueToObject(createnbmmojo, "nbmJavahelpSource", dummyHelper);
         createDummyJarApp("project-nbm-nbm");
         createnbmmojo.execute();
     }
 
-    public void testValidPackagingWithContent() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/nbm-nbm-withcontent/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateNbmMojo createnbmmojo = (CreateNbmMojo) lookupMojo("nbm", pom);
+    @Test
+    @InjectMojo(goal = "nbm", pom = "src/test/resources/unit/nbm-nbm-withcontent/plugin-config.xml")
+    @MojoParameter(name = "codeNameBase", value = "my.group.my-artifact")
+    @MojoParameter(name = "finalName", value = "foo")
+    @MojoParameter(name = "nbmJavahelpSource", value = "${project.basedir}/target/test-classes/unit/nbm-nbm-withcontent/notexisting.help")
+    void testValidPackagingWithContent(CreateNbmMojo createnbmmojo) throws Exception {
         assertNotNull(createnbmmojo);
-        setVariableValueToObject(createnbmmojo, "codeNameBase", "my.group.my-artifact");
-        setVariableValueToObject(createnbmmojo, "finalName", "foo");
-        File dummyHelper = new File(getBasedir(), "target/test-classes/unit/nbm-nbm-withcontent/notexisting.help");
-        setVariableValueToObject(createnbmmojo, "nbmJavahelpSource", dummyHelper);
         createDummyJarApp("project-nbm-nbm-withcontent");
         createnbmmojo.execute();
     }
 
-    public void testValidPackagingWithContentSite() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/nbm-nbm-withcontent-site/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateNbmMojo createnbmmojo = (CreateNbmMojo) lookupMojo("nbm", pom);
+    @Test
+    @InjectMojo(goal = "nbm", pom = "src/test/resources/unit/nbm-nbm-withcontent-site/plugin-config.xml")
+    @MojoParameter(name = "codeNameBase", value = "my.group.my-artifact")
+    @MojoParameter(name = "finalName", value = "foo")
+    @MojoParameter(name = "distributionUrl", value = "https://bit.netbeans.org/testme")
+
+    @MojoParameter(name = "nbmJavahelpSource", value = "${project.basedir}/target/test-classes/unit/nbm-nbm-withcontent-site/notexisting.help")
+
+    void testValidPackagingWithContentSite(CreateNbmMojo createnbmmojo) throws Exception {
         assertNotNull(createnbmmojo);
-        setVariableValueToObject(createnbmmojo, "distributionUrl", "https://bit.netbeans.org/testme");
-        setVariableValueToObject(createnbmmojo, "codeNameBase", "my.group.my-artifact");
-        setVariableValueToObject(createnbmmojo, "finalName", "foo");
-        File dummyHelper = new File(getBasedir(), "target/test-classes/unit/nbm-nbm-withcontent-site/notexisting.help");
-        setVariableValueToObject(createnbmmojo, "nbmJavahelpSource", dummyHelper);
         createDummyJarApp("project-nbm-nbm-withcontent-site");
         createnbmmojo.execute();
     }
 
-    public void testValidPackagingWithContentSiteAlt() throws Exception {
-        File pom = new File(getBasedir(), "target/test-classes/unit/nbm-nbm-withcontent-site/plugin-config.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        CreateNbmMojo createnbmmojo = (CreateNbmMojo) lookupMojo("nbm", pom);
+    @Test
+    @InjectMojo(goal = "nbm", pom = "src/test/resources/unit/nbm-nbm-withcontent-site/plugin-config.xml")
+    @MojoParameter(name = "codeNameBase", value = "my.group.my-artifact")
+    @MojoParameter(name = "finalName", value = "foo")
+    @MojoParameter(name = "distributionUrl", value = "id::default::url")
+    @MojoParameter(name = "nbmJavahelpSource", value = "${project.basedir}/target/test-classes/unit/nbm-nbm-withcontent-site/notexisting.help")
+
+    void testValidPackagingWithContentSiteAlt(CreateNbmMojo createnbmmojo) throws Exception {
         assertNotNull(createnbmmojo);
-        setVariableValueToObject(createnbmmojo, "distributionUrl", "id::default::url");
-        setVariableValueToObject(createnbmmojo, "codeNameBase", "my.group.my-artifact");
-        setVariableValueToObject(createnbmmojo, "finalName", "foo");
-        File dummyHelper = new File(getBasedir(), "target/test-classes/unit/nbm-nbm-withcontent-site/notexisting.help");
-        setVariableValueToObject(createnbmmojo, "nbmJavahelpSource", dummyHelper);
-        setVariableValueToObject(createnbmmojo, "session", newTestMavenSession());
+        MojoExtension.setVariableValueToObject(createnbmmojo, "session", newTestMavenSession());
         createDummyJarApp("project-nbm-nbm-withcontent-site");
         createnbmmojo.execute();
     }
 
     private void createDummyJarApp(String folder) throws IOException {
-        File file = new File(getBasedir(), "target/test-harness/" + folder + "/target/foo.jar");
+        File file = new File(MojoExtension.getBasedir(), "target/test-harness/" + folder + "/target/foo.jar");
         file.getParentFile().mkdirs();
         file.createNewFile();
         Manifest manifest = new Manifest();
@@ -148,16 +129,14 @@ public class CreateNbmMojoTest extends AbstractMojoTestCase {
             project.setArtifacts(Collections.emptySet());
             project.setDependencyArtifacts(Collections.emptySet());
 
-            MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-            MavenExecutionResult result = new DefaultMavenExecutionResult();
             DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
             repoSession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory(new DefaultLocalPathComposer()).newInstance(repoSession, new LocalRepository("")));
-            MavenSession session = new MavenSession(getContainer(), repoSession, request, result);
+            MavenSession session = Mockito.mock(MavenSession.class);
             session.setCurrentProject(project);
-            session.setProjects(Arrays.asList( project));
+            session.setProjects(Arrays.asList(project));
             return session;
         } catch (Exception e) {
-            throw new  RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 }

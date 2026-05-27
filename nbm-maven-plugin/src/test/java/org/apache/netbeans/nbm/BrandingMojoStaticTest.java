@@ -19,20 +19,20 @@ package org.apache.netbeans.nbm;
  * under the License.
  */
 import java.io.File;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author mkleint
  */
-public class BrandingMojoStaticTest {
+class BrandingMojoStaticTest {
 
     /**
      * Test of destinationFileName method, of class BrandingMojo.
      */
     @Test
-    public void testDestinationFileName() {
+    void testDestinationFileName() {
         assertEquals("cut_brandingToken.gif", BrandingMojo.destinationFileName("cut.gif", "brandingToken"));
         assertEquals("cut_brandingToken", BrandingMojo.destinationFileName("cut", "brandingToken"));
         assertEquals("cut_pressed_brandingToken.gif", BrandingMojo.destinationFileName("cut_pressed.gif", "brandingToken"));
@@ -42,7 +42,7 @@ public class BrandingMojoStaticTest {
     }
 
     @Test
-    public void testLocale() {
+    void testLocale() {
         assertEquals("en_us", BrandingMojo.getLocale("aaa_en_us.properties")[1]);
         assertEquals("en_us_ca", BrandingMojo.getLocale("aaa_en_us_ca.properties")[1]);
         assertEquals("en_us_ca", BrandingMojo.getLocale("aa_en_us_ca.properties")[1]);

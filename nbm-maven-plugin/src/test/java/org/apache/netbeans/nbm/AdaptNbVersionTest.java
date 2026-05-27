@@ -18,22 +18,22 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.time.Instant;
 import java.util.Date;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
 
 /**
  * AdaptNbVersionTest.
  */
-public class AdaptNbVersionTest {
+class AdaptNbVersionTest {
 
     /**
      * Test of destinationFileName method, of class BrandingMojo.
      */
     @Test
-    public void testAdaptVersion() {
+    void testAdaptVersion() {
         Date date = Date.from(Instant.ofEpochSecond(1721051156)); // 2024-07-15T13:45:56Z
 
         // Empty version
