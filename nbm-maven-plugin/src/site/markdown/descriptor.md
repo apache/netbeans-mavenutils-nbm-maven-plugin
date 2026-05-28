@@ -1,38 +1,39 @@
-~~ Licensed to the Apache Software Foundation (ASF) under one
-~~ or more contributor license agreements.  See the NOTICE file
-~~ distributed with this work for additional information
-~~ regarding copyright ownership.  The ASF licenses this file
-~~ to you under the Apache License, Version 2.0 (the
-~~ "License"); you may not use this file except in compliance
-~~ with the License.  You may obtain a copy of the License at
-~~
-~~ http://www.apache.org/licenses/LICENSE-2.0
-~~
-~~ Unless required by applicable law or agreed to in writing,
-~~ software distributed under the License is distributed on an
-~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~~ KIND, either express or implied.  See the License for the
-~~ specific language governing permissions and limitations
-~~ under the License.
+---
+title: Example nbm descriptors - since 3.8 DEPRECATED.
+author:
+ - Milos Kleint
+ - <dev@apache.netbeans.org>
+date:  2007-06-15
+---
 
- ------
- Maven 2 NBM Plugin 
- ------
- Milos Kleint
- <dev@netbeans.apache.org>
- ------
- 2007-06-15
-
-Example nbm descriptors - since 3.8 DEPRECATED.
-
- These descriptors are referenced from the {{{./nbm-mojo.html}nbm:nbm}} mojo. The descriptor file is deprecated since version 3.8.
+<!-- Licensed to the Apache Software Foundation (ASF) under one-->
+<!-- or more contributor license agreements.  See the NOTICE file-->
+<!-- distributed with this work for additional information-->
+<!-- regarding copyright ownership.  The ASF licenses this file-->
+<!-- to you under the Apache License, Version 2.0 (the-->
+<!-- "License"); you may not use this file except in compliance-->
+<!-- with the License.  You may obtain a copy of the License at-->
+<!---->
+<!--   http://www.apache.org/licenses/LICENSE-2.0-->
+<!---->
+<!-- Unless required by applicable law or agreed to in writing,-->
+<!-- software distributed under the License is distributed on an-->
+<!-- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY-->
+<!-- KIND, either express or implied.  See the License for the-->
+<!-- specific language governing permissions and limitations-->
+<!-- under the License.-->
  
-*Usual case
 
- A rather common module descriptor. Basic properties filled in, defines some libraries that ship with the module and
- declared dependencies on other NetBeans modules.
+# Example nbm descriptors - since 3.8 DEPRECATED.
 
-+-----+
+These descriptors are referenced from the [`nbm:nbm`](./nbm-mojo.html) mojo. The descriptor file is deprecated since version 3.8.
+ 
+## Usual case
+
+A rather common module descriptor. Basic properties filled in, defines some libraries that ship with the module and
+declared dependencies on other NetBeans modules.
+
+```xml
 <nbm>
    <moduleType>normal</moduleType>
    <codeNameBase>org.codehaus.mevenide.netbeans/2</codeNameBase>
@@ -79,13 +80,13 @@ Example nbm descriptors - since 3.8 DEPRECATED.
       </dependency>
    </dependencies> 
 </nbm>
-+-----+
+```
 
-*Additional custom files in module
+## Additional custom files in module
 
  Apart from the usual properties, this one declares additional files that ought to be packed into the module.
 
-+-----+
+```xml
 <nbm>
    <moduleType>eager</moduleType>
    <codeNameBase>org.codehaus.mevenide.netbeans.nbrepo/2</codeNameBase>
@@ -108,4 +109,4 @@ Example nbm descriptors - since 3.8 DEPRECATED.
        </nbmResource>
    </nbmResources>
 </nbm>
-+-----+
+```
