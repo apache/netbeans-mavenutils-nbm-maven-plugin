@@ -45,10 +45,10 @@ under the License.
           <item name="2.6 -> 3.0 upgrade" href="2630upgrade.html"/>
         </menu>-->
         <menu name="HOWTOs ">
-            <item name="Customize installers" href="buildinstexample.html"/>
             <item name="Upgrade from older versions" href="upgrade.html"/>
         </menu>
         <menu name="Deprecated">
+            <item name="Customize installers" href="buildinstexample.html"/>
             <item name="Descriptor Format" href="nbm.html"/>
             <item name="Example Descriptor" href="descriptor.html"/>
         </menu>

@@ -1,0 +1,43 @@
+---
+title: NetBeans Repository plugin
+author:
+ - Milos Kleint
+ - <dev@apache.netbeans.org>
+date:  2012-10-19
+---
+
+<!-- Licensed to the Apache Software Foundation (ASF) under one-->
+<!-- or more contributor license agreements.  See the NOTICE file-->
+<!-- distributed with this work for additional information-->
+<!-- regarding copyright ownership.  The ASF licenses this file-->
+<!-- to you under the Apache License, Version 2.0 (the-->
+<!-- "License"); you may not use this file except in compliance-->
+<!-- with the License.  You may obtain a copy of the License at-->
+<!---->
+<!--   http://www.apache.org/licenses/LICENSE-2.0-->
+<!---->
+<!-- Unless required by applicable law or agreed to in writing,-->
+<!-- software distributed under the License is distributed on an-->
+<!-- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY-->
+<!-- KIND, either express or implied.  See the License for the-->
+<!-- specific language governing permissions and limitations-->
+<!-- under the License.-->
+
+
+
+# NetBeans Repository plugin
+
+The plugin is capable of populating the local or remote maven repository with module jars and NBM files from a given NetBeans installation. 
+Useful for module development, modules with public APIs are separated from those without a public API.
+See the [`popuplate`](./populate-mojo.html) goal and the [HOWTO document](./repository.html) for details.
+
+[Maven Central](https://search.maven.org/) contains artefacts of Apache NetBeans 9.0 and later.
+
+Also see: [Maven NBM development FAQs](https://netbeans.apache.org/wiki/DevFaqIndex#_mavenized_builds)
+
+# Older NetBeans Version
+
+To get access to a repository with NetBeans.org module artifacts and metadata, 
+add [https://netbeans.apidesign.org/maven2/](https://netbeans.apidesign.org/maven2/) repository to your project POM
+or the repository manager you are using. The repository hosts binaries from NetBeans 6.5 to NetBeans 8.2.
+
