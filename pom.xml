@@ -82,7 +82,7 @@
         <jdkbaseline>21</jdkbaseline>
         <mockito.version>5.22.0</mockito.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <pmdVersion>7.26.0</pmdVersion>
+        <pmdVersion>7.27.0</pmdVersion>
     </properties>
 
     <dependencyManagement>
