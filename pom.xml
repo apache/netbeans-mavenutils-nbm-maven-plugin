@@ -221,7 +221,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.21.0</version>
+                    <version>3.22.0</version>
                     <!-- version sensitive to maven-fluido-skin version -->
                     <configuration>
                         <!-- hard coded work here,  ${project.distributionManagement.site.url} move everything
