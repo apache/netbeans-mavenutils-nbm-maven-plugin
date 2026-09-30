@@ -33,7 +33,7 @@ class CreateNetBeansFileStructureTest {
     @Test
     void testWriteExternal() throws Exception {
 
-        String version = "6.1.0";  // TODO must be in local repo downloaded by other means -> fix this test!
+        String version = "6.1.3";  // TODO must be in local repo downloaded by other means -> fix this test!
 
         String localRepository = System.getProperty("localRepository");
         String path = "org/junit/jupiter/junit-jupiter/" + version + "/junit-jupiter-" + version + ".jar";
@@ -42,8 +42,8 @@ class CreateNetBeansFileStructureTest {
         StringWriter w = new StringWriter();
         CreateNetBeansFileStructure.writeExternal(new Artifacts(new ArtifactHandlerManagerStub()), new PrintWriter(w), a);
         assertEquals(
-                "CRC:1362182011\n"
-                + "SIZE:6375\n"
+                "CRC:2107559009\n"
+                + "SIZE:6378\n"
                 + "URL:m2:/org.junit.jupiter:junit-jupiter:" + version + ":jar\n"
                 + "URL:http://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter/" + version + "/junit-jupiter-" + version + ".jar\n",
                 w.toString()
