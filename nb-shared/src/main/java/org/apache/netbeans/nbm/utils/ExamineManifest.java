@@ -20,7 +20,6 @@ package org.apache.netbeans.nbm.utils;
  */
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,36 +82,16 @@ public class ExamineManifest {
 
         Manifest mf = null;
         if (jarFile != null) {
-            JarFile jar = null;
-            try {
-                jar = new JarFile(jarFile);
+            try (JarFile jar = new JarFile(jarFile)) {
                 mf = jar.getManifest();
             } catch (Exception exc) {
                 throw new MojoExecutionException("Could not open " + jarFile + ": " + exc.getMessage(), exc);
-            } finally {
-                if (jar != null) {
-                    try {
-                        jar.close();
-                    } catch (IOException io) {
-                        throw new MojoExecutionException(io.getMessage(), io);
-                    }
-                }
             }
         } else if (manifestFile != null) {
-            InputStream stream = null;
-            try {
-                stream = new FileInputStream(manifestFile);
+            try (InputStream stream = new FileInputStream(manifestFile)) {
                 mf = new Manifest(stream);
             } catch (Exception exc) {
                 throw new MojoExecutionException(exc.getMessage(), exc);
-            } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (IOException io) {
-                        throw new MojoExecutionException(io.getMessage(), io);
-                    }
-                }
             }
         }
         if (mf != null) {
@@ -173,7 +152,7 @@ public class ExamineManifest {
                 String deps = attrs.getValue("OpenIDE-Module-Module-Dependencies");
                 if (deps != null) {
                     StringTokenizer tokens = new StringTokenizer(deps, ",");
-                    List<String> depList = new ArrayList<String>();
+                    List<String> depList = new ArrayList<>();
                     while (tokens.hasMoreTokens()) {
                         String tok = tokens.nextToken();
                         //we are just interested in specification and loose dependencies.
@@ -199,7 +178,7 @@ public class ExamineManifest {
                     provides = Arrays.asList(StringUtils.stripAll(StringUtils.split(prov, ",")));
                 }
                 if (req != null || needs != null) {
-                    requires = new ArrayList<String>();
+                    requires = new ArrayList<>();
                     if (req != null) {
                         requires.addAll(Arrays.asList(StringUtils.stripAll(StringUtils.split(req, ","))));
                     }
@@ -229,7 +208,7 @@ public class ExamineManifest {
                     //the major way of declation dependencies in osgi - Import-Package
                     String deps = attrs.getValue("Require-Bundle");
                     if (deps != null) {
-                        List<String> depList = new ArrayList<String>();
+                        List<String> depList = new ArrayList<>();
                         // https://stackoverflow.com/questions/1757065
                         // java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for (String piece : deps.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")) {
@@ -239,7 +218,7 @@ public class ExamineManifest {
                     }
                     String imps = attrs.getValue("Import-Package");
                     if (imps != null) {
-                        Set<String> depList = new HashSet<String>();
+                        Set<String> depList = new HashSet<>();
                         // https://stackoverflow.com/questions/1757065
                         // java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for (String piece : imps.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")) {
@@ -249,7 +228,7 @@ public class ExamineManifest {
                     }
                     String exps = attrs.getValue("Export-Package");
                     if (exps != null) {
-                        Set<String> depList = new HashSet<String>();
+                        Set<String> depList = new HashSet<>();
                         // https://stackoverflow.com/questions/1757065
                         // java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for (String piece : exps.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")) {
@@ -294,7 +273,7 @@ public class ExamineManifest {
     /**
      * Manifest file to be examined. It is exclusive with jarFile.
      *
-     * @param manifestFileLoc manifedt file
+     * @param manifestFileLoc manifest file
      */
     public void setManifestFile(File manifestFileLoc) {
         manifestFile = manifestFileLoc;

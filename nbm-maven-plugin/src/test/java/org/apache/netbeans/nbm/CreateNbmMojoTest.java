@@ -18,6 +18,8 @@ package org.apache.netbeans.nbm;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.jar.Attributes;
@@ -37,6 +39,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RepositoryUriUtils;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -130,7 +133,7 @@ class CreateNbmMojoTest {
             project.setDependencyArtifacts(Collections.emptySet());
 
             DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
-            repoSession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory(new DefaultLocalPathComposer()).newInstance(repoSession, new LocalRepository("")));
+            repoSession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory(new DefaultLocalPathComposer()).newInstance(repoSession, new LocalRepository(Paths.get(RepositoryUriUtils.toUri("")).toAbsolutePath())));
             MavenSession session = Mockito.mock(MavenSession.class);
             session.setCurrentProject(project);
             session.setProjects(Arrays.asList(project));

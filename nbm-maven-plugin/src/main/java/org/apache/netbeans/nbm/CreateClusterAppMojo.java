@@ -216,7 +216,8 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
 
                 if (super.artifacts.getArtifactType(art).getId().equals("nbm-file")) {
                     try {
-                        JarFile jf = new JarFile(art.getFile());
+                        File artifactFile = art.getPath().toFile();
+                        JarFile jf = new JarFile(artifactFile);
                         try {
                             String clusterName = findCluster(jf);
                             ClusterTuple cluster = processCluster(clusterName, nbmBuildDirFile, art);
@@ -226,7 +227,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
 
                             // we need to trigger this ant task to generate the update_tracking file.
                             MakeListOfNBM makeTask = (MakeListOfNBM) antProject.createTask("genlist");
-                            antProject.setNewProperty("module.name", art.getFile().getName()); // TODO
+                            antProject.setNewProperty("module.name", artifactFile.getName()); // TODO
                             antProject.setProperty("cluster.dir", clusterName);
                             FileSet set = makeTask.createFileSet();
                             set.setDir(cluster.location);
@@ -386,7 +387,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
                                 try {
                                     makeTask.execute();
                                 } catch (BuildException e) {
-                                    getLog().error("Cannot Generate update_tracking XML file from " + art.getFile());
+                                    getLog().error("Cannot Generate update_tracking XML file from " + artifactFile);
                                     throw new MojoExecutionException(e.getMessage(), e);
                                 }
 
@@ -406,7 +407,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
                             jf.close();
                         }
                     } catch (IOException ex) {
-                        getLog().error(art.getFile().getAbsolutePath(), ex);
+                        getLog().error(art.getPath().toFile().getAbsolutePath(), ex);
                     }
                 }
                 if (res.isOSGiBundle()) {
@@ -535,7 +536,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
                     final File moduleArt = new File(modules, cnbDashed + ".jar");
                     final String specVer = ex.getSpecVersion();
                     try {
-                        FileUtils.copyFile(art.getFile(), moduleArt);
+                        FileUtils.copyFile(art.getPath().toFile(), moduleArt);
                         final File moduleConf = new File(confModules, cnbDashed + ".xml");
                         FileUtils.copyStreamToFile(() -> new StringInputStream(createBundleConfigFile(cnb, ex.isBundleAutoload()), "UTF-8"), moduleConf);
                         FileUtils.copyStreamToFile(() -> new StringInputStream(createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8"), new File(updateTracking, cnbDashed + ".xml"));
@@ -742,7 +743,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
             newer = true;
         } else {
             File stamp = new File(clusterFile, ".lastModified");
-            if (stamp.lastModified() < art.getFile().lastModified()) {
+            if (stamp.lastModified() < art.getPath().toFile().lastModified()) {
                 newer = true;
             }
         }
@@ -776,7 +777,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
                             ArtifactRequest request = new ArtifactRequest(artifact, project.getRemoteProjectRepositories(), "nbm");
                             org.eclipse.aether.resolution.ArtifactResult result = repositorySystem.resolveArtifact(session.getRepositorySession(), request);
                             artifact = result.getArtifact();
-                            FileUtils.copyFile(artifact.getFile(), f);
+                            FileUtils.copyFile(artifact.getPath().toFile(), f);
                             found = true;
                         } catch (ArtifactResolutionException x) {
                             getLog().warn("Cannot find " + line.substring(8), x);
@@ -839,7 +840,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
         } catch (ArtifactResolutionException e) {
             throw new MojoExecutionException("Failed to retrieve the nbm file from repository", e);
         }
-        return nbmArt.getFile();
+        return nbmArt.getPath().toFile();
     }
 
     private void writeFromZip(final ZipFile zip, String zipPath, File destFile, boolean mandatory) throws MojoExecutionException, IOException {
