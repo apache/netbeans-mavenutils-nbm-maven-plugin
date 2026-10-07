@@ -37,7 +37,7 @@ under the License.
     <inceptionYear>2005</inceptionYear>
 
     <prerequisites>
-      <maven>[3.8,)</maven>
+        <maven>[3.10,)</maven>
     </prerequisites>
 
     <dependencies>
@@ -75,7 +75,21 @@ under the License.
             <artifactId>javax.inject</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-util</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-impl</artifactId>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -180,8 +194,8 @@ under the License.
                     </reportSet>
                 </reportSets>
             </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>

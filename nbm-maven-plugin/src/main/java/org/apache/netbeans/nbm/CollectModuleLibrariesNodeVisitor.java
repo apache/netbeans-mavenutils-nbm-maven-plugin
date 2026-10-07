@@ -53,7 +53,7 @@ public class CollectModuleLibrariesNodeVisitor extends DependencyVisitorSupport 
 
     private final DependencyNode root;
 
-    private final Stack<String> currentModule = new Stack<String>();
+    private final Stack<String> currentModule = new Stack<>();
 
     private static final String LIB_ID = "!@#$%^&ROOT";
 
@@ -109,13 +109,13 @@ public class CollectModuleLibrariesNodeVisitor extends DependencyVisitorSupport 
             ExamineManifest depExaminator = examinerCache.get(artifact);
             if (depExaminator == null) {
                 depExaminator = new ExamineManifest(log);
-                depExaminator.setArtifactFile(artifact.getFile());
+                depExaminator.setArtifactFile(artifact.getPath().toFile());
                 depExaminator.checkFile();
                 examinerCache.put(artifact, depExaminator);
             }
             if (depExaminator.isNetBeansModule() || (useOSGiDependencies && depExaminator.isOsgiBundle())) {
                 currentModule.push(ArtifactIdUtils.toVersionlessId(artifact));
-                ArrayList<Artifact> arts = new ArrayList<Artifact>();
+                ArrayList<Artifact> arts = new ArrayList<>();
                 arts.add(artifact);
                 if (currentModule.size() == 1) {
                     directNodes.put(currentModule.peek(), arts);

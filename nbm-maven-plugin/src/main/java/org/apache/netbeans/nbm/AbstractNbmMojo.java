@@ -63,6 +63,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 
 public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
+
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     protected MavenSession session;
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
@@ -137,9 +138,9 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
     }
 
     static List<Artifact> getLibraryArtifacts(Artifacts artifacts, DependencyNode treeRoot, NetBeansModule module,
-                                              Collection<Artifact> runtimeArtifacts,
-                                              Map<Artifact, ExamineManifest> examinerCache, Log log,
-                                              boolean useOsgiDependencies) throws MojoExecutionException {
+            Collection<Artifact> runtimeArtifacts,
+            Map<Artifact, ExamineManifest> examinerCache, Log log,
+            boolean useOsgiDependencies) throws MojoExecutionException {
         List<Artifact> include = new ArrayList<>();
         if (module != null) {
             List<String> librList = new ArrayList<>();
@@ -184,22 +185,22 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
                 deps.add(d);
             }
         }
-        List<ModuleWrapper> include = new ArrayList<ModuleWrapper>();
+        List<ModuleWrapper> include = new ArrayList<>();
 
         // we get compile DIRECT dependencies only (to not have to discard below transitive deps)
         Set<String> compileScopes = new HashSet<>(Arrays.asList(JavaScopes.COMPILE, JavaScopes.PROVIDED, JavaScopes.SYSTEM));
-        Collection<Artifact> artifacts= RepositoryUtils.toArtifacts(project.getDependencyArtifacts().stream()
+        Collection<Artifact> dependencyArtifacts = RepositoryUtils.toArtifacts(project.getDependencyArtifacts().stream()
                 .filter(a -> a.getArtifactHandler().isAddedToClasspath())
                 .filter(a -> compileScopes.contains(a.getScope()))
                 .collect(Collectors.toList()));
-        for (Artifact artifact : artifacts) {
+        for (Artifact artifact : dependencyArtifacts) {
             if (libraryArtifacts.contains(artifact)) {
                 continue;
             }
             ExamineManifest depExaminator = examinerCache.get(artifact);
             if (depExaminator == null) {
                 depExaminator = new ExamineManifest(log);
-                depExaminator.setArtifactFile(artifact.getFile());
+                depExaminator.setArtifactFile(artifact.getPath().toFile());
                 depExaminator.checkFile();
                 examinerCache.put(artifact, depExaminator);
             }
@@ -242,6 +243,7 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
     }
 
     public static class ModuleWrapper {
+
         Dependency dependency;
         Artifact artifact;
         boolean transitive = true;
@@ -273,7 +275,7 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
             // list of dependencies (as "nbm-file") or not..
             // that would be a timesaver
             ExamineManifest mnf = new ExamineManifest(getLog());
-            File jar = art.getFile();
+            File jar = art.getPath().toFile();
             if (!jar.isFile()) {
                 //MNBMODULE-210 with recent CoS changes in netbeans (7.4) jar will be file as we link open projects in
                 // the build via WorkspaceReader.
@@ -304,7 +306,7 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
                 } catch (ArtifactResolutionException ex) {
                     //shall we check before actually resolving from repos?
                     nbmArt = checkReactor(art, nbmArt);
-                    if (nbmArt.getFile() == null) {
+                    if (nbmArt.getPath() == null) {
                         throw new MojoExecutionException("Failed to retrieve the nbm file from repository", ex);
                     }
                 }
@@ -318,6 +320,7 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
     }
 
     protected static final class ArtifactResult {
+
         private final Artifact converted;
         private final ExamineManifest manifest;
 
@@ -344,12 +347,13 @@ public abstract class AbstractNbmMojo extends AbstractNetbeansMojo {
     }
 
     private Artifact checkReactor(Artifact art, Artifact nbmArt) {
-        if (art.getFile().getName().endsWith(".jar")) {
-            String name = art.getFile().getName();
+        File artFile = art.getPath().toFile();
+        if (artFile.getName().endsWith(".jar")) {
+            String name = artFile.getName();
             name = name.substring(0, name.length() - ".jar".length()) + ".nbm";
-            File fl = new File(art.getFile().getParentFile(), name);
+            File fl = new File(artFile.getParentFile(), name);
             if (fl.exists()) {
-                nbmArt = nbmArt.setFile(fl); // is resolved by having file set
+                nbmArt = nbmArt.setPath(fl.toPath()); // is resolved by having file set
             }
         }
         return nbmArt;
