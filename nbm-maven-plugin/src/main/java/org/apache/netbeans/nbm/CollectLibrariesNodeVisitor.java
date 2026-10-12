@@ -115,7 +115,7 @@ public class CollectLibrariesNodeVisitor extends DependencyVisitorSupport {
             ExamineManifest depExaminator = examinerCache.get(artifact);
             if (depExaminator == null) {
                 depExaminator = new ExamineManifest(log);
-                depExaminator.setArtifactFile(artifact.getFile());
+                depExaminator.setArtifactFile(artifact.getPath().toFile());
                 depExaminator.checkFile();
                 examinerCache.put(artifact, depExaminator);
             }

@@ -20,13 +20,13 @@ package org.apache.netbeans.nbm.repository;
  */
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -231,7 +231,8 @@ public class PopulateRepositoryMojo
 
     /**
      * Number of times to retry a failed deployment. A value of {@code 0} means
-     * a single attempt with no retries (the default). Must be at least {@code 0}.
+     * a single attempt with no retries (the default). Must be at least
+     * {@code 0}.
      *
      * @since 15.0
      */
@@ -274,10 +275,10 @@ public class PopulateRepositoryMojo
     }
 
     @Override
-    public void execute()
-            throws MojoExecutionException {
+    public void execute() throws MojoExecutionException {
         getLog().info("Populate repository with NetBeans modules");
         Project antProject = antProject();
+
         RemoteRepository deploymentRepository = null;
 
         if (parentGAV != null) {
@@ -285,8 +286,7 @@ public class PopulateRepositoryMojo
             artefactParent = new Parent();
             String[] split = parentGAV.split(":");
             if (split.length != 3) {
-                throw new MojoExecutionException(
-                        "parentGAV should respect the following format groupId:artefactId:version");
+                throw new MojoExecutionException("parentGAV should respect the following format groupId:artefactId:version");
             }
             artefactParent.setGroupId(split[0]);
             artefactParent.setArtifactId(split[1]);
@@ -296,8 +296,7 @@ public class PopulateRepositoryMojo
         if (deployUrl != null) {
             deploymentRepository = repositorySystem.newDeploymentRepository(session.getRepositorySession(), new RemoteRepository.Builder(deployId, "default", deployUrl).build());
         } else if (skipLocalInstall) {
-            throw new MojoExecutionException(
-                    "When skipping install to local repository, one shall define the deployUrl parameter");
+            throw new MojoExecutionException("When skipping install to local repository, one shall define the deployUrl parameter");
         }
 
         if (netbeansInstallDirectory == null) {
@@ -317,7 +316,7 @@ public class PopulateRepositoryMojo
         File rootDir = netbeansInstallDirectory;
         if (!rootDir.exists()) {
             getLog().error("NetBeans installation doesn't exist.");
-            throw new MojoExecutionException("NetBeans installation doesn't exist.");
+            throw new MojoExecutionException("NetBeans installation [" + rootDir.getAbsolutePath() + "] doesn't exist.");
         }
         getLog().info("Copying NetBeans artifacts from " + netbeansInstallDirectory);
 
@@ -366,7 +365,7 @@ public class PopulateRepositoryMojo
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
                 String group = groupIdPrefix + (examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL);
                 Artifact art = createArtifact(artifact, version, group);
-                ModuleWrapper wr = new ModuleWrapper(artifact, version, group, examinator, module);
+                ModuleWrapper wr = new ModuleWrapper(artifact, version, group, examinator, module.toPath());
                 if (examinator.isOsgiBundle()) {
                     Dependency dep = findExternal(module);
                     if (dep != null) {
@@ -374,7 +373,7 @@ public class PopulateRepositoryMojo
                         art = createArtifact(dep.getArtifactId(), dep.getVersion(), dep.getGroupId());
                         group = dep.getGroupId();
                         version = dep.getVersion();
-                        wr = new ModuleWrapperMaven(artifact, version, group, examinator, module, dep);
+                        wr = new ModuleWrapperMaven(artifact, version, group, examinator, module.toPath(), dep);
                     }
                 }
                 wr.setCluster(clust);
@@ -392,18 +391,14 @@ public class PopulateRepositoryMojo
         if (netbeansJavadocDirectory != null) {
             javadocRoot = netbeansJavadocDirectory;
             if (!javadocRoot.exists()) {
-                javadocRoot = null;
-                throw new MojoExecutionException(
-                        "The netbeansJavadocDirectory parameter doesn't point to an existing folder");
+                throw new MojoExecutionException("The netbeansJavadocDirectory parameter doesn't point to an existing folder");
             }
         }
         File sourceRoot = null;
         if (netbeansSourcesDirectory != null) {
             sourceRoot = netbeansSourcesDirectory;
             if (!sourceRoot.exists()) {
-                sourceRoot = null;
-                throw new MojoExecutionException(
-                        "The netbeansSourceDirectory parameter doesn't point to an existing folder");
+                throw new MojoExecutionException("The netbeansSourceDirectory parameter doesn't point to an existing folder");
             }
         }
 
@@ -411,9 +406,7 @@ public class PopulateRepositoryMojo
         if (netbeansNbmDirectory != null) {
             nbmRoot = netbeansNbmDirectory;
             if (!nbmRoot.exists()) {
-                nbmRoot = null;
-                throw new MojoExecutionException(
-                        "The nbmDirectory parameter doesn't point to an existing folder");
+                throw new MojoExecutionException("The nbmDirectory parameter doesn't point to an existing folder");
             }
         }
         List<ModuleWrapper> wrapperList = new ArrayList<>(moduleDefinitions.keySet());
@@ -430,204 +423,211 @@ public class PopulateRepositoryMojo
             }
         }
         List<ExternalsWrapper> externals = new ArrayList<>();
-        int count = tobePopulated.size() + 1;
-        int index = 0;
 
-        try {
-            for (Map.Entry<ModuleWrapper, Artifact> elem : tobePopulated.entrySet()) {
-                ModuleWrapper man = elem.getKey();
-                Artifact art = elem.getValue();
-                index = index + 1;
-                getLog().info("Processing " + index + "/" + count);
-                File pom = createMavenProject(man, wrapperList, externals);
-                Artifact pomArt = new SubArtifact(art, "", "pom", pom);
-                File javadoc = null;
-                Artifact javadocArt = null;
-                if (javadocRoot != null) {
-                    File zip = new File(javadocRoot, art.getArtifactId() + ".zip");
-                    if (zip.exists()) {
-                        javadoc = zip;
-                        javadocArt = createAttachedArtifact(art, javadoc, "jar", "javadoc");
-                    }
-                }
-                File source = null;
-                Artifact sourceArt = null;
-                if (sourceRoot != null) {
-                    File zip = new File(sourceRoot, art.getArtifactId() + ".zip");
-                    if (zip.exists()) {
-                        source = zip;
-                        sourceArt = createAttachedArtifact(art, source, "jar", "sources");
-                    }
-                }
-                File nbm = null;
-                Artifact nbmArt = null;
-                if (nbmRoot != null) {
-                    File zip = new File(nbmRoot, art.getArtifactId() + ".nbm");
+        // populate module and collect externals
+        populateModules(tobePopulated, wrapperList, externals, javadocRoot, sourceRoot, nbmRoot, deploymentRepository);
 
-                    if (!zip.exists()) {
-                        zip = new File(nbmRoot,
-                                man.getCluster() + File.separator + art.getArtifactId() + ".nbm");
-                    }
-                    if (zip.exists()) {
-                        nbm = zip;
-                        nbmArt = createAttachedArtifact(art, nbm, "nbm-file", null);
-                        if (nbmArt.getExtension().equals("nbm-file")) {
-                            // Maven 2.x compatibility.
-                            nbmArt = createAttachedArtifact(art, nbm, "nbm", null);
-                        }
-                        assert nbmArt.getExtension().equals("nbm");
-                    }
-                }
-                File moduleJar = man.getFile();
-                File moduleJarMinusCP = null;
-                if (!man.getModuleManifest().getClasspath().isEmpty()) {
-                    try {
-                        moduleJarMinusCP = Files.createTempFile(man.getArtifact(), ".jar").toFile();
-                        moduleJarMinusCP.deleteOnExit();
-                        try (InputStream is = Files.newInputStream(moduleJar.toPath())) {
-                            try (OutputStream os = Files.newOutputStream(moduleJarMinusCP.toPath())) {
-                                JarInputStream jis = new JarInputStream(is);
-                                Manifest mani = new Manifest(jis.getManifest());
-                                mani.getMainAttributes().remove(Attributes.Name.CLASS_PATH);
-                                if (!man.deps.isEmpty()) { // MNBMODULE-132
-                                    StringBuilder b = new StringBuilder();
-                                    for (Dependency dep : man.deps) {
-                                        if (b.length() > 0) {
-                                            b.append(' ');
-                                        }
-                                        b.append(dep.getGroupId()).append(':').append(dep.getArtifactId())
-                                                .append(':').append(dep.getVersion());
-                                        if (dep.getClassifier() != null) {
-                                            b.append(":").append(dep.getClassifier());
-                                        }
-                                    }
-                                    mani.getMainAttributes().putValue("Maven-Class-Path", b.toString());
-                                } else {
-                                    getLog().warn("did not find any external artifacts for " + man.getModule());
-                                }
-                                JarOutputStream jos = new JarOutputStream(os, mani);
-                                JarEntry entry;
-                                while ((entry = jis.getNextJarEntry()) != null) {
-                                    if (entry.getName().matches("META-INF/.+[.]SF")) {
-                                        throw new IOException("cannot handle signed JARs");
-                                    }
-                                    jos.putNextEntry(entry);
-                                    byte[] buf = new byte[(int) entry.getSize()];
-                                    int read = jis.read(buf, 0, buf.length);
-                                    if (read != buf.length) {
-                                        throw new IOException("read wrong amount");
-                                    }
-                                    jos.write(buf);
-                                }
-                                jos.close();
-                            }
-                        }
-                    } catch (IOException x) {
-                        getLog().warn("Could not process " + moduleJar + ": " + x, x);
-                        moduleJarMinusCP.delete();
-                        moduleJarMinusCP = null;
-                    }
-                }
-                try {
-                    if (!skipLocalInstall) {
-                        install(pomArt.setFile(pom));
-                        install(art.setFile(moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar));
-                        if (javadoc != null) {
-                            install(javadocArt.setFile(javadoc));
-                        }
-                        if (source != null) {
-                            install(sourceArt.setFile(source));
-                        }
-                        if (nbm != null) {
-                            install(nbmArt.setFile(nbm));
-                        }
-                    }
-                    if (deploymentRepository != null) {
-                        DeployRequest deployRequest = newDeployRequest(deploymentRepository);
-                        deployRequest.addArtifact(art.setFile(moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar));
-                        if (pom != null) {
-                            deployRequest.addArtifact(pomArt.setFile(pom));
-                        }
-                        if (javadoc != null) {
-                            deployRequest.addArtifact(javadocArt.setFile(javadoc));
-                        }
-                        if (source != null) {
-                            deployRequest.addArtifact(sourceArt.setFile(source));
-                        }
-                        if (nbm != null) {
-                            deployRequest.addArtifact(nbmArt.setFile(nbm));
-                        }
-                        deploy(deployRequest);
-                    }
-                } finally {
-                    if (moduleJarMinusCP != null) {
-                        moduleJarMinusCP.delete();
-                    }
-                }
-            }
-        } finally {
-            /*if ( searcher != null )
-            {
-                try
-                {
-                    searcher.close();
-                }
-                catch ( IOException ex )
-                {
-                    getLog().error( ex );
-                }
-            }*/
-        }
-
-        //process collected non-recognized external jars..
+        // populate unmatched module as externals
         if (!externals.isEmpty()) {
-            index = 0;
-            count = externals.size();
-            for (ExternalsWrapper ex : externals) {
-                Artifact art = createArtifact(ex.getArtifact(), ex.getVersion(), ex.getGroupid());
-                index = index + 1;
-                getLog().info("Processing external " + index + "/" + count);
-                File pom = createExternalProject(ex);
-                Artifact pomArt = new SubArtifact(art, "", "pom", pom);
-                if (!skipLocalInstall) {
-                    install(pomArt.setFile(pom));
-                    install(art.setFile(ex.getFile()));
-                }
-                if (deploymentRepository != null) {
-                    DeployRequest deployRequest = newDeployRequest(deploymentRepository);
-                    deployRequest.addArtifact(pomArt.setFile(pom));
-                    deployRequest.addArtifact(art.setFile(ex.getFile()));
-                    deploy(deployRequest);
-                }
-            }
+            populateExternals(externals, deploymentRepository);
         }
-
         if (!defineCluster) {
             getLog().info("Not creating cluster POMs.");
         } else if (forcedVersion == null) {
             getLog().warn("Version not specified, cannot create cluster POMs.");
         } else {
-            for (Map.Entry<String, Collection<ModuleWrapper>> elem : clusters.entrySet()) {
-                String cluster = stripClusterName(elem.getKey());
-                Collection<ModuleWrapper> modules = elem.getValue();
-                getLog().info("Processing cluster " + cluster);
-                Artifact art = createClusterArtifact(cluster, forcedVersion);
-                File pom = createClusterProject(art, modules);
-                if (!skipLocalInstall) {
-                    install(art.setFile(pom));
-                }
-                if (deploymentRepository != null) {
-                    DeployRequest deployRequest = newDeployRequest(deploymentRepository);
-                    deployRequest.addArtifact(art.setFile(pom));
-                    deploy(deployRequest);
-                }
+            populateClusters(clusters, deploymentRepository);
+        }
+    }
+
+    private void populateClusters(Map<String, Collection<ModuleWrapper>> clusters, RemoteRepository deploymentRepository) throws MojoExecutionException {
+        for (Map.Entry<String, Collection<ModuleWrapper>> elem : clusters.entrySet()) {
+            String cluster = stripClusterName(elem.getKey());
+            Collection<ModuleWrapper> modules = elem.getValue();
+            getLog().info("Processing cluster " + cluster);
+            Artifact art = createClusterArtifact(cluster, forcedVersion);
+            Path pom = createClusterProjectPOM(art, modules);
+            if (!skipLocalInstall) {
+                install(art.setPath(pom));
+            }
+            if (deploymentRepository != null) {
+                DeployRequest deployRequest = newDeployRequest(deploymentRepository);
+                deployRequest.addArtifact(art.setPath(pom));
+                deploy(deployRequest);
+            }
+        }
+    }
+
+    private void populateExternals(List<ExternalsWrapper> externals, RemoteRepository deploymentRepository) throws MojoExecutionException {
+        //process collected non-recognized external jars..
+        int index = 0;
+        int count = externals.size();
+        for (ExternalsWrapper ex : externals) {
+            Artifact art = createArtifact(ex.getArtifactId(), ex.getVersion(), ex.getGroupId());
+            index = index + 1;
+            getLog().info("Processing external " + index + "/" + count + " :" + ex.getGroupId() + ":" + ex.getArtifactId() + ":" + ex.getVersion());
+            Path pom = createExternalProjectPOM(ex);
+            Artifact pomArt = new SubArtifact(art, "", "pom", pom);
+            if (!skipLocalInstall) {
+                install(pomArt.setPath(pom));
+                install(art.setPath(ex.getPath()));
+            }
+            if (deploymentRepository != null) {
+                DeployRequest deployRequest = newDeployRequest(deploymentRepository);
+                deployRequest.addArtifact(pomArt.setPath(pom));
+                deployRequest.addArtifact(art.setPath(ex.getPath()));
+                deploy(deployRequest);
             }
 
         }
     }
 
-    void install(Artifact art)
-            throws MojoExecutionException {
+    private void populateModules(Map<ModuleWrapper, Artifact> tobePopulated, List<ModuleWrapper> wrapperList, List<ExternalsWrapper> externals, File javadocRoot, File sourceRoot, File nbmRoot, RemoteRepository deploymentRepository) throws MojoExecutionException {
+        int count = tobePopulated.size() + 1;
+        int index = 0;
+
+        for (Map.Entry<ModuleWrapper, Artifact> elem : tobePopulated.entrySet()) {
+            ModuleWrapper man = elem.getKey();
+            Artifact art = elem.getValue();
+            index = index + 1;
+            getLog().info("Processing " + index + "/" + count + " :" + art.getGroupId() + ":" + art.getArtifactId() + ":" + art.getVersion());
+            Path pom = createModuleProjectPOM(man, wrapperList, externals);
+            Artifact pomArt = new SubArtifact(art, "", "pom", pom);
+            Path javadoc = null;
+            Artifact javadocArt = null;
+            if (javadocRoot != null) {
+                Path zip = javadocRoot.toPath().resolve(art.getArtifactId() + ".zip");
+                if (Files.exists(zip)) {
+                    javadoc = zip;
+                    javadocArt = createAttachedArtifact(art, javadoc, "jar", "javadoc");
+                }
+            }
+            Path source = null;
+            Artifact sourceArt = null;
+            if (sourceRoot != null) {
+                Path zip = sourceRoot.toPath().resolve(art.getArtifactId() + ".zip");
+                if (Files.exists(zip)) {
+                    source = zip;
+                    sourceArt = createAttachedArtifact(art, source, "jar", "sources");
+                }
+            }
+            Path nbm = null;
+            Artifact nbmArt = null;
+            if (nbmRoot != null) {
+                Path zip = nbmRoot.toPath().resolve(art.getArtifactId() + ".nbm");
+
+                if (!Files.exists(zip)) {
+                    zip = nbmRoot.toPath().resolve(man.getCluster()).resolve(art.getArtifactId() + ".nbm");
+                }
+                if (Files.exists(zip)) {
+                    nbm = zip;
+                    nbmArt = createAttachedArtifact(art, nbm, "nbm-file", null);
+                    if (nbmArt.getExtension().equals("nbm-file")) {
+                        // Maven 2.x compatibility.
+                        nbmArt = createAttachedArtifact(art, nbm, "nbm", null);
+                    }
+                    assert nbmArt.getExtension().equals("nbm");
+                }
+            }
+            File moduleJar = man.getPath().toFile();
+            Path moduleJarMinusCP = null;
+
+            moduleJarMinusCP = manageManifestClasspath(man, moduleJarMinusCP, moduleJar);
+
+            //
+            try {
+                if (!skipLocalInstall) {
+                    install(pomArt.setPath(pom));
+                    install(art.setPath(moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar.toPath()));
+                    if (javadoc != null) {
+                        install(javadocArt.setPath(javadoc));
+                    }
+                    if (source != null) {
+                        install(sourceArt.setPath(source));
+                    }
+                    if (nbm != null) {
+                        install(nbmArt.setPath(nbm));
+                    }
+                }
+                if (deploymentRepository != null) {
+                    DeployRequest deployRequest = newDeployRequest(deploymentRepository);
+                    deployRequest.addArtifact(art.setPath(moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar.toPath()));
+                    if (pom != null) {
+                        deployRequest.addArtifact(pomArt.setPath(pom));
+                    }
+                    if (javadoc != null) {
+                        deployRequest.addArtifact(javadocArt.setPath(javadoc));
+                    }
+                    if (source != null) {
+                        deployRequest.addArtifact(sourceArt.setPath(source));
+                    }
+                    if (nbm != null) {
+                        deployRequest.addArtifact(nbmArt.setPath(nbm));
+                    }
+                    deploy(deployRequest);
+                }
+            } finally {
+                if (moduleJarMinusCP != null) {
+                    //moduleJarMinusCP.delete();
+                }
+            }
+        }
+
+    }
+
+    private Path manageManifestClasspath(ModuleWrapper man, Path moduleJarMinusCP, File moduleJar) {
+        if (!man.getModuleManifest().getClasspath().isEmpty()) {
+            try {
+                moduleJarMinusCP = Files.createTempFile(man.getArtifactId(), ".jar");
+                moduleJarMinusCP.toFile().deleteOnExit();
+                try (InputStream is = Files.newInputStream(moduleJar.toPath())) {
+                    try (OutputStream os = Files.newOutputStream(moduleJarMinusCP)) {
+                        JarInputStream jis = new JarInputStream(is);
+                        Manifest mani = new Manifest(jis.getManifest());
+                        mani.getMainAttributes().remove(Attributes.Name.CLASS_PATH);
+                        if (!man.deps.isEmpty()) { // MNBMODULE-132
+                            StringBuilder b = new StringBuilder();
+                            for (Dependency dep : man.deps) {
+                                if (b.length() > 0) {
+                                    b.append(' ');
+                                }
+                                b.append(dep.getGroupId()).append(':').append(dep.getArtifactId())
+                                        .append(':').append(dep.getVersion());
+                                if (dep.getClassifier() != null) {
+                                    b.append(":").append(dep.getClassifier());
+                                }
+                            }
+                            mani.getMainAttributes().putValue("Maven-Class-Path", b.toString());
+                        } else {
+                            getLog().warn("did not find any external artifacts for " + man.getModule());
+                        }
+                        try (JarOutputStream jos = new JarOutputStream(os, mani);) {
+                            JarEntry entry;
+                            while ((entry = jis.getNextJarEntry()) != null) {
+                                if (entry.getName().matches("META-INF/.+[.]SF")) {
+                                    throw new IOException("cannot handle signed JARs");
+                                }
+                                jos.putNextEntry(entry);
+                                byte[] buf = new byte[(int) entry.getSize()];
+                                int read = jis.read(buf, 0, buf.length);
+                                if (read != buf.length) {
+                                    throw new IOException("read wrong amount");
+                                }
+                                jos.write(buf);
+                            }
+                        }
+                    }
+                }
+            } catch (IOException x) {
+                getLog().warn("Could not process " + moduleJar + ": " + x, x);
+                //moduleJarMinusCP.delete();
+                moduleJarMinusCP = null;
+            }
+        }
+        return moduleJarMinusCP;
+    }
+
+    void install(Artifact art) throws MojoExecutionException {
         try {
             InstallRequest installRequest = new InstallRequest();
             installRequest.addArtifact(art);
@@ -646,8 +646,7 @@ public class PopulateRepositoryMojo
         return deployRequest;
     }
 
-    void deploy(DeployRequest deployRequest)
-            throws MojoExecutionException {
+    void deploy(DeployRequest deployRequest) throws MojoExecutionException {
         int attempts = Math.max(0, retryFailedDeploymentCount) + 1;
         DeploymentException lastException = null;
         for (int attempt = 1; attempt <= attempts; attempt++) {
@@ -666,7 +665,7 @@ public class PopulateRepositoryMojo
     }
 
     //performs the same tasks as the MavenProjectHelper
-    Artifact createAttachedArtifact(Artifact primary, File file, String type, String classifier) {
+    Artifact createAttachedArtifact(Artifact primary, Path path, String type, String classifier) {
         assert type != null;
 
         ArtifactHandler handler;
@@ -678,22 +677,25 @@ public class PopulateRepositoryMojo
             handler = artifactHandlerManager.getArtifactHandler("jar");
         }
 
-        return new SubArtifact(primary, classifier, handler.getExtension(), null, file);
+        return new SubArtifact(primary, classifier, handler.getExtension(), null, path);
     }
 
-    private File createMavenProject(ModuleWrapper wrapper, List<ModuleWrapper> wrapperList,
-            List<ExternalsWrapper> externalsList)
-            throws MojoExecutionException {
+    private Model getMavenModel(ArtifactHelper wrapper, String packaging) {
         Model mavenModel = new Model();
-
-        mavenModel.setGroupId(wrapper.getGroup());
-        mavenModel.setArtifactId(wrapper.getArtifact());
+        mavenModel.setGroupId(wrapper.getGroupId());
+        mavenModel.setArtifactId(wrapper.getArtifactId());
         mavenModel.setVersion(wrapper.getVersion());
-        mavenModel.setPackaging("jar");
+        mavenModel.setPackaging(packaging);
         mavenModel.setModelVersion("4.0.0");
         if (artefactParent != null) {
             mavenModel.setParent(artefactParent);
         }
+        return mavenModel;
+    }
+
+    private Path createModuleProjectPOM(ModuleWrapper wrapper, List<ModuleWrapper> wrapperList, List<ExternalsWrapper> externalsList) throws MojoExecutionException {
+        Model mavenModel = getMavenModel(wrapper, "jar");
+
         ExamineManifest man = wrapper.getModuleManifest();
         List<Dependency> deps = new ArrayList<>();
         if (!man.getDependencyTokens().isEmpty()) {
@@ -704,19 +706,18 @@ public class PopulateRepositoryMojo
                 if (index > -1) {
                     wr = wrapperList.get(index);
                     Dependency dep;
-                    if (wr instanceof ModuleWrapperMaven) {
-                        dep = ((ModuleWrapperMaven) wr).getDep();
+                    if (wr instanceof ModuleWrapperMaven mwr) {
+                        dep = mwr.getDep();
                     } else {
                         dep = new Dependency();
-                        dep.setArtifactId(wr.getArtifact());
-                        dep.setGroupId(wr.getGroup());
+                        dep.setArtifactId(wr.getArtifactId());
+                        dep.setGroupId(wr.getGroupId());
                         dep.setVersion(wr.getVersion());
                     }
                     dep.setType("jar");
                     //we don't want the API modules to depend on non-api ones..
                     // otherwise the transitive dependency mechanism pollutes your classpath..
-                    if (wrapper.getModuleManifest().hasPublicPackages()
-                            && !wr.getModuleManifest().hasPublicPackages()) {
+                    if (wrapper.getModuleManifest().hasPublicPackages() && !wr.getModuleManifest().hasPublicPackages()) {
                         dep.setScope("runtime");
                     }
                     deps.add(dep);
@@ -776,23 +777,19 @@ public class PopulateRepositoryMojo
             StringTokenizer tok = new StringTokenizer(cp);
             while (tok.hasMoreTokens()) {
                 String path = tok.nextToken();
-                File f = new File(wrapper.getFile().getParentFile(), path);
+                File f = new File(wrapper.getPath().toFile().getParentFile(), path);
                 if (f.exists()) {
                     Dependency dep = findExternal(f);
                     if (dep != null) {
                         deps.add(dep);
                         // XXX MNBMODULE-170: repack NBM with *.external
                     } else {
-                        ExternalsWrapper ex = new ExternalsWrapper();
-                        ex.setFile(f);
                         String artId = f.getName();
                         if (artId.endsWith(".jar")) {
                             artId = artId.substring(0, artId.length() - ".jar".length());
                         }
-                        ex.setVersion(wrapper.getVersion());
-                        ex.setArtifact(artId);
-                        ex.setGroupid(groupIdPrefix + GROUP_EXTERNAL);
-                        externalsList.add(ex);
+
+                        externalsList.add(new ExternalsWrapper(artId, groupIdPrefix + GROUP_EXTERNAL, wrapper.getVersion(), f.toPath()));
                         dep = new Dependency();
                         dep.setArtifactId(artId);
                         dep.setGroupId(groupIdPrefix + GROUP_EXTERNAL);
@@ -806,26 +803,61 @@ public class PopulateRepositoryMojo
 
         wrapper.deps = deps;
         mavenModel.setDependencies(deps);
-        FileWriter writer = null;
-        File fil = null;
+
+        return writePOMFile(mavenModel);
+    }
+
+    private Path createExternalProjectPOM(ExternalsWrapper wrapper) {
+        Model mavenModel = getMavenModel(wrapper, "jar");
+
+        mavenModel.setName("Maven definition for " + wrapper.getPath().toFile().getName() + " - external part of NetBeans module.");
+        mavenModel.setDescription("POM and identification for artifact that was not possible to uniquely identify as a maven dependency.");
+        return writePOMFile(mavenModel);
+
+    }
+
+    private Path createClusterProjectPOM(Artifact cluster, Collection<ModuleWrapper> mods) {
+        Model mavenModel = getMavenModel(new ClusterWrapper(cluster), "pom");
+
+        List<Dependency> deps = new ArrayList<>();
+        for (ModuleWrapper wr : mods) {
+            Dependency dep = new Dependency();
+            if (wr.getModuleManifest().isNetBeansModule()) {
+                dep.setArtifactId(wr.getArtifactId());
+                dep.setGroupId(wr.getGroupId());
+                dep.setVersion(wr.getVersion());
+                dep.setType("nbm-file");
+            } else if (wr instanceof ModuleWrapperMaven mwr) {
+                dep.setArtifactId(mwr.getDep().getArtifactId());
+                dep.setGroupId(mwr.getDep().getGroupId());
+                dep.setVersion(mwr.getDep().getVersion());
+                dep.setClassifier(mwr.getDep().getClassifier());
+                dep.setScope(mwr.getDep().getScope());
+            } else {
+                dep.setArtifactId(wr.getArtifactId());
+                dep.setGroupId(wr.getGroupId());
+                dep.setVersion(wr.getVersion());
+            }
+            deps.add(dep);
+        }
+        mavenModel.setDependencies(deps);
+
+        return writePOMFile(mavenModel);
+    }
+
+    private Path writePOMFile(Model mavenModel) throws UncheckedIOException {
+        Path pomFile = null;
+        MavenXpp3Writer xpp = new MavenXpp3Writer();
         try {
-            MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = Files.createTempFile("maven", ".pom").toFile();
-            fil.deleteOnExit();
-            writer = new FileWriter(fil);
-            xpp.write(writer, mavenModel);
+            pomFile = Files.createTempFile("maven", ".pom");
+            pomFile.toFile().deleteOnExit();
+            try (OutputStream output = Files.newOutputStream(pomFile);) {
+                xpp.write(output, mavenModel);
+            }
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException io) {
-                    throw new UncheckedIOException(io);
-                }
-            }
         }
-        return fil;
+        return pomFile;
     }
 
     private Dependency findExternal(File f) {
@@ -878,105 +910,6 @@ public class PopulateRepositoryMojo
         return dep;
     }
 
-    File createExternalProject(ExternalsWrapper wrapper) {
-        Model mavenModel = new Model();
-
-        mavenModel.setGroupId(wrapper.getGroupid());
-        mavenModel.setArtifactId(wrapper.getArtifact());
-        mavenModel.setVersion(wrapper.getVersion());
-        mavenModel.setPackaging("jar");
-        mavenModel.setModelVersion("4.0.0");
-        if (artefactParent != null) {
-            mavenModel.setParent(artefactParent);
-        }
-        mavenModel.setName(
-                "Maven definition for " + wrapper.getFile().getName() + " - external part of NetBeans module.");
-        mavenModel.setDescription(
-                "POM and identification for artifact that was not possible to uniquely identify as a maven dependency.");
-        FileWriter writer = null;
-        File fil = null;
-        try {
-            MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = Files.createTempFile("maven", ".pom").toFile();
-            fil.deleteOnExit();
-            writer = new FileWriter(fil);
-            xpp.write(writer, mavenModel);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException io) {
-                    io.printStackTrace();
-                }
-            }
-        }
-        return fil;
-
-    }
-
-    private File createClusterProject(Artifact cluster, Collection<ModuleWrapper> mods) {
-        Model mavenModel = new Model();
-
-        mavenModel.setGroupId(cluster.getGroupId());
-        mavenModel.setArtifactId(cluster.getArtifactId());
-        mavenModel.setVersion(cluster.getVersion());
-//        mavenModel.setPackaging("nbm-application");
-        mavenModel.setPackaging("pom");
-        mavenModel.setModelVersion("4.0.0");
-        if (artefactParent != null) {
-            mavenModel.setParent(artefactParent);
-        }
-        List<Dependency> deps = new ArrayList<>();
-        for (ModuleWrapper wr : mods) {
-            Dependency dep = new Dependency();
-            if (wr.getModuleManifest().isNetBeansModule()) {
-                dep.setArtifactId(wr.getArtifact());
-                dep.setGroupId(wr.getGroup());
-                dep.setVersion(wr.getVersion());
-                dep.setType("nbm-file");
-            } else if (wr instanceof ModuleWrapperMaven) {
-                ModuleWrapperMaven mwr = (ModuleWrapperMaven) wr;
-                dep.setArtifactId(mwr.getDep().getArtifactId());
-                dep.setGroupId(mwr.getDep().getGroupId());
-                dep.setVersion(mwr.getDep().getVersion());
-                dep.setClassifier(mwr.getDep().getClassifier());
-                dep.setScope(mwr.getDep().getScope());
-            } else {
-                dep.setArtifactId(wr.getArtifact());
-                dep.setGroupId(wr.getGroup());
-                dep.setVersion(wr.getVersion());
-            }
-            deps.add(dep);
-        }
-        mavenModel.setDependencies(deps);
-//
-//
-//        Build build = new Build();
-//        Plugin plg = new Plugin();
-//        plg.setGroupId("org.codehaus.mojo");
-//        plg.setArtifactId("nbm-maven-plugin");
-//        plg.setVersion("2.7-SNAPSHOT");
-//        plg.setExtensions(true);
-//        build.addPlugin(plg);
-//        mavenModel.setBuild(build);
-
-        try {
-            File fil = Files.createTempFile("maven", ".pom").toFile();
-            fil.deleteOnExit();
-
-            try (FileWriter writer = new FileWriter(fil)) {
-                MavenXpp3Writer xpp = new MavenXpp3Writer();
-                xpp.write(writer, mavenModel);
-            }
-            return fil;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
     Artifact createArtifact(String artifact, String version, String group) {
         return new DefaultArtifact(group, artifact, "jar", version);
     }
@@ -995,46 +928,62 @@ public class PopulateRepositoryMojo
         return key;
     }
 
-    private static class ExternalsWrapper {
+    interface ArtifactHelper {
 
-        private File file;
+        String getArtifactId();
 
-        private String artifact;
+        String getGroupId();
 
-        private String groupid;
+        String getVersion();
 
-        public String getArtifact() {
-            return artifact;
+        Path getPath();
+    }
+
+    private record ClusterWrapper(Artifact artifact) implements ArtifactHelper {
+
+        @Override
+        public String getArtifactId() {
+            return artifact.getArtifactId();
         }
 
-        public void setArtifact(String artifact) {
-            this.artifact = artifact;
+        @Override
+        public String getGroupId() {
+            return artifact.getGroupId();
         }
 
-        public File getFile() {
-            return file;
+        @Override
+        public String getVersion() {
+            return artifact.getVersion();
         }
 
-        public void setFile(File file) {
-            this.file = file;
+        @Override
+        public Path getPath() {
+            return artifact.getPath();
         }
 
-        public String getGroupid() {
-            return groupid;
+    }
+
+    private record ExternalsWrapper(String artifactId, String groupId, String version, Path path) implements ArtifactHelper {
+
+        @Override
+        public String getArtifactId() {
+            return artifactId;
         }
 
-        public void setGroupid(String groupid) {
-            this.groupid = groupid;
+        @Override
+        public Path getPath() {
+            return path;
         }
 
+        @Override
+        public String getGroupId() {
+            return groupId;
+        }
+
+        @Override
         public String getVersion() {
             return version;
         }
-
-        public void setVersion(String version) {
-            this.version = version;
-        }
-        private String version;
 
     }
 
@@ -1042,7 +991,7 @@ public class PopulateRepositoryMojo
 
         private final Dependency dep;
 
-        ModuleWrapperMaven(String art, String ver, String grp, ExamineManifest manifest, File fil, Dependency de) {
+        ModuleWrapperMaven(String art, String ver, String grp, ExamineManifest manifest, Path fil, Dependency de) {
             super(art, ver, grp, manifest, fil);
             this.dep = de;
         }
@@ -1052,7 +1001,7 @@ public class PopulateRepositoryMojo
         }
     }
 
-    private static class ModuleWrapper {
+    private static class ModuleWrapper implements ArtifactHelper {
 
         ExamineManifest man;
 
@@ -1062,7 +1011,7 @@ public class PopulateRepositoryMojo
 
         private String group;
 
-        private File file;
+        private Path path;
 
         private String cluster;
 
@@ -1074,12 +1023,12 @@ public class PopulateRepositoryMojo
             this.module = module;
         }
 
-        ModuleWrapper(String art, String ver, String grp, ExamineManifest manifest, File fil) {
+        ModuleWrapper(String art, String ver, String grp, ExamineManifest manifest, Path fil) {
             man = manifest;
             artifact = art;
             version = ver;
             group = grp;
-            file = fil;
+            path = fil;
         }
 
         @Override
@@ -1100,20 +1049,24 @@ public class PopulateRepositoryMojo
             return man;
         }
 
-        private String getArtifact() {
+        @Override
+        public String getArtifactId() {
             return artifact;
         }
 
-        private String getVersion() {
+        @Override
+        public String getVersion() {
             return version;
         }
 
-        private String getGroup() {
+        @Override
+        public String getGroupId() {
             return group;
         }
 
-        private File getFile() {
-            return file;
+        @Override
+        public Path getPath() {
+            return path;
         }
 
         void setCluster(String clust) {
@@ -1125,12 +1078,11 @@ public class PopulateRepositoryMojo
         }
     }
 
-    private static class NullOutputStream
-            extends OutputStream {
+    private static class NullOutputStream extends OutputStream {
 
         @Override
-        public void write(int b)
-                throws IOException {
+        public void write(int b) throws IOException {
+            // empty by design
         }
     }
 
@@ -1143,8 +1095,7 @@ public class PopulateRepositoryMojo
     static String encode(byte[] binaryData) {
         int bitLength = binaryData.length * 8;
         if (bitLength != 128 && bitLength != 160) {
-            throw new IllegalArgumentException(
-                    "Unrecognised length for binary data: " + bitLength + " bits");
+            throw new IllegalArgumentException("Unrecognised length for binary data: " + bitLength + " bits");
         }
         return String.format("%0" + bitLength / 4 + "x", new BigInteger(1, binaryData));
     }

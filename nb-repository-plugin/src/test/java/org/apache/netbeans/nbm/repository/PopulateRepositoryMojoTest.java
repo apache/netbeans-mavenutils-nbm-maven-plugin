@@ -23,26 +23,30 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeploymentException;
 import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
 import org.eclipse.aether.internal.impl.DefaultLocalPathPrefixComposerFactory;
-import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
 import org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.maven.api.plugin.testing.InjectMojo;
 import org.apache.maven.api.plugin.testing.MojoExtension;
 import org.apache.maven.api.plugin.testing.MojoParameter;
 import org.apache.maven.api.plugin.testing.MojoTest;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultRepositoryKeyFunctionFactory;
+import org.eclipse.aether.internal.impl.TrackingFileManagerSupplier;
+import org.eclipse.aether.repository.RepositoryUriUtils;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -72,15 +76,15 @@ class PopulateRepositoryMojoTest {
         File f1 = File.createTempFile("PopulateRepositoryMojoTest", ".jar");
         f1.deleteOnExit();
         Artifact art1 = mojo.createArtifact("testarg", "1.0", "testgrp");
-        art1 = art1.setFile(f1);
+        art1 = art1.setPath(f1.toPath());
         File f2 = File.createTempFile("PopulateRepositoryMojoTest", ".nbm");
         f2.deleteOnExit();
         Artifact art2 = new SubArtifact(art1, "", "nbm", f2);
         mojo.install(art1);
         mojo.install(art2);
-        File localRepo = mojo.session.getRepositorySession().getLocalRepository().getBasedir();
-        assertTrue(new File(localRepo, "testgrp/testarg/1.0/testarg-1.0.nbm").isFile());
-        assertTrue(new File(localRepo, "testgrp/testarg/1.0/testarg-1.0.jar").isFile());
+        Path localRepo = mojo.session.getRepositorySession().getLocalRepository().getBasePath();
+        assertTrue(new File(localRepo.toFile(), "testgrp/testarg/1.0/testarg-1.0.nbm").isFile());
+        assertTrue(new File(localRepo.toFile(), "testgrp/testarg/1.0/testarg-1.0.jar").isFile());
     }
 
     @Test
@@ -210,10 +214,14 @@ class PopulateRepositoryMojoTest {
     private MavenSession createMavenSession() throws NoLocalRepositoryManagerException {
         MavenSession session = mock(MavenSession.class);
         DefaultRepositorySystemSession repositorySession = new DefaultRepositorySystemSession();
-        repositorySession.setLocalRepositoryManager(new EnhancedLocalRepositoryManagerFactory(
-                new DefaultLocalPathComposer(), new DefaultTrackingFileManager(), new DefaultLocalPathPrefixComposerFactory()
-        )
-                .newInstance(repositorySession, new LocalRepository(LOCAL_REPO)));
+        repositorySession.setLocalRepositoryManager(
+                new EnhancedLocalRepositoryManagerFactory(
+                        new DefaultLocalPathComposer(),
+                        new TrackingFileManagerSupplier().get(),
+                        new DefaultLocalPathPrefixComposerFactory(new DefaultRepositoryKeyFunctionFactory()),
+                        new DefaultRepositoryKeyFunctionFactory()
+                )
+                        .newInstance(repositorySession, new LocalRepository(Paths.get(RepositoryUriUtils.toUri(LOCAL_REPO)).toAbsolutePath())));
         ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest();
         buildingRequest.setRepositorySession(repositorySession);
         when(session.getProjectBuildingRequest()).thenReturn(buildingRequest);

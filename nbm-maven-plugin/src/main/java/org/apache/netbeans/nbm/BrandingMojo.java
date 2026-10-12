@@ -170,7 +170,7 @@ public final class BrandingMojo extends AbstractNbmMojo {
                     // create nnn.jar archive of contents
                     JarArchiver archiver = new JarArchiver();
                     archiver.setDestFile(destinationJar);
-                    archiver.addDirectory(jarDirectory);
+                    archiver.addFileSet(MigrationUtils.getFileSet(jarDirectory, archiver, null, null));
                     archiver.createArchive();
                 }
             }
