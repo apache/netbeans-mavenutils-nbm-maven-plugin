@@ -125,6 +125,11 @@ under the License.
             <artifactId>nb-shared</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nbm-maven-harness</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->

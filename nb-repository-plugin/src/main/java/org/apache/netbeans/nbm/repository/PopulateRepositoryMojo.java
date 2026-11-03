@@ -61,6 +61,8 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Input;
 import org.apache.tools.ant.taskdefs.PathConvert;
 import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.selectors.FilenameSelector;
+import org.apache.tools.ant.types.selectors.OrSelector;
 import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RequestTrace;
@@ -75,6 +77,7 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.artifact.SubArtifact;
+import org.netbeans.nbbuild.MakeUpdateDesc;
 
 /**
  * A goal for identifying NetBeans modules from the installation and populating
@@ -520,6 +523,7 @@ public class PopulateRepositoryMojo
                     }
                 }
                 try {
+                    man.setNbm(nbm);
                     if (!skipLocalInstall) {
                         install(pomArt.setFile(pom));
                         install(art.setFile(moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar));
@@ -615,17 +619,22 @@ public class PopulateRepositoryMojo
                 String cluster = stripClusterName(elem.getKey());
                 Collection<ModuleWrapper> modules = elem.getValue();
                 getLog().info("Processing cluster " + cluster);
-                Artifact art = createClusterArtifact(cluster, forcedVersion);
+                Artifact art = new DefaultArtifact(groupIdPrefix + GROUP_CLUSTER, cluster, "pom", forcedVersion);
+                Artifact catalog = new DefaultArtifact(groupIdPrefix + GROUP_CLUSTER, cluster, "xml.gz", forcedVersion);
+                catalog.setFile(createCatalog(catalog, modules));
                 File pom = createClusterProject(art, modules);
+                art.setFile(pom);
                 if (!skipLocalInstall) {
-                    install(art.setFile(pom));
+                    install(art);
+                    install(catalog);
                 }
                 try {
                     if (deploymentRepository != null) {
                         DeployRequest deployRequest = new DeployRequest();
                         deployRequest.setRepository(deploymentRepository);
                         deployRequest.setTrace(RequestTrace.newChild(null, "nb-repository-plugin"));
-                        deployRequest.addArtifact(art.setFile(pom));
+                        deployRequest.addArtifact(art);
+                        deployRequest.addArtifact(catalog);
 
                         repositorySystem.deploy(session.getRepositorySession(), deployRequest);
                     }
@@ -962,13 +971,57 @@ public class PopulateRepositoryMojo
         return null;
     }
 
+    private File createCatalog(Artifact catalog, Collection<ModuleWrapper> mods) throws MojoExecutionException {
+        File xml = null;
+        try {
+            xml = Files.createTempFile("maven-catalog", ".xml.gz").toFile();
+            xml.setLastModified(0L); // always out of date
+
+            Project project = new Project();
+            MakeUpdateDesc generateCatalogTask = new MakeUpdateDesc();
+            generateCatalogTask.setProject(project);
+            generateCatalogTask.setDesc(xml);
+            File parentDir = null;
+            OrSelector allFiles = new OrSelector();
+            allFiles.setProject(project);
+            for (var m : mods) {
+                File nbm = m.getNbm();
+                System.err.println("file: " + nbm + " for " + m.getArtifact());
+                if (parentDir == null) {
+                    parentDir = nbm.getParentFile();
+                } else {
+                    if (!parentDir.equals(nbm.getParentFile())) {
+                        throw new MojoExecutionException("All NBM files must be in the same directory " + nbm.getParentFile() + " vs. " + parentDir);
+                    }
+                }
+                FilenameSelector selector = new FilenameSelector();
+                selector.setProject(project);
+                selector.setName(nbm.getName());
+                allFiles.add(selector);
+            }
+
+            FileSet files = new FileSet();
+            files.setProject(project);
+            files.setDir(parentDir);
+            files.add(allFiles);
+            generateCatalogTask.addFileset(files);
+
+            generateCatalogTask.execute();
+            if (!xml.exists() || xml.length() == 0) {
+                throw new MojoExecutionException("No catalog file generated: " + xml + " for " + catalog);
+            }
+            xml.deleteOnExit();
+            return xml;
+        } catch (IOException ex) {
+            throw new MojoExecutionException("Generating catalog " + catalog + " into " + xml, ex);
+        }
+    }
+
+
     Artifact createArtifact(String artifact, String version, String group) {
         return new DefaultArtifact(group, artifact, "jar", version);
     }
 
-    private Artifact createClusterArtifact(String artifact, String version) {
-        return new DefaultArtifact(groupIdPrefix + GROUP_CLUSTER, artifact, "pom", version);
-    }
 
     private static final Pattern PATTERN_CLUSTER = Pattern.compile("([a-zA-Z]+)[0-9\\.]*");
 
@@ -1054,6 +1107,7 @@ public class PopulateRepositoryMojo
         String module;
 
         List<Dependency> deps;
+        private File nbm;
 
         ModuleWrapper(String module) {
             this.module = module;
@@ -1101,12 +1155,20 @@ public class PopulateRepositoryMojo
             return file;
         }
 
-        void setCluster(String clust) {
+        private void setCluster(String clust) {
             cluster = clust;
         }
 
-        String getCluster() {
+        private String getCluster() {
             return cluster;
+        }
+
+        private void setNbm(File nbm) {
+            this.nbm = nbm;
+        }
+
+        private File getNbm() {
+            return nbm;
         }
     }
 
