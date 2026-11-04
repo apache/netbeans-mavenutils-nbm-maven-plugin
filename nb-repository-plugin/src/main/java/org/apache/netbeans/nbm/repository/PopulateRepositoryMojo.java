@@ -986,7 +986,11 @@ public class PopulateRepositoryMojo
             allFiles.setProject(project);
             for (var m : mods) {
                 File nbm = m.getNbm();
-                System.err.println("file: " + nbm + " for " + m.getArtifact() + " file: " + m.getFile());
+                getLog().info("file: " + nbm + " for " + m.getArtifact() + " file: " + m.getFile());
+                if (nbm == null) {
+                    getLog().warn("No NBM for " + m);
+                    continue;
+                }
                 if (parentDir == null) {
                     parentDir = nbm.getParentFile();
                 } else {
@@ -1169,6 +1173,11 @@ public class PopulateRepositoryMojo
 
         private File getNbm() {
             return nbm;
+        }
+
+        @Override
+        public String toString() {
+            return "ModuleWrapper{" + "man=" + man + ", artifact=" + artifact + ", version=" + version + ", group=" + group + ", file=" + file + ", cluster=" + cluster + ", module=" + module + ", deps=" + deps + ", nbm=" + nbm + '}';
         }
     }
 
