@@ -621,9 +621,9 @@ public class PopulateRepositoryMojo
                 getLog().info("Processing cluster " + cluster);
                 Artifact art = new DefaultArtifact(groupIdPrefix + GROUP_CLUSTER, cluster, "pom", forcedVersion);
                 Artifact catalog = new DefaultArtifact(groupIdPrefix + GROUP_CLUSTER, cluster, "xml.gz", forcedVersion);
-                catalog.setFile(createCatalog(catalog, modules));
+                catalog = catalog.setFile(createCatalog(catalog, modules));
                 File pom = createClusterProject(art, modules);
-                art.setFile(pom);
+                art = art.setFile(pom);
                 if (!skipLocalInstall) {
                     install(art);
                     install(catalog);
@@ -986,7 +986,7 @@ public class PopulateRepositoryMojo
             allFiles.setProject(project);
             for (var m : mods) {
                 File nbm = m.getNbm();
-                System.err.println("file: " + nbm + " for " + m.getArtifact());
+                System.err.println("file: " + nbm + " for " + m.getArtifact() + " file: " + m.getFile());
                 if (parentDir == null) {
                     parentDir = nbm.getParentFile();
                 } else {
