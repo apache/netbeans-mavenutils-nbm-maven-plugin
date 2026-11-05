@@ -19,7 +19,14 @@ package org.apache.netbeans.nbm.repository;
  * under the License.
  */
 import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
@@ -81,6 +88,38 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         assertTrue(new File(localRepo, "testgrp/testarg/1.0/testarg-1.0.jar").isFile());
     }
 
+    public void testInstallWithCluster() throws Exception {
+        Path installDir = Files.createTempDirectory("netbeansInstall");
+        Path clusterDir = Files.createDirectory(installDir.resolve("extra"));
+        Path modulesDir = Files.createDirectory(clusterDir.resolve("modules"));
+        File moduleJar = Files.createFile(modulesDir.resolve("testmodule.jar")).toFile();
+        assertEquals("Modules dir is inside of install dir", modulesDir.getParent().getParent(), installDir);
+        Manifest moduleMan = new Manifest();
+        moduleMan.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        moduleMan.getMainAttributes().putValue("OpenIDE-Module", "testarg");
+        moduleMan.getMainAttributes().putValue("OpenIDE-Module-Specification-Version", "0.33");
+        try (var os = new JarOutputStream(new FileOutputStream(moduleJar), moduleMan)) {
+            os.putNextEntry(new JarEntry("empty.txt"));
+            os.closeEntry();
+        }
+        moduleJar.deleteOnExit();
+        Path nbmDir = Files.createTempDirectory("nbms");
+        File moduleNbm = Files.createFile(nbmDir.resolve("testmodule.nbm")).toFile();
+        moduleNbm.deleteOnExit();
+
+        PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
+        setVariableValueToObject(mojo, "session", createMavenSession());
+        mojo.netbeansInstallDirectory = installDir.toFile();
+        mojo.netbeansNbmDirectory = nbmDir.toFile();
+        setVariableValueToObject(mojo, "groupIdPrefix", "testgrp");
+
+        mojo.execute();
+        File localRepo = mojo.session.getRepositorySession().getLocalRepository().getBasedir();
+        assertFile("pom.xml has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.pom"));
+        assertFile("Module JAR has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.jar"));
+        assertFile("NBM file has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.nbm"));
+    }
+
     public void testSplit() throws Exception {
         Dependency dep1 = PopulateRepositoryMojo.splitDependencyString("org.apache.maven:apache-maven:3.6.3:bin@zip");
         assertEquals("org.apache.maven", dep1.getGroupId());
@@ -127,5 +166,37 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         when(session.getPluginContext(any(PluginDescriptor.class), any(MavenProject.class)))
                 .thenReturn(new ConcurrentHashMap<String, Object>());
         return session;
+    }
+
+    private static File files(File root, String... segments) {
+        File file = root;
+        for (var s : segments) {
+            file = new File(file, s);
+        }
+        return file;
+    }
+
+    private static void assertFile(String msg, File file) {
+        if (file.isFile()) {
+            return;
+        }
+        var sb = new StringBuilder();
+        sb.append(msg);
+        for (;;) {
+            File parentDir = file.getParentFile();
+            if (parentDir == null) {
+                break;
+            }
+            if (parentDir.isDirectory()) {
+                sb.append("\nContent of ").append(parentDir.getPath());
+                for (var ch : parentDir.listFiles()) {
+                    sb.append("\n  ").append(ch.getName());
+                }
+                break;
+            }
+            sb.append("\nNot found ").append(parentDir);
+            file = parentDir;
+        }
+        fail(sb.toString());
     }
 }
