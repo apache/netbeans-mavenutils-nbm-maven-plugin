@@ -24,6 +24,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -112,6 +114,19 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         assertFile("pom.xml has been registered", files(localRepo, "testgrp", "modules", "testmodule", "99-SNAPSHOT", "testmodule-99-SNAPSHOT.pom"));
         assertFile("Module JAR has been registered", files(localRepo, "testgrp", "modules", "testmodule", "99-SNAPSHOT", "testmodule-99-SNAPSHOT.jar"));
         assertFile("NBM file has been registered", files(localRepo, "testgrp", "modules", "testmodule", "99-SNAPSHOT", "testmodule-99-SNAPSHOT.nbm"));
+
+        File clusterPom = files(localRepo, "testgrp", "cluster", "extra", "99-SNAPSHOT", "extra-99-SNAPSHOT.pom");
+        assertFile("Cluster pom created", clusterPom,
+            "<dependency>",
+            "  <groupId>testgrp.modules</groupId>",
+            "  <artifactId>testmodule</artifactId>",
+            "  <version>99-SNAPSHOT</version>",
+            "  <type>nbm-file</type>",
+            "</dependency>"
+        );
+
+        File clusterCatalog = files(localRepo, "testgrp", "cluster", "extra", "99-SNAPSHOT", "extra-99-SNAPSHOT.xml.gz");
+        assertFile("Cluster catalog found", clusterCatalog);
     }
 
     private PopulateRepositoryMojo preparePopulateRepositoryMojo() throws IllegalAccessException, NoLocalRepositoryManagerException, Exception, IOException {
@@ -218,8 +233,20 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         return file;
     }
 
-    private static void assertFile(String msg, File file) {
+    private static void assertFile(String msg, File file, String... expectedLines) throws IOException {
         if (file.isFile()) {
+            if (expectedLines.length > 0) {
+                Set<String> notYetFound = new TreeSet<>();
+                for (var l : expectedLines) {
+                    notYetFound.add(l.trim());
+                }
+                for (var l : Files.readAllLines(file.toPath())) {
+                    notYetFound.remove(l.trim());
+                }
+                if (!notYetFound.isEmpty()) {
+                    fail("Expecting " + notYetFound + " lines in " + file);
+                }
+            }
             return;
         }
         var sb = new StringBuilder();
