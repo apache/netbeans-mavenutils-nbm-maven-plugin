@@ -283,6 +283,7 @@
                     <configuration>
                         <showDeprecation>true</showDeprecation>
                         <release>${jdkbaseline}</release>
+                        <testRelease>21</testRelease>
                         <proc>none</proc>
                     </configuration>
                 </plugin>

@@ -20,6 +20,7 @@ package org.apache.netbeans.nbm.repository;
  */
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +38,7 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.tools.ant.Project;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
@@ -50,6 +52,7 @@ import org.eclipse.aether.util.artifact.SubArtifact;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.netbeans.nbbuild.MakeNBM;
 
 /**
  *
@@ -89,7 +92,7 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         assertTrue(new File(localRepo, "testgrp/testarg/1.0/testarg-1.0.jar").isFile());
     }
 
-    public void testInstallWithCluster() throws Exception {
+    public void testInstallNbmAndJar() throws Exception {
         PopulateRepositoryMojo mojo = preparePopulateRepositoryMojo();
         mojo.execute();
 
@@ -97,6 +100,18 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         assertFile("pom.xml has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.pom"));
         assertFile("Module JAR has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.jar"));
         assertFile("NBM file has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.nbm"));
+    }
+
+    public void testInstallWithCluster() throws Exception {
+        PopulateRepositoryMojo mojo = preparePopulateRepositoryMojo();
+        setVariableValueToObject(mojo, "defineCluster", true);
+        setVariableValueToObject(mojo, "forcedVersion", "99-SNAPSHOT");
+        mojo.execute();
+
+        File localRepo = mojo.session.getRepositorySession().getLocalRepository().getBasedir();
+        assertFile("pom.xml has been registered", files(localRepo, "testgrp", "modules", "testmodule", "99-SNAPSHOT", "testmodule-99-SNAPSHOT.pom"));
+        assertFile("Module JAR has been registered", files(localRepo, "testgrp", "modules", "testmodule", "99-SNAPSHOT", "testmodule-99-SNAPSHOT.jar"));
+        assertFile("NBM file has been registered", files(localRepo, "testgrp", "modules", "testmodule", "99-SNAPSHOT", "testmodule-99-SNAPSHOT.nbm"));
     }
 
     private PopulateRepositoryMojo preparePopulateRepositoryMojo() throws IllegalAccessException, NoLocalRepositoryManagerException, Exception, IOException {
@@ -107,16 +122,38 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         assertEquals("Modules dir is inside of install dir", modulesDir.getParent().getParent(), installDir);
         Manifest moduleMan = new Manifest();
         moduleMan.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-        moduleMan.getMainAttributes().putValue("OpenIDE-Module", "testarg");
+        moduleMan.getMainAttributes().putValue("OpenIDE-Module", "testmodule");
         moduleMan.getMainAttributes().putValue("OpenIDE-Module-Specification-Version", "0.33");
         try (var os = new JarOutputStream(new FileOutputStream(moduleJar), moduleMan)) {
             os.putNextEntry(new JarEntry("empty.txt"));
             os.closeEntry();
         }
+        Path updatesDir = Files.createDirectory(modulesDir.resolve("update_tracking"));
+        File updatesXml = Files.createFile(updatesDir.resolve("testmodule.xml")).toFile();
+        try (var os = new FileWriter(updatesXml)) {
+            os.write("""
+            <?xml version="1.0" encoding="UTF-8"?><module codename="testgrp.testmodule">
+                <module_version install_time="1793684081731" last="true" origin="installer" specification_version="0.33">
+                </module_version>
+            </module>
+            """);
+        }
+        assertTrue(updatesXml.isFile());
         moduleJar.deleteOnExit();
         Path nbmDir = Files.createTempDirectory("nbms");
-        File moduleNbm = Files.createFile(nbmDir.resolve("testmodule.nbm")).toFile();
+        File moduleNbm = nbmDir.resolve("testmodule.nbm").toFile();
+        Project prj = new Project();
+        MakeNBM makeNbm = new MakeNBM();
+        makeNbm.setProject(prj);
+        makeNbm.setFile(moduleNbm);
+        makeNbm.setModule(moduleJar.getName());
+        makeNbm.setProductDir(modulesDir.toFile());
+        assertFalse("NBM file doesn't exist yet " + moduleNbm, moduleNbm.exists());
+        makeNbm.execute();
         moduleNbm.deleteOnExit();
+        assertTrue("NBM file was generated: " + moduleNbm, moduleNbm.length() > 0);
+
+
         PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
         setVariableValueToObject(mojo, "session", createMavenSession());
         mojo.netbeansInstallDirectory = installDir.toFile();
