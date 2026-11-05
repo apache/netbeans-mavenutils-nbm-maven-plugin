@@ -20,6 +20,7 @@ package org.apache.netbeans.nbm.repository;
  */
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,6 +90,16 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
     }
 
     public void testInstallWithCluster() throws Exception {
+        PopulateRepositoryMojo mojo = preparePopulateRepositoryMojo();
+        mojo.execute();
+
+        File localRepo = mojo.session.getRepositorySession().getLocalRepository().getBasedir();
+        assertFile("pom.xml has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.pom"));
+        assertFile("Module JAR has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.jar"));
+        assertFile("NBM file has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.nbm"));
+    }
+
+    private PopulateRepositoryMojo preparePopulateRepositoryMojo() throws IllegalAccessException, NoLocalRepositoryManagerException, Exception, IOException {
         Path installDir = Files.createTempDirectory("netbeansInstall");
         Path clusterDir = Files.createDirectory(installDir.resolve("extra"));
         Path modulesDir = Files.createDirectory(clusterDir.resolve("modules"));
@@ -106,18 +117,12 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         Path nbmDir = Files.createTempDirectory("nbms");
         File moduleNbm = Files.createFile(nbmDir.resolve("testmodule.nbm")).toFile();
         moduleNbm.deleteOnExit();
-
         PopulateRepositoryMojo mojo = (PopulateRepositoryMojo) lookupMojo("populate", new File(getBasedir(), "src/test/resources/PopulateMojoTest.xml"));
         setVariableValueToObject(mojo, "session", createMavenSession());
         mojo.netbeansInstallDirectory = installDir.toFile();
         mojo.netbeansNbmDirectory = nbmDir.toFile();
         setVariableValueToObject(mojo, "groupIdPrefix", "testgrp");
-
-        mojo.execute();
-        File localRepo = mojo.session.getRepositorySession().getLocalRepository().getBasedir();
-        assertFile("pom.xml has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.pom"));
-        assertFile("Module JAR has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.jar"));
-        assertFile("NBM file has been registered", files(localRepo, "testgrp", "modules", "testmodule", "0.33", "testmodule-0.33.nbm"));
+        return mojo;
     }
 
     public void testSplit() throws Exception {
