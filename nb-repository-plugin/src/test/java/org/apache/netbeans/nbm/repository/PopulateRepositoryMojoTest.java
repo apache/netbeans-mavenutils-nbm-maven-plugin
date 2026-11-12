@@ -19,6 +19,7 @@ package org.apache.netbeans.nbm.repository;
  * under the License.
  */
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
@@ -127,6 +129,15 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
 
         File clusterCatalog = files(localRepo, "testgrp", "cluster", "extra", "99-SNAPSHOT", "extra-99-SNAPSHOT.xml.gz");
         assertFile("Cluster catalog found", clusterCatalog);
+
+        try (var catalogStream = new GZIPInputStream(new FileInputStream(clusterCatalog))) {
+            var catalog = new String(catalogStream.readAllBytes());
+            if (!catalog.contains("<module codenamebase=\"testmodule\" distribution=\"\"")) {
+                fail("Expecting codenamebase=testmodule in the catalog:\n" + catalog);
+            }
+        } catch (IOException ex) {
+            throw new AssertionError("Problem processing " + clusterCatalog, ex);
+        }
     }
 
     private PopulateRepositoryMojo preparePopulateRepositoryMojo() throws IllegalAccessException, NoLocalRepositoryManagerException, Exception, IOException {

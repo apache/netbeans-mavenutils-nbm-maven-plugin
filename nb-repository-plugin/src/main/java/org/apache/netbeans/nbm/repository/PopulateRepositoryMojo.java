@@ -20,6 +20,7 @@ package org.apache.netbeans.nbm.repository;
  */
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPOutputStream;
 import javax.inject.Inject;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -1014,6 +1016,15 @@ public class PopulateRepositoryMojo
             if (!xml.exists() || xml.length() == 0) {
                 throw new MojoExecutionException("No catalog file generated: " + xml + " for " + catalog);
             }
+            if (xml.getName().endsWith(".gz")) {
+                try (var is = new FileInputStream(xml)) {
+                    var content = is.readAllBytes();
+                    try (var os = new GZIPOutputStream(new FileOutputStream(xml))) {
+                        os.write(content);
+                    }
+                }
+            }
+
             xml.deleteOnExit();
             return xml;
         } catch (IOException ex) {
