@@ -138,8 +138,8 @@ public final class CreateUpdateSiteMojo extends AbstractNbmMojo {
         }
 
         if ("nbm-application".equals(project.getPackaging())) {
-            Collection<Artifact> artifacts = RepositoryUtils.toArtifacts(project.getArtifacts());
-            for (Artifact art : artifacts) {
+            Collection<Artifact> projectArtifacts = RepositoryUtils.toArtifacts(project.getArtifacts());
+            for (Artifact art : projectArtifacts) {
                 if (!matchesIncludes(art)) {
                     continue;
                 }
@@ -148,7 +148,7 @@ public final class CreateUpdateSiteMojo extends AbstractNbmMojo {
                     art = res.getConvertedArtifact();
                 }
 
-                if (super.artifacts.getArtifactType(art).getId().equals("nbm-file")) {
+                if (artifacts.getArtifactType(art).getId().equals("nbm-file")) {
                     Copy copyTask = (Copy) antProject.createTask("copy");
                     copyTask.setOverwrite(true);
                     copyTask.setFile(art.getFile());
@@ -156,7 +156,7 @@ public final class CreateUpdateSiteMojo extends AbstractNbmMojo {
                         copyTask.setFlatten(true);
                         copyTask.setTodir(nbmBuildDirFile);
                     } else {
-                        String path = super.artifacts.pathOf(art);
+                        String path = artifacts.pathOf(art);
                         File f = new File(nbmBuildDirFile, path.replace('/', File.separatorChar));
                         copyTask.setTofile(f);
                     }

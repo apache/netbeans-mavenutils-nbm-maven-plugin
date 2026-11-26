@@ -314,8 +314,8 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
 
         if (module != null) {
             // copy libraries to the designated place..
-            Collection<Artifact> artifacts = RepositoryUtils.toArtifacts(project.getRuntimeArtifacts());
-            for (Artifact artifact : artifacts) {
+            Collection<Artifact> runtimeArtifacts = RepositoryUtils.toArtifacts(MavenInfraUtils.getRuntimeArtifacts(project));
+            for (Artifact artifact : runtimeArtifacts) {
                 File source = artifact.getFile();
 
                 String path = NetBeansManifestUpdateMojo.artifactToClassPathEntry(artifact, codeNameBase);
