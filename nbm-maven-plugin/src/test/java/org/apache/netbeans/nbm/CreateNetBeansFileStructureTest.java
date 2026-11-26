@@ -38,7 +38,7 @@ class CreateNetBeansFileStructureTest {
         String localRepository = System.getProperty("localRepository");
         String path = "org/junit/jupiter/junit-jupiter/" + version + "/junit-jupiter-" + version + ".jar";
         File junitFile = new File(new File(localRepository), path);
-        Artifact a = new DefaultArtifact("org.junit.jupiter", "junit-jupiter", "jar", version).setFile(junitFile);
+        Artifact a = new DefaultArtifact("org.junit.jupiter", "junit-jupiter", "jar", version).setPath(junitFile.toPath());
         StringWriter w = new StringWriter();
         CreateNetBeansFileStructure.writeExternal(new Artifacts(new ArtifactHandlerManagerStub()), new PrintWriter(w), a);
         assertEquals(

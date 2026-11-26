@@ -416,9 +416,10 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         getLog().debug("module =" + module);
 
         DependencyNode treeroot = createDependencyTree(project, includeRuntimeModuleLibraries);
-        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-        List<Artifact> libArtifacts = getLibraryArtifacts(artifacts, treeroot, module, RepositoryUtils.toArtifacts(project.getRuntimeArtifacts()),
-                examinerCache, getLog(), useOSGiDependencies);
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<>();
+        List<Artifact> libArtifacts = getLibraryArtifacts(artifacts, treeroot, module, RepositoryUtils.toArtifacts(MigrationUtils.getRuntimeArtifacts(project)),
+                examinerCache, getLog(), useOSGiDependencies
+        );
         List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts(treeroot, module, moduleDependencies,
                 project, examinerCache, libArtifacts, getLog(), useOSGiDependencies);
         StringBuilder classPath = new StringBuilder();
@@ -535,8 +536,8 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
 
     //MNBMODULE-137
     static String artifactToClassPathEntry(Artifact a, String codenamebase) {
-        return "ext/" + codenamebase + "/" + a.getGroupId().replace('.', '-') + "/" + a.getArtifactId() +
-                ((a.getClassifier() != null && !a.getClassifier().trim().isEmpty()) ? "-" + a.getClassifier() : "") + "." + a.getExtension();
+        return "ext/" + codenamebase + "/" + a.getGroupId().replace('.', '-') + "/" + a.getArtifactId()
+                + ((a.getClassifier() != null && !a.getClassifier().trim().isEmpty()) ? "-" + a.getClassifier() : "") + "." + a.getExtension();
     }
 
     /**
@@ -609,10 +610,10 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         Set<String> own = projectModuleOwnClasses(project, libArtifacts);
         deps.removeAll(own);
         CollectModuleLibrariesNodeVisitor visitor = new CollectModuleLibrariesNodeVisitor(artifacts,
-                RepositoryUtils.toArtifacts(project.getRuntimeArtifacts()), examinerCache, getLog(), treeroot, useOSGiDependencies);
+                RepositoryUtils.toArtifacts(MigrationUtils.getRuntimeArtifacts(project)), examinerCache, getLog(), treeroot, useOSGiDependencies);
         treeroot.accept(visitor);
         Map<String, List<Artifact>> modules = visitor.getDeclaredArtifacts();
-        Map<Artifact, Set<String>> moduleAllClasses = new HashMap<Artifact, Set<String>>();
+        Map<Artifact, Set<String>> moduleAllClasses = new HashMap<>();
 
         for (ModuleWrapper wr : moduleArtifacts) {
             if (modules.containsKey(ArtifactIdUtils.toVersionlessId(wr.artifact))) {
@@ -650,14 +651,14 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
                         getLog().info("Private classes referenced in transitive module: " + Arrays.toString(
                                 classes[1].toArray()));
                         getLog().error(
-                                "Project depends on packages not accessible at runtime in transitive module " +
-                                ArtifactIdUtils.toId(wr.artifact) + " which will not be accessible at runtime.");
+                                "Project depends on packages not accessible at runtime in transitive module "
+                                + ArtifactIdUtils.toId(wr.artifact) + " which will not be accessible at runtime.");
                         deps.removeAll(classes[1]);
                     }
                 }
             }
             for (Map.Entry<Artifact, Set<String>> e : moduleAllClasses.entrySet()) {
-                List<String> strs = new ArrayList<String>(deps);
+                List<String> strs = new ArrayList<>(deps);
                 if (deps.removeAll(e.getValue())) {
                     strs.retainAll(e.getValue());
                     getLog().info("Private classes referenced in module: " + Arrays.toString(strs.toArray()));
@@ -691,21 +692,20 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
      */
     private Set<String> buildProjectDependencyClasses(MavenProject project, List<Artifact> libraries)
             throws IOException {
-        Set<String> dependencyClasses = new HashSet<String>();
+        Set<String> dependencyClasses = new HashSet<>();
 
         String outputDirectory = project.getBuild().getOutputDirectory();
         dependencyClasses.addAll(buildDependencyClasses(outputDirectory));
 
         for (Artifact lib : libraries) {
-            dependencyClasses.addAll(buildDependencyClasses(lib.getFile().getAbsolutePath()));
+            dependencyClasses.addAll(buildDependencyClasses(lib.getPath().toFile().getAbsolutePath()));
         }
         return dependencyClasses;
     }
 
     @SuppressWarnings("unchecked")
-    private Set<String> projectModuleOwnClasses(MavenProject project, List<Artifact> libraries)
-            throws IOException {
-        Set<String> projectClasses = new HashSet<String>();
+    private Set<String> projectModuleOwnClasses(MavenProject project, List<Artifact> libraries) throws IOException {
+        Set<String> projectClasses = new HashSet<>();
         DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
 
         String outputDirectory = project.getBuild().getOutputDirectory();
@@ -713,7 +713,7 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         projectClasses.addAll(analyzer.analyze(fl));
 
         for (Artifact lib : libraries) {
-            URL url = lib.getFile().toURI().toURL();
+            URL url = lib.getPath().toFile().toURI().toURL();
             projectClasses.addAll(analyzer.analyze(url));
         }
 
@@ -728,19 +728,18 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
      * @throws java.io.IOException
      */
     @SuppressWarnings("unchecked")
-    private Set<String> allProjectClasses(MavenProject project)
-            throws IOException {
-        Set<String> projectClasses = new HashSet<String>();
+    private Set<String> allProjectClasses(MavenProject project) throws IOException {
+        Set<String> projectClasses = new HashSet<>();
         DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
 
         String outputDirectory = project.getBuild().getOutputDirectory();
         URL fl = new File(outputDirectory).toURI().toURL();
         projectClasses.addAll(analyzer.analyze(fl));
 
-        Collection<Artifact> libs = RepositoryUtils.toArtifacts(project.getRuntimeArtifacts());
+        Collection<Artifact> libs = RepositoryUtils.toArtifacts(MigrationUtils.getRuntimeArtifacts(project));
 
         for (Artifact lib : libs) {
-            URL url = lib.getFile().toURI().toURL();
+            URL url = lib.getPath().toFile().toURI().toURL();
             projectClasses.addAll(analyzer.analyze(url));
         }
 
@@ -751,8 +750,8 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
             ExamineManifest manifest, Dependency dep, String projectCodeNameBase,
             boolean transitive)
             throws IOException, MojoFailureException {
-        Set<String> moduleClasses = new HashSet<String>();
-        Set<String> visibleModuleClasses = new HashSet<String>();
+        Set<String> moduleClasses = new HashSet<>();
+        Set<String> visibleModuleClasses = new HashSet<>();
         DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
         String type = dep.getType();
         if (dep.getExplicitValue() != null) {
@@ -765,7 +764,7 @@ public final class NetBeansManifestUpdateMojo extends AbstractNbmMojo {
         }
 
         for (Artifact lib : moduleLibraries) {
-            URL url = lib.getFile().toURI().toURL();
+            URL url = lib.getPath().toFile().toURI().toURL();
             moduleClasses.addAll(analyzer.analyze(url));
         }
 

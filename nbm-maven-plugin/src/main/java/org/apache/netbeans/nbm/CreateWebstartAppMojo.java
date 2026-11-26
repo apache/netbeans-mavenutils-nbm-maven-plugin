@@ -65,11 +65,11 @@ import javax.inject.Inject;
 
 /**
  * Create webstartable binaries for a 'nbm-application'.
+ *
  * @author Johan Andrén
  * @author Milos Kleint
  * @since 3.0
  */
-
 @Mojo(name = "webstart-app", defaultPhase = LifecyclePhase.PACKAGE)
 public final class CreateWebstartAppMojo extends AbstractNbmMojo {
 
@@ -414,11 +414,11 @@ public final class CreateWebstartAppMojo extends AbstractNbmMojo {
             ZipArchiver archiver = new ZipArchiver();
             if (codebase != null) {
                 getLog().warn("Defining <codebase>/${nbm.webstart.codebase} is generally unnecessary");
-                archiver.addDirectory(webstartBuildDir);
+                archiver.addFileSet(MigrationUtils.getFileSet(webstartBuildDir, archiver, null, null));
             } else {
-                archiver.addDirectory(webstartBuildDir, null, new String[]{
+                archiver.addFileSet(MigrationUtils.getFileSet(webstartBuildDir, archiver, null, new String[]{
                     "**/*.jnlp"
-                });
+                }));
                 for (final File jnlp : webstartBuildDir.listFiles()) {
                     if (!jnlp.getName().endsWith(".jnlp")) {
                         continue;

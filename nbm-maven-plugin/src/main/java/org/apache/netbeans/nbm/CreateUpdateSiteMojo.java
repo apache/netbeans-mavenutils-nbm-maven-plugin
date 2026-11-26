@@ -151,7 +151,7 @@ public final class CreateUpdateSiteMojo extends AbstractNbmMojo {
                 if (super.artifacts.getArtifactType(art).getId().equals("nbm-file")) {
                     Copy copyTask = (Copy) antProject.createTask("copy");
                     copyTask.setOverwrite(true);
-                    copyTask.setFile(art.getFile());
+                    copyTask.setFile(art.getPath().toFile());
                     if (!isRepository) {
                         copyTask.setFlatten(true);
                         copyTask.setTodir(nbmBuildDirFile);

@@ -314,9 +314,9 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
 
         if (module != null) {
             // copy libraries to the designated place..
-            Collection<Artifact> artifacts = RepositoryUtils.toArtifacts(project.getRuntimeArtifacts());
-            for (Artifact artifact : artifacts) {
-                File source = artifact.getFile();
+            Collection<Artifact> runtimeArtifacts = RepositoryUtils.toArtifacts(MigrationUtils.getRuntimeArtifacts(project));
+            for (Artifact artifact : runtimeArtifacts) {
+                File source = (artifact.getPath() != null) ? artifact.getPath().toFile() : null;
 
                 String path = NetBeansManifestUpdateMojo.artifactToClassPathEntry(artifact, codeNameBase);
 
@@ -549,7 +549,7 @@ public abstract class CreateNetBeansFileStructure extends AbstractNbmMojo {
 
     static void writeExternal(Artifacts artifacts, PrintWriter w, Artifact artifact) throws IOException {
         w.write("CRC:");
-        File file = artifact.getFile();
+        File file = artifact.getPath().toFile();
         w.write(Long.toString(CreateClusterAppMojo.crcForFile(file).getValue()));
         w.write("\nSIZE:");
         w.write(Long.toString(file.length()));
