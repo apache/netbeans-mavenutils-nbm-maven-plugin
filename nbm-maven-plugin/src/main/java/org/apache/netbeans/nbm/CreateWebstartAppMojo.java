@@ -30,6 +30,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
@@ -65,11 +66,11 @@ import javax.inject.Inject;
 
 /**
  * Create webstartable binaries for a 'nbm-application'.
+ *
  * @author Johan Andrén
  * @author Milos Kleint
  * @since 3.0
  */
-
 @Mojo(name = "webstart-app", defaultPhase = LifecyclePhase.PACKAGE)
 public final class CreateWebstartAppMojo extends AbstractNbmMojo {
 
@@ -414,11 +415,9 @@ public final class CreateWebstartAppMojo extends AbstractNbmMojo {
             ZipArchiver archiver = new ZipArchiver();
             if (codebase != null) {
                 getLog().warn("Defining <codebase>/${nbm.webstart.codebase} is generally unnecessary");
-                archiver.addDirectory(webstartBuildDir);
+                archiver.addFileSet(MavenInfraUtils.getFileSet(webstartBuildDir, archiver, null, null));
             } else {
-                archiver.addDirectory(webstartBuildDir, null, new String[]{
-                    "**/*.jnlp"
-                });
+                archiver.addFileSet(MavenInfraUtils.getFileSet(webstartBuildDir, archiver, null, new String[]{"**/*.jnlp"}));
                 for (final File jnlp : webstartBuildDir.listFiles()) {
                     if (!jnlp.getName().endsWith(".jnlp")) {
                         continue;
@@ -482,17 +481,18 @@ public final class CreateWebstartAppMojo extends AbstractNbmMojo {
                 archiver.addResource(new PlexusIoResource() {
                     public @Override
                     InputStream getContents() throws IOException {
-                        return new ByteArrayInputStream((""
-                                + "<web-app>\n"
-                                + "    <servlet>\n"
-                                + "        <servlet-name>JnlpDownloadServlet</servlet-name>\n"
-                                + "        <servlet-class>jnlp.sample.servlet.JnlpDownloadServlet</servlet-class>\n"
-                                + "    </servlet>\n"
-                                + "    <servlet-mapping>\n"
-                                + "        <servlet-name>JnlpDownloadServlet</servlet-name>\n"
-                                + "        <url-pattern>*.jnlp</url-pattern>\n"
-                                + "    </servlet-mapping>\n"
-                                + "</web-app>\n").getBytes());
+                        return new ByteArrayInputStream(("""
+                                                         <web-app>
+                                                             <servlet>
+                                                                 <servlet-name>JnlpDownloadServlet</servlet-name>
+                                                                 <servlet-class>jnlp.sample.servlet.JnlpDownloadServlet</servlet-class>
+                                                             </servlet>
+                                                             <servlet-mapping>
+                                                                 <servlet-name>JnlpDownloadServlet</servlet-name>
+                                                                 <url-pattern>*.jnlp</url-pattern>
+                                                             </servlet-mapping>
+                                                         </web-app>
+                                                         """).getBytes(StandardCharsets.UTF_8));
                     }
 
                     public @Override
@@ -567,20 +567,9 @@ public final class CreateWebstartAppMojo extends AbstractNbmMojo {
         }
     }
 
-    private void filterCopy(File sourceFile, String resourcePath, File destinationFile, Properties filterProperties)
-            throws IOException {
+    private void filterCopy(File sourceFile, String resourcePath, File destinationFile, Properties filterProperties) throws IOException {
         // buffer so it isn't reading a byte at a time!
-
-        InputStream instream;
-        if (sourceFile != null) {
-            instream = new FileInputStream(sourceFile);
-        } else {
-            instream = getClass().getClassLoader().getResourceAsStream(resourcePath);
-        }
-
-        FileOutputStream outstream = new FileOutputStream(destinationFile);
-
-        try (Reader source = new BufferedReader(new InputStreamReader(instream, "UTF-8")); Writer destination = new OutputStreamWriter(outstream, "UTF-8");) {
+        try (InputStream instream = sourceFile != null ? new FileInputStream(sourceFile) : getClass().getClassLoader().getResourceAsStream(resourcePath); FileOutputStream outstream = new FileOutputStream(destinationFile); Reader source = new BufferedReader(new InputStreamReader(instream, StandardCharsets.UTF_8)); Writer destination = new OutputStreamWriter(outstream, StandardCharsets.UTF_8);) {
             // support ${token}
             Reader reader = new InterpolationFilterReader(source, filterProperties, "${", "}");
 
@@ -598,8 +587,7 @@ public final class CreateWebstartAppMojo extends AbstractNbmMojo {
      * @return
      * @throws java.io.IOException
      */
-    private String generateExtensions(FileSet files, Project antProject, String masterPrefix)
-            throws IOException {
+    private String generateExtensions(FileSet files, Project antProject, String masterPrefix) throws IOException {
         StringBuilder buff = new StringBuilder();
         for (String nm : files.getDirectoryScanner(antProject).getIncludedFiles()) {
             File jar = new File(files.getDir(antProject), nm);
@@ -608,33 +596,36 @@ public final class CreateWebstartAppMojo extends AbstractNbmMojo {
                 throw new IOException("Cannot read file: " + jar);
             }
 
-            JarFile theJar = new JarFile(jar);
-            Attributes attr = theJar.getManifest().getMainAttributes();
-            String codenamebase = attr.getValue("OpenIDE-Module");
-            if (codenamebase == null) {
-                codenamebase = attr.getValue("Bundle-SymbolicName");
-            }
-            if (codenamebase == null) {
-                throw new IOException("Not a NetBeans Module: " + jar);
-            }
+            try (JarFile theJar = new JarFile(jar)) {
+                Attributes attr = theJar.getManifest().getMainAttributes();
+                String codenamebase = attr.getValue("OpenIDE-Module");
+                if (codenamebase == null) {
+                    codenamebase = attr.getValue("Bundle-SymbolicName");
+                }
+                if (codenamebase == null) {
+                    throw new IOException("Not a NetBeans Module: " + jar);
+                }
 
-            // see http://hg.netbeans.org/main-silver/rev/87823abb86d9
-            if (codenamebase.equals("org.objectweb.asm.all")
-                    && jar.getParentFile().getName().equals("core")
-                    && jar.getParentFile().getParentFile().getName().startsWith("platform")) {
-                continue;
+                // see http://hg.netbeans.org/main-silver/rev/87823abb86d9
+                if (codenamebase.equals("org.objectweb.asm.all")
+                        && jar.getParentFile().getName().equals("core")
+                        && jar.getParentFile().getParentFile().getName().startsWith("platform")) {
+                    continue;
+                }
+
+                int slash = codenamebase.indexOf('/');
+                if (slash >= 0) {
+                    codenamebase = codenamebase.substring(0, slash);
+                }
+
+                String dashcnb = codenamebase.replace('.', '-');
+
+                buff.append("    <extension name='").
+                        append(codenamebase).append("' href='").
+                        append(masterPrefix).
+                        append(dashcnb).
+                        append(".jnlp' />\n");
             }
-
-            int slash = codenamebase.indexOf('/');
-            if (slash >= 0) {
-                codenamebase = codenamebase.substring(0, slash);
-            }
-
-            String dashcnb = codenamebase.replace('.', '-');
-
-            buff.append("    <extension name='").append(codenamebase).append("' href='").append(masterPrefix).
-                    append(dashcnb).append(".jnlp' />\n");
-            theJar.close();
         }
         return buff.toString();
 

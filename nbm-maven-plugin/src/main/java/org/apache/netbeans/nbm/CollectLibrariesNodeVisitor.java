@@ -52,10 +52,6 @@ public class CollectLibrariesNodeVisitor extends DependencyVisitorSupport {
 
     private final DependencyNode root;
 
-    private final Set<String> duplicates;
-
-    private final Set<String> conflicts;
-
     private final Set<String> includes;
 
     private final boolean useOsgiDependencies;
@@ -87,8 +83,6 @@ public class CollectLibrariesNodeVisitor extends DependencyVisitorSupport {
         this.explicitLibs = explicitLibraries;
         this.root = root;
         this.useOsgiDependencies = useOsgiDependencies;
-        this.duplicates = new HashSet<>();
-        this.conflicts = new HashSet<>();
         this.includes = new HashSet<>();
     }
 
@@ -144,12 +138,11 @@ public class CollectLibrariesNodeVisitor extends DependencyVisitorSupport {
         if (throwable != null) {
             return false;
         }
-        if (node == root) {
-            if (!nodes.isEmpty()) {
-                log.info("Adding on module's Class-Path:");
-                for (Artifact inc : nodes) {
-                    log.info("    " + ArtifactIdUtils.toId(inc));
-                }
+        if (node == root && !nodes.isEmpty()) {
+            log.info("Adding on module's Class-Path:");
+            for (Artifact inc : nodes) {
+                log.info("    " + ArtifactIdUtils.toId(inc));
+
             }
         }
         return true;

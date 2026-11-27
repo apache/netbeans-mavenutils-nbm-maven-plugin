@@ -18,13 +18,14 @@ package org.apache.netbeans.nbm;
  * specific language governing permissions and limitations
  * under the License.
  */
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.netbeans.nbm.utils.ExamineManifest;
@@ -53,7 +54,7 @@ public class CollectModuleLibrariesNodeVisitor extends DependencyVisitorSupport 
 
     private final DependencyNode root;
 
-    private final Stack<String> currentModule = new Stack<String>();
+    private final Deque<String> currentModule = new ArrayDeque<>();
 
     private static final String LIB_ID = "!@#$%^&ROOT";
 
@@ -114,25 +115,25 @@ public class CollectModuleLibrariesNodeVisitor extends DependencyVisitorSupport 
                 examinerCache.put(artifact, depExaminator);
             }
             if (depExaminator.isNetBeansModule() || (useOSGiDependencies && depExaminator.isOsgiBundle())) {
-                currentModule.push(ArtifactIdUtils.toVersionlessId(artifact));
-                ArrayList<Artifact> arts = new ArrayList<Artifact>();
+                currentModule.addFirst(ArtifactIdUtils.toVersionlessId(artifact));
+                List<Artifact> arts = new ArrayList<>();
                 arts.add(artifact);
                 if (currentModule.size() == 1) {
-                    directNodes.put(currentModule.peek(), arts);
+                    directNodes.put(currentModule.peekFirst(), arts);
                 } else {
-                    transitiveNodes.put(currentModule.peek(), arts);
+                    transitiveNodes.put(currentModule.peekFirst(), arts);
                 }
                 return true;
             }
             if (!currentModule.isEmpty()) {
                 ////MNBMODULE-95 we are only interested in the module owned libraries
-                if (!currentModule.peek().startsWith(LIB_ID)
+                if (!currentModule.peekFirst().startsWith(LIB_ID)
                         && matchesLibrary(artifact, node.getDependency().getScope(), Collections.emptyList(), depExaminator,
                                         useOSGiDependencies)) {
                     if (currentModule.size() == 1) {
-                        directNodes.get(currentModule.peek()).add(artifact);
+                        directNodes.get(currentModule.peekFirst()).add(artifact);
                     } else {
-                        transitiveNodes.get(currentModule.peek()).add(artifact);
+                        transitiveNodes.get(currentModule.peekFirst()).add(artifact);
                     }
                     // if a library, iterate to it's child nodes.
                     return true;
@@ -142,7 +143,7 @@ public class CollectModuleLibrariesNodeVisitor extends DependencyVisitorSupport 
                 // depend on modules/bundles. these bundles are transitive, so
                 // we add the root module as the first currentModule to keep
                 //any bundle/module underneath it as transitive
-                currentModule.push(LIB_ID + ArtifactIdUtils.toVersionlessId(artifact));
+                currentModule.addFirst(LIB_ID + ArtifactIdUtils.toVersionlessId(artifact));
             }
         } catch (MojoExecutionException mojoExecutionException) {
             throwable = mojoExecutionException;
@@ -158,10 +159,10 @@ public class CollectModuleLibrariesNodeVisitor extends DependencyVisitorSupport 
         if (throwable != null) {
             return false;
         }
-        if (!currentModule.empty()
-                && (currentModule.peek().equals(ArtifactIdUtils.toVersionlessId(node.getArtifact()))
-                || currentModule.peek().equals(LIB_ID + ArtifactIdUtils.toVersionlessId(node.getArtifact())))) {
-            currentModule.pop();
+        if (!currentModule.isEmpty()
+                && (currentModule.peekFirst().equals(ArtifactIdUtils.toVersionlessId(node.getArtifact()))
+                || currentModule.peekFirst().equals(LIB_ID + ArtifactIdUtils.toVersionlessId(node.getArtifact())))) {
+            currentModule.removeFirst();
         }
         return true;
     }

@@ -216,8 +216,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
 
                 if (super.artifacts.getArtifactType(art).getId().equals("nbm-file")) {
                     try {
-                        JarFile jf = new JarFile(art.getFile());
-                        try {
+                        try (JarFile jf = new JarFile(art.getFile())) {
                             String clusterName = findCluster(jf);
                             ClusterTuple cluster = processCluster(clusterName, nbmBuildDirFile, art);
 
@@ -259,12 +258,9 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
                                             fl.mkdirs();
                                         } else if (path.endsWith(".external")) // MNBMODULE-138
                                         {
-                                            InputStream is = jf.getInputStream(ent);
-                                            try {
+                                            try (InputStream is = jf.getInputStream(ent)) {
                                                 externalDownload(new File(fl.getParentFile(),
                                                         fl.getName().replaceFirst("[.]external$", "")), is);
-                                            } finally {
-                                                is.close();
                                             }
                                             //MNBMODULE-192
                                             set.appendIncludes(new String[]{
@@ -402,8 +398,6 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
                                 }
                             }
 
-                        } finally {
-                            jf.close();
                         }
                     } catch (IOException ex) {
                         getLog().error(art.getFile().getAbsolutePath(), ex);
@@ -810,9 +804,9 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
     }
 
     private File getHarnessNbm() throws MojoExecutionException {
-        Collection<Artifact> artifacts = RepositoryUtils.toArtifacts(project.getArtifacts());
+        Collection<Artifact> projectArtifacts = RepositoryUtils.toArtifacts(project.getArtifacts());
         String version = null;
-        for (Artifact a : artifacts) {
+        for (Artifact a : projectArtifacts) {
             if ((groupIdPrefix + ".modules").equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
                 //base version in non-snapshot should equals version, in snapshots to X-SNAPSHOT, not timestamp
                 version = a.getBaseVersion();
@@ -824,7 +818,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
                     "We could not find org-netbeans-bootstrap among the modules in the application. "
                     + "Launchers could not be found.");
         }
-        ArtifactType nmbFileType = super.artifacts.getArtifactType(NbmFileArtifactHandler.NAME);
+        ArtifactType nmbFileType = artifacts.getArtifactType(NbmFileArtifactHandler.NAME);
         Artifact nbmArt = new DefaultArtifact(
                 groupIdPrefix + ".modules",
                 "org-netbeans-modules-apisupport-harness",
@@ -892,7 +886,7 @@ public final class CreateClusterAppMojo extends AbstractNbmMojo {
     static void assignClustersToBundles(MavenProject mavenProject, List<BundleTuple> bundles, Set<String> wrappedBundleCNBs,
                                         Map<String, Set<String>> clusterDependencies,
                                         Map<String, Set<String>> cluster2depClusters, Log log) {
-        Collection<Artifact> directDeps = mavenProject != null ? RepositoryUtils.toArtifacts(mavenProject.getDependencyArtifacts()) : bundles.stream().map(b -> b.artifact).filter(Objects::nonNull).collect(Collectors.toSet());
+        Collection<Artifact> directDeps = mavenProject != null ? RepositoryUtils.toArtifacts(MavenInfraUtils.getDependencyArtifacts(mavenProject)) : bundles.stream().map(b -> b.artifact).filter(Objects::nonNull).collect(Collectors.toSet());
         Predicate<Artifact> isTransitive = a -> !directDeps.contains(a);
         List<BundleTuple> toProcess = new ArrayList<>();
         List<BundleTuple> known = new ArrayList<>();
